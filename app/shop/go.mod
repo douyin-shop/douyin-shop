@@ -1,4 +1,4 @@
-module github.com/douyin-shop/douyin-shop
+module github.com/douyin-shop/douyin-shop/app/shop
 
 go 1.22.9
 
