@@ -5,6 +5,7 @@ on:
     branches: ['main']
     paths:
       - 'app/auth/**'
+      - 'idl/auth.proto'
       - '.github/workflows/deploy-auth.yml'
 
 jobs:
