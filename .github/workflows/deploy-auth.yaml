@@ -13,15 +13,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: '1.18'
+          go-version: '1.22.0'
 
       - name: Add SSH key
-        uses: webfactory/ssh-agent@v0.5.3
+        uses: webfactory/ssh-agent@v0.8.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
@@ -34,4 +34,4 @@ jobs:
         run: |
           scp -o StrictHostKeyChecking=no app/auth/output/bin/auth ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/auth/
           scp -o StrictHostKeyChecking=no -r app/auth/output/conf/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/auth/conf/
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd /root/services/auth && ./bootstrap.sh restart"
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd /root/services/auth && chmod +x bootstrap.sh && ./bootstrap.sh restart"
