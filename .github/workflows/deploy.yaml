@@ -7,6 +7,13 @@ on:
         description: 'Name  of the service to deploy'
         required: true
         type: string
+    secrets:
+      SERVER_HOST:
+        required: true
+      SERVER_USER:
+        required: true
+      SSH_PRIVATE_KEY:
+        required: true
 
 jobs:
   build-and-deploy:
