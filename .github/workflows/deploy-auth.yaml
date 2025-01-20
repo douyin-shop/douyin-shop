@@ -6,7 +6,7 @@ on:
     paths:
       - 'app/auth/**'
       - 'idl/auth.proto'
-      - '.github/workflows/deploy-auth.yml'
+      - '.github/workflows/deploy-auth.yaml'
 
 jobs:
   build-and-deploy:
