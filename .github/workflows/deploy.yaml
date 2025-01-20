@@ -43,20 +43,9 @@ jobs:
           # 添加主机到 known_hosts
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
-          # 创建目录
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
-            if [ ! -d "/root/services/${{ inputs.service_name }}" ]; then
-              mkdir -p /root/services/${{ inputs.service_name }}/conf
-            fi
-          '
-
-          # 上传文件
-          scp -o StrictHostKeyChecking=no app/${{ inputs.service_name }}/output/bin/${{ inputs.service_name }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/${{ inputs.service_name }}/
-          scp -o StrictHostKeyChecking=no -r app/${{ inputs.service_name }}/output/conf/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/${{ inputs.service_name }}/conf/
-          scp -o StrictHostKeyChecking=no app/${{ inputs.service_name }}/output/bootstrap.sh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/${{ inputs.service_name }}/
-
-
-          # 重启服务
+          # 创建目录并复制文件
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "mkdir -p /root/services/${{ inputs.service_name }}"
+          scp -o StrictHostKeyChecking=no -r app/${{ inputs.service_name }}/output/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/${{ inputs.service_name }}/
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd /root/services/${{ inputs.service_name }} && chmod +x bootstrap.sh && ./bootstrap.sh restart"
 
 # name: Deploy Go Service
