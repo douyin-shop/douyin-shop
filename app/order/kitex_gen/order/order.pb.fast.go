@@ -5,7 +5,7 @@ package order
 import (
 	fmt "fmt"
 	fastpb "github.com/cloudwego/fastpb"
-	cart "github.com/douyin-shop/douyin-shop/kitex_gen/cart"
+	cart "github.com/douyin-shop/douyin-shop/app/order/kitex_gen/cart"
 )
 
 var (

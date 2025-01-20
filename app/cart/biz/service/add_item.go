@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	cart "github.com/douyin-shop/douyin-shop/kitex_gen/cart"
+	cart "github.com/douyin-shop/douyin-shop/app/cart/kitex_gen/cart"
 )
 
 type AddItemService struct {

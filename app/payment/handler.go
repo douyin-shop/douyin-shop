@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	payment "github.com/douyin-shop/douyin-shop/kitex_gen/payment"
-	"github.com/douyin-shop/douyin-shop/biz/service"
+	payment "github.com/douyin-shop/douyin-shop/app/payment/kitex_gen/payment"
+	"github.com/douyin-shop/douyin-shop/app/payment/biz/service"
 )
 
 // PaymentServiceImpl implements the last service interface defined in the IDL.

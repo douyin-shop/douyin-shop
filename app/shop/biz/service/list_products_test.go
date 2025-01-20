@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"testing"
-	product "github.com/douyin-shop/douyin-shop/kitex_gen/product"
+	product "github.com/douyin-shop/douyin-shop/app/shop/kitex_gen/product"
 )
 
 func TestListProducts_Run(t *testing.T) {

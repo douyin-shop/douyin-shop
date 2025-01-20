@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	order "github.com/douyin-shop/douyin-shop/kitex_gen/order"
-	"github.com/douyin-shop/douyin-shop/biz/service"
+	order "github.com/douyin-shop/douyin-shop/app/order/kitex_gen/order"
+	"github.com/douyin-shop/douyin-shop/app/order/biz/service"
 )
 
 // OrderServiceImpl implements the last service interface defined in the IDL.

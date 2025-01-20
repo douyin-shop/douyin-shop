@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	product "github.com/douyin-shop/douyin-shop/kitex_gen/product"
-	"github.com/douyin-shop/douyin-shop/biz/service"
+	product "github.com/douyin-shop/douyin-shop/app/shop/kitex_gen/product"
+	"github.com/douyin-shop/douyin-shop/app/shop/biz/service"
 )
 
 // ProductCatalogServiceImpl implements the last service interface defined in the IDL.

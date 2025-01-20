@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	user "github.com/douyin-shop/douyin-shop/kitex_gen/user"
+	user "github.com/douyin-shop/douyin-shop/app/user/kitex_gen/user"
 )
 
 type RegisterService struct {

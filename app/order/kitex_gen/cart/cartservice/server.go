@@ -3,7 +3,7 @@ package cartservice
 
 import (
 	server "github.com/cloudwego/kitex/server"
-	cart "github.com/douyin-shop/douyin-shop/kitex_gen/cart"
+	cart "github.com/douyin-shop/douyin-shop/app/order/kitex_gen/cart"
 )
 
 // NewServer creates a server.Server with the given handler and options.

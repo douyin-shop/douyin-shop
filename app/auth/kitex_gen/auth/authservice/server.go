@@ -3,7 +3,7 @@ package authservice
 
 import (
 	server "github.com/cloudwego/kitex/server"
-	auth "github.com/douyin-shop/douyin-shop/kitex_gen/auth"
+	auth "github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth"
 )
 
 // NewServer creates a server.Server with the given handler and options.

@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	product "github.com/douyin-shop/douyin-shop/kitex_gen/product"
+	product "github.com/douyin-shop/douyin-shop/app/shop/kitex_gen/product"
 )
 
 type SearchProductsService struct {

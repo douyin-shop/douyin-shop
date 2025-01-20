@@ -3,7 +3,7 @@ package checkoutservice
 
 import (
 	server "github.com/cloudwego/kitex/server"
-	checkout "github.com/douyin-shop/douyin-shop/kitex_gen/checkout"
+	checkout "github.com/douyin-shop/douyin-shop/app/checkout/kitex_gen/checkout"
 )
 
 // NewServer creates a server.Server with the given handler and options.

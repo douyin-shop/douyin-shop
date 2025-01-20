@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"testing"
-	order "github.com/douyin-shop/douyin-shop/kitex_gen/order"
+	order "github.com/douyin-shop/douyin-shop/app/order/kitex_gen/order"
 )
 
 func TestListOrder_Run(t *testing.T) {

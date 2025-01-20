@@ -8,8 +8,8 @@ import (
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
-	"github.com/douyin-shop/douyin-shop/conf"
-	"github.com/douyin-shop/douyin-shop/kitex_gen/product/productcatalogservice"
+	"github.com/douyin-shop/douyin-shop/app/shop/conf"
+	"github.com/douyin-shop/douyin-shop/app/shop/kitex_gen/product/productcatalogservice"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 )

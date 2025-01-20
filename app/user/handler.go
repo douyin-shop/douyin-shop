@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	user "github.com/douyin-shop/douyin-shop/kitex_gen/user"
-	"github.com/douyin-shop/douyin-shop/biz/service"
+	user "github.com/douyin-shop/douyin-shop/app/user/kitex_gen/user"
+	"github.com/douyin-shop/douyin-shop/app/user/biz/service"
 )
 
 // UserServiceImpl implements the last service interface defined in the IDL.

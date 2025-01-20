@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	checkout "github.com/douyin-shop/douyin-shop/kitex_gen/checkout"
-	"github.com/douyin-shop/douyin-shop/biz/service"
+	checkout "github.com/douyin-shop/douyin-shop/app/checkout/kitex_gen/checkout"
+	"github.com/douyin-shop/douyin-shop/app/checkout/biz/service"
 )
 
 // CheckoutServiceImpl implements the last service interface defined in the IDL.

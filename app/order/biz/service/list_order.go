@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	order "github.com/douyin-shop/douyin-shop/kitex_gen/order"
+	order "github.com/douyin-shop/douyin-shop/app/order/kitex_gen/order"
 )
 
 type ListOrderService struct {

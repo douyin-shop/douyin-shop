@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"testing"
-	auth "github.com/douyin-shop/douyin-shop/kitex_gen/auth"
+	auth "github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth"
 )
 
 func TestVerifyTokenByRPC_Run(t *testing.T) {

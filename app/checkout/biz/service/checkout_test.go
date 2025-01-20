@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"testing"
-	checkout "github.com/douyin-shop/douyin-shop/kitex_gen/checkout"
+	checkout "github.com/douyin-shop/douyin-shop/app/checkout/kitex_gen/checkout"
 )
 
 func TestCheckout_Run(t *testing.T) {

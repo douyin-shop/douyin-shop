@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"testing"
-	cart "github.com/douyin-shop/douyin-shop/kitex_gen/cart"
+	cart "github.com/douyin-shop/douyin-shop/app/cart/kitex_gen/cart"
 )
 
 func TestAddItem_Run(t *testing.T) {

@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	checkout "github.com/douyin-shop/douyin-shop/kitex_gen/checkout"
+	checkout "github.com/douyin-shop/douyin-shop/app/checkout/kitex_gen/checkout"
 )
 
 type CheckoutService struct {
