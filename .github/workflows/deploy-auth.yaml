@@ -28,6 +28,7 @@ jobs:
       - name: Build Auth Service
         run: |
           cd app/auth
+          go mod tidy
           bash build.sh
 
       - name: Deploy Auth Service
