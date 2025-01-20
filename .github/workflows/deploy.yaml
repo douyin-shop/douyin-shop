@@ -29,10 +29,10 @@ jobs:
 
       - name: Deploy Submodule A
         run: |
-          scp -o StrictHostKeyChecking=no main-a ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/path/to/appA
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "nohup /path/to/appA/main-a > /path/to/appA/appA.log 2>&1 &"
+          scp -o StrictHostKeyChecking=no main-a ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/appA
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "nohup /root/appA/main-a > /root/appA/appA.log 2>&1 &"
 
       - name: Deploy Submodule B
         run: |
-          scp -o StrictHostKeyChecking=no main-b ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/path/to/appB
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "nohup /path/to/appB/main-b > /path/to/appB/appB.log 2>&1 &"
+          scp -o StrictHostKeyChecking=no main-b ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/appB
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "nohup /root/appB/main-b > /root/appB/appB.log 2>&1 &"
