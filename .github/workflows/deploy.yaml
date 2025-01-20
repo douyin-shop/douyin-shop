@@ -53,6 +53,8 @@ jobs:
           # 上传文件
           scp -o StrictHostKeyChecking=no app/${{ inputs.service_name }}/output/bin/${{ inputs.service_name }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/${{ inputs.service_name }}/
           scp -o StrictHostKeyChecking=no -r app/${{ inputs.service_name }}/output/conf/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/${{ inputs.service_name }}/conf/
+          scp -o StrictHostKeyChecking=no app/${{ inputs.service_name }}/output/bootstrap.sh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/${{ inputs.service_name }}/
+
 
           # 重启服务
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd /root/services/${{ inputs.service_name }} && chmod +x bootstrap.sh && ./bootstrap.sh restart"
