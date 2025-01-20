@@ -9,30 +9,52 @@ on:
       - '.github/workflows/deploy-auth.yaml'
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  deploy:
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      service_name: auth
+    secrets: inherit
+# name: Deploy Auth Service
 
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.22.0'
+# on:
+#   push:
+#     branches: ['main']
+#     paths:
+#       - 'app/auth/**'
+#       - 'idl/auth.proto'
+#       - '.github/workflows/deploy-auth.yaml'
 
-      - name: Add SSH key
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+# jobs:
+#   build-and-deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v3
 
-      - name: Build Auth Service
-        run: |
-          cd app/auth
-          go mod tidy
-          bash build.sh
+#       - name: Set up Go
+#         uses: actions/setup-go@v4
+#         with:
+#           go-version: '1.22.0'
 
-      - name: Deploy Auth Service
-        run: |
-          scp -o StrictHostKeyChecking=no app/auth/output/bin/auth ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/auth/
-          scp -o StrictHostKeyChecking=no -r app/auth/output/conf/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/auth/conf/
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd /root/services/auth && chmod +x bootstrap.sh && ./bootstrap.sh restart"
+#       - name: Add SSH key
+#         uses: webfactory/ssh-agent@v0.5.3
+#         with:
+#           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+#       - name: Build Auth Service
+#         run: |
+#           cd app/auth
+#           go mod tidy
+#           bash build.sh
+
+#       - name: Deploy Auth Service
+#         run: |
+#           # 首先确保远程目录存在
+#           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
+#             if [ ! -d "/root/services/auth" ]; then
+#               mkdir -p /root/services/auth/conf
+#             fi
+#           '
+#           scp -o StrictHostKeyChecking=no app/auth/output/bin/auth ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/auth/
+#           scp -o StrictHostKeyChecking=no -r app/auth/output/conf/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/auth/conf/
+#           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd /root/services/auth && chmod +x bootstrap.sh && ./bootstrap.sh restart"

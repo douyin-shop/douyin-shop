@@ -42,3 +42,46 @@
 #         run: |
 #           scp -o StrictHostKeyChecking=no main-b ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/appB
 #           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "nohup /root/appB/main-b > /root/appB/appB.log 2>&1 &"
+
+name: Deploy ${{ inputs.service_name }} Service
+
+on:
+  workflow_call:
+    inputs:
+      service_name:
+        required: true
+        type: string
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22.0'
+
+      - name: Add SSH key
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Build Service
+        run: |
+          cd app/${{ inputs.service_name }}
+          go mod tidy
+          bash build.sh
+
+      - name: Deploy Service
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
+            if [ ! -d "/root/services/${{ inputs.service_name }}" ]; then
+              mkdir -p /root/services/${{ inputs.service_name }}/conf
+            fi
+          '
+          scp -o StrictHostKeyChecking=no app/${{ inputs.service_name }}/output/bin/${{ inputs.service_name }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/${{ inputs.service_name }}/
+          scp -o StrictHostKeyChecking=no -r app/${{ inputs.service_name }}/output/conf/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/${{ inputs.service_name }}/conf/
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd /root/services/${{ inputs.service_name }} && chmod +x bootstrap.sh && ./bootstrap.sh restart"
