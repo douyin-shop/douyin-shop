@@ -1,44 +1,44 @@
-name: Deploy Go Service
+# name: Deploy Go Service
 
-on:
-  push:
-    branches: ['main']
+# on:
+#   push:
+#     branches: ['main']
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+# jobs:
+#   build-and-deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v2
 
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: '1.18'
+#       - name: Set up Go
+#         uses: actions/setup-go@v3
+#         with:
+#           go-version: '1.18'
 
-      - name: Add SSH key
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+#       - name: Add SSH key
+#         uses: webfactory/ssh-agent@v0.5.3
+#         with:
+#           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Build Submodule A
-        run: |
-          cd submoduleA
-          go mod tidy
-          go build -o ../main-a .
+#       - name: Build Submodule A
+#         run: |
+#           cd submoduleA
+#           go mod tidy
+#           go build -o ../main-a .
 
-      - name: Build Submodule B
-        run: |
-          cd submoduleB
-          go mod tidy
-          go build -o ../main-b .
+#       - name: Build Submodule B
+#         run: |
+#           cd submoduleB
+#           go mod tidy
+#           go build -o ../main-b .
 
-      - name: Deploy Submodule A
-        run: |
-          scp -o StrictHostKeyChecking=no main-a ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/appA
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "nohup /root/appA/main-a > /root/appA/appA.log 2>&1 &"
+#       - name: Deploy Submodule A
+#         run: |
+#           scp -o StrictHostKeyChecking=no main-a ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/appA
+#           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "nohup /root/appA/main-a > /root/appA/appA.log 2>&1 &"
 
-      - name: Deploy Submodule B
-        run: |
-          scp -o StrictHostKeyChecking=no main-b ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/appB
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "nohup /root/appB/main-b > /root/appB/appB.log 2>&1 &"
+#       - name: Deploy Submodule B
+#         run: |
+#           scp -o StrictHostKeyChecking=no main-b ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/appB
+#           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "nohup /root/appB/main-b > /root/appB/appB.log 2>&1 &"

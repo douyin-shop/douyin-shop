@@ -1,0 +1,36 @@
+name: Deploy Auth Service
+
+on:
+  push:
+    branches: ['main']
+    paths:
+      - 'app/auth/**'
+      - '.github/workflows/deploy-auth.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.18'
+
+      - name: Add SSH key
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Build Auth Service
+        run: |
+          cd app/auth
+          bash build.sh
+
+      - name: Deploy Auth Service
+        run: |
+          scp -o StrictHostKeyChecking=no app/auth/output/bin/auth ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/auth/
+          scp -o StrictHostKeyChecking=no -r app/auth/output/conf/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/auth/conf/
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd /root/services/auth && ./bootstrap.sh restart"
