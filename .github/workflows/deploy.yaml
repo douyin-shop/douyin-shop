@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       service_name:
-        description: 'Name of the service to deploy'
+        description: 'Name  of the service to deploy'
         required: true
         type: string
 
