@@ -22,10 +22,16 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Build Submodule A
-        run: go build -o main-a ./submoduleA
+        run: |
+          cd submoduleA
+          go mod tidy
+          go build -o ../main-a .
 
       - name: Build Submodule B
-        run: go build -o main-b ./submoduleB
+        run: |
+          cd submoduleB
+          go mod tidy
+          go build -o ../main-b .
 
       - name: Deploy Submodule A
         run: |
