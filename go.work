@@ -9,4 +9,6 @@ use (
 	./app/shop
 	./app/user
 	./common
+	./common/conf
+	./common/nacos
 )
