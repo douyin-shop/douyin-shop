@@ -1,6 +1,6 @@
 kitex:
   service: "payment"
-  address: ":8888"
+  address: ":8005"
   log_level: info
   log_file_name: "log/kitex.log"
   log_max_size: 10
@@ -13,8 +13,21 @@ registry:
   username: ""
   password: ""
 
+nacos:
+  address: "127.0.0.1"
+  port: 8848
+  namespace: ""
+  group: "DEFAULT_GROUP"
+  username: ""
+  password: ""
+  log_dir: "/tmp/nacos/log"
+  cache_dir: "/tmp/nacos/cache"
+  log_level: "debug"
+  timeous_ms: 5000
+  not_load_cache_at_start: true
+
 mysql:
-  dsn: "gorm:gorm@tcp(127.0.0.1:3306)/gorm?charset=utf8mb4&parseTime=True&loc=Local"
+  dsn: "root:88888888@tcp(127.0.0.1:3306)/douyin-shop?charset=utf8mb4&parseTime=True&loc=Local"
 
 redis:
   address: "127.0.0.1:6379"

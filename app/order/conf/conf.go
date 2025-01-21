@@ -1,10 +1,13 @@
 package conf
 
 import (
+	"github.com/nacos-group/nacos-sdk-go/vo"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/kitex-contrib/config-nacos/nacos"
 
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/kr/pretty"
@@ -23,6 +26,7 @@ type Config struct {
 	MySQL    MySQL    `yaml:"mysql"`
 	Redis    Redis    `yaml:"redis"`
 	Registry Registry `yaml:"registry"`
+	Nacos    Nacos    `yaml:"nacos"`
 }
 
 type MySQL struct {
@@ -52,6 +56,20 @@ type Registry struct {
 	Password        string   `yaml:"password"`
 }
 
+type Nacos struct {
+	Address             string `yaml:"address"`
+	Port                uint64 `yaml:"port"`
+	Namespace           string `yaml:"namespace"`
+	Group               string `yaml:"group"`
+	Username            string `yaml:"username"`
+	Password            string `yaml:"password"`
+	LogDir              string `yaml:"log_dir"`
+	CacheDir            string `yaml:"cache_dir"`
+	LogLevel            string `yaml:"log_level"`
+	TimeoutMs           uint64 `yaml:"timeout_ms"`
+	NotLoadCacheAtStart bool   `yaml:"not_load_cache_at_start"`
+}
+
 // GetConf gets configuration instance
 func GetConf() *Config {
 	once.Do(initConf)
@@ -77,6 +95,39 @@ func initConf() {
 	}
 	conf.Env = GetEnv()
 	pretty.Printf("%+v\n", conf)
+}
+
+// 从远程加载配置
+func loadRemoteConf(env string) error {
+	// 从公共配置中加载 Nacos 配置
+	nacos_config := GetConf().Nacos
+	client, err := nacos.NewClient(nacos.Options{
+		Address:     nacos_config.Address,
+		Port:        nacos_config.Port,
+		NamespaceID: nacos_config.Namespace,
+		Group:       nacos_config.Group,
+	})
+
+	if err != nil {
+		return err
+	}
+	client.RegisterConfigCallback(vo.ConfigParam{
+		DataId:   "nexus-config.yaml",
+		Group:    env,
+		Type:     "yaml",
+		OnChange: nil,
+	}, func(s string, parser nacos.ConfigParser) {
+		err = yaml.Unmarshal([]byte(s), conf)
+		if err != nil {
+			klog.Error("转换配置失败 - %v", err)
+		}
+
+	}, 100)
+
+	klog.Info("远程配置文件加载成功")
+	klog.Info(pretty.Sprint(conf))
+
+	return nil
 }
 
 func GetEnv() string {
