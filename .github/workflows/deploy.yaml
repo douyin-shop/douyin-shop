@@ -46,7 +46,7 @@ jobs:
           # 创建目录并复制文件
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "mkdir -p /root/services/${{ inputs.service_name }}"
           scp -o StrictHostKeyChecking=no -r app/${{ inputs.service_name }}/output/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/${{ inputs.service_name }}/
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd /root/services/${{ inputs.service_name }} && chmod +x bootstrap.sh && ./bootstrap.sh restart"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}     "cd /root/services/${{ inputs.service_name }} && chmod +x bootstrap.sh && nohup ./bootstrap.sh restart > /dev/null 2>&1 &"
 
 # name: Deploy Go Service
 
