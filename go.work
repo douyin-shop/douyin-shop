@@ -8,6 +8,6 @@ use (
 	./app/payment
 	./app/shop
 	./app/user
-	./common/conf
-	./common/nacos
+	./common
 )
+
