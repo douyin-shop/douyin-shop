@@ -2,7 +2,6 @@ package conf
 
 import (
 	"github.com/cloudwego/kitex/pkg/klog"
-	remote_config "github.com/douyin-shop/douyin-shop/common/conf"
 	"github.com/kitex-contrib/config-nacos/v2/nacos"
 	"github.com/kr/pretty"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
@@ -117,7 +116,7 @@ func initConf() {
 func LoadRemoteConf(env string) error {
 
 	// 从公共配置中加载 Nacos 配置
-	nacosConfig := remote_config.GetConf().Nacos
+	nacosConfig := GetConf().Nacos
 
 	client, err := nacos.NewClient(nacos.Options{
 		Address:     nacosConfig.Address,
