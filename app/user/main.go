@@ -3,7 +3,9 @@ package main
 import (
 	"github.com/douyin-shop/douyin-shop/common/nacos"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"io"
 	"net"
+	"os"
 	"time"
 
 	"github.com/cloudwego/kitex/pkg/klog"
@@ -56,7 +58,9 @@ func kitexInit() (opts []server.Option) {
 		}),
 		FlushInterval: time.Minute,
 	}
-	klog.SetOutput(asyncWriter)
+	// 创建一个 MultiWriter，同时写入文件和控制台
+	multiWriter := io.MultiWriter(asyncWriter, os.Stdout)
+	klog.SetOutput(multiWriter)
 	server.RegisterShutdownHook(func() {
 		asyncWriter.Sync()
 	})
