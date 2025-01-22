@@ -43,10 +43,22 @@ jobs:
           # 添加主机到 known_hosts
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
-          # 创建目录并复制文件
+          cd app/${{ inputs.service_name }}/output
+          tar czf /tmp/service.tar.gz *
+
+          # 2. 创建远程目录
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "mkdir -p /root/services/${{ inputs.service_name }}"
-          scp -o StrictHostKeyChecking=no -r app/${{ inputs.service_name }}/output/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/${{ inputs.service_name }}/
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}     "cd /root/services/${{ inputs.service_name }} && chmod +x bootstrap.sh && nohup ./bootstrap.sh restart > /dev/null 2>&1 &"
+
+          # 3. 单次传输压缩包
+          scp -o StrictHostKeyChecking=no /tmp/service.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/${{ inputs.service_name }}/
+
+           # 4. 远程解压并重启
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd /root/services/${{ inputs.service_name }} && tar xzf service.tar.gz && rm -f service.tar.gz && chmod +x bootstrap.sh && nohup ./bootstrap.sh restart > /dev/null 2>&1 &"
+
+          # # 创建目录并复制文件
+          # ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "mkdir -p /root/services/${{ inputs.service_name }}"
+          # scp -o StrictHostKeyChecking=no -r app/${{ inputs.service_name }}/output/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/${{ inputs.service_name }}/
+          # ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}     "cd /root/services/${{ inputs.service_name }} && chmod +x bootstrap.sh && nohup ./bootstrap.sh restart > /dev/null 2>&1 &"
 
 # name: Deploy Go Service
 
