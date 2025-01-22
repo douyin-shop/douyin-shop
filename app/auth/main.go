@@ -29,6 +29,7 @@ func main() {
 }
 
 func kitexInit() (opts []server.Option) {
+
 	// address
 	addr, err := net.ResolveTCPAddr("tcp", conf.GetConf().Kitex.Address)
 	if err != nil {
