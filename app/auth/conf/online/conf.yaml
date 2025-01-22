@@ -26,11 +26,3 @@ nacos:
   timeous_ms: 5000
   not_load_cache_at_start: true
 
-mysql:
-  dsn: "root:Q1w2e3r4@tcp(rm-cn-em943mba000039.rwlb.rds.aliyuncs.com:3306)/douyin-shop?charset=utf8mb4&parseTime=True&loc=Local"
-
-redis:
-  address: "127.0.0.1:6379"
-  username: ""
-  password: ""
-  db: 0

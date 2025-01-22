@@ -77,6 +77,9 @@ func GetConf() *Config {
 
 func initConf() {
 
+	// 设置日志级别,防止日志级别未配置
+	klog.SetLevel(klog.LevelDebug)
+
 	// 获取当前环境配置
 	env := GetEnv()
 	klog.Infof("当前环境: %s", env)
