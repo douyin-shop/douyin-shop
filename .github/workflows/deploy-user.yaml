@@ -8,6 +8,7 @@ on:
       - 'idl/user.proto'
       - '.github/workflows/deploy-user.yaml'
       - '.github/workflows/deploy.yaml'
+      - 'common/*'
   workflow_dispatch: # 添加手动触发
 
 jobs:
