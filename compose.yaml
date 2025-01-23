@@ -52,7 +52,7 @@ services:
             MYSQL_USER: douyin-shop # 创建的新用户
             MYSQL_PASSWORD: 88888888 # 新用户的密码
         ports:
-            - "3306:3306" # 映射容器的3306端口到主机的3306端口
+            - "3307:3306" # 映射容器的3306端口到主机的3306端口
         volumes:
             - db_data:/var/lib/mysql # 挂载宿主机的目录到容器的MySQL数据目录，用于持久化数据
 
