@@ -4,8 +4,12 @@ package frontend;
 
 option go_package = "/frontend";
 
+import "api.proto";
+
 service FrontendService {
-  rpc Login(LoginReq) returns (LoginResp) {}
+  rpc Login(LoginReq) returns (LoginResp) {
+    option (api.get) = "/login";
+  }
   rpc VerifyToken(VerifyTokenReq) returns (VerifyTokenResp) {}
 }
 
