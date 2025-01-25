@@ -28,7 +28,7 @@ message VerifyTokenResp {
 
 service FrontendService {
   rpc Login(LoginReq) returns (LoginResp) {
-    option (api.get) = "/login";
+    option (api.post) = "/login";
   }
   rpc VerifyToken(VerifyTokenReq) returns (VerifyTokenResp) {}
 }

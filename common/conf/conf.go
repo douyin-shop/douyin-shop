@@ -132,3 +132,25 @@ func LogLevel() klog.Level {
 		return klog.LevelInfo
 	}
 }
+
+// 获取当前运行的目录相对于根目录的路径
+func getRelativePath() string {
+	// 获取当前运行的目录
+	currentDir, err := os.Getwd()
+	if err != nil {
+		klog.Error("get current directory error - %v", err)
+		panic(err)
+	}
+
+	// 获取根目录
+	rootDir := "/"
+
+	// 计算相对于根目录的路径
+	relativePath, err := filepath.Rel(rootDir, currentDir)
+	if err != nil {
+		klog.Error("calculate relative path error - %v", err)
+		panic(err)
+	}
+
+	return relativePath
+}

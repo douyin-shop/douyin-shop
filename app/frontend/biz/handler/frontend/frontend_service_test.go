@@ -2,6 +2,7 @@ package frontend
 
 import (
 	"bytes"
+	"os"
 	"testing"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -10,12 +11,23 @@ import (
 )
 
 func TestLogin(t *testing.T) {
+
+	// 设置当前目录为项目根目录
+	err := os.Chdir("../../../")
+	if err != nil {
+		return
+	}
+
 	h := server.Default()
-	h.GET("/login", Login)
-	path := "/login"                                          // todo: you can customize query
-	body := &ut.Body{Body: bytes.NewBufferString(""), Len: 1} // todo: you can customize body
-	header := ut.Header{}                                     // todo: you can customize header
-	w := ut.PerformRequest(h.Engine, "GET", path, body, header)
+	h.POST("/login", Login)
+	path := "/login"
+	bodyStr := `{"email":"wyz17601402786@gmail.com","password":"123456"}`
+	body := &ut.Body{Body: bytes.NewBufferString(bodyStr), Len: len(bodyStr)} // todo: you can customize body
+	header := ut.Header{
+		Key:   "Content-Type",
+		Value: "application/json",
+	} // todo: you can customize header
+	w := ut.PerformRequest(h.Engine, "POST", path, body, header)
 	resp := w.Result()
 	t.Log(string(resp.Body()))
 

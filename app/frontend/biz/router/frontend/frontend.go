@@ -17,5 +17,5 @@ import (
 func Register(r *server.Hertz) {
 
 	root := r.Group("/", rootMw()...)
-	root.GET("/login", append(_loginMw(), frontend.Login)...)
+	root.POST("/login", append(_loginMw(), frontend.Login)...)
 }
