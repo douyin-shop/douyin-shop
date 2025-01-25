@@ -26,6 +26,7 @@ type Config struct {
 	Redis    Redis    `yaml:"redis"`
 	Registry Registry `yaml:"registry"`
 	Nacos    Nacos    `yaml:"nacos"`
+	Jwt      Jwt      `yaml:"jwt"`
 }
 
 type MySQL struct {
@@ -67,6 +68,10 @@ type Nacos struct {
 	LogLevel            string `yaml:"log_level"`
 	TimeoutMs           uint64 `yaml:"timeout_ms"`
 	NotLoadCacheAtStart bool   `yaml:"not_load_cache_at_start"`
+}
+
+type Jwt struct {
+	Secret string `yaml:"secret"`
 }
 
 // GetConf gets configuration instance
