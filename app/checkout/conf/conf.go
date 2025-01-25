@@ -116,7 +116,6 @@ func initConf() {
 // LoadRemoteConf 从远程加载配置
 func LoadRemoteConf(env string) error {
 
-	klog.Info("kitexInit")
 	// 从公共配置中加载 Nacos 配置
 	nacosConfig := common_conf.GetConf().Nacos
 
