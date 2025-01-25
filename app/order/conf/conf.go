@@ -1,18 +1,17 @@
 package conf
 
 import (
-	"github.com/nacos-group/nacos-sdk-go/vo"
+	"github.com/cloudwego/kitex/pkg/klog"
+	remote_config "github.com/douyin-shop/douyin-shop/common/conf"
+	"github.com/kitex-contrib/config-nacos/v2/nacos"
+	"github.com/kr/pretty"
+	"github.com/nacos-group/nacos-sdk-go/v2/vo"
+	"gopkg.in/validator.v2"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
-
-	"github.com/kitex-contrib/config-nacos/nacos"
-
-	"github.com/cloudwego/kitex/pkg/klog"
-	"github.com/kr/pretty"
-	"gopkg.in/validator.v2"
-	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -77,6 +76,14 @@ func GetConf() *Config {
 }
 
 func initConf() {
+
+	// 设置日志级别,防止日志级别未配置
+	klog.SetLevel(klog.LevelDebug)
+
+	// 获取当前环境配置
+	env := GetEnv()
+	klog.Infof("当前环境: %s", env)
+
 	prefix := "conf"
 	confFileRelPath := filepath.Join(prefix, filepath.Join(GetEnv(), "conf.yaml"))
 	content, err := ioutil.ReadFile(confFileRelPath)
@@ -84,48 +91,61 @@ func initConf() {
 		panic(err)
 	}
 	conf = new(Config)
+
 	err = yaml.Unmarshal(content, conf)
 	if err != nil {
 		klog.Error("parse yaml error - %v", err)
 		panic(err)
 	}
+
+	err = LoadRemoteConf(env)
+	if err != nil {
+		klog.Error("load remote config error - %v", err)
+		panic(err)
+	}
+
 	if err := validator.Validate(conf); err != nil {
 		klog.Error("validate config error - %v", err)
 		panic(err)
 	}
+
 	conf.Env = GetEnv()
-	pretty.Printf("%+v\n", conf)
+
 }
 
-// 从远程加载配置
-func loadRemoteConf(env string) error {
+// LoadRemoteConf 从远程加载配置
+func LoadRemoteConf(env string) error {
+
 	// 从公共配置中加载 Nacos 配置
-	nacos_config := GetConf().Nacos
+	nacosConfig := remote_config.GetConf().Nacos
+
 	client, err := nacos.NewClient(nacos.Options{
-		Address:     nacos_config.Address,
-		Port:        nacos_config.Port,
-		NamespaceID: nacos_config.Namespace,
-		Group:       nacos_config.Group,
+		Address:     nacosConfig.Address,
+		Port:        nacosConfig.Port,
+		NamespaceID: nacosConfig.Namespace,
+		Group:       nacosConfig.Group,
 	})
 
 	if err != nil {
 		return err
 	}
 	client.RegisterConfigCallback(vo.ConfigParam{
-		DataId:   "nexus-config.yaml",
+		DataId:   "common-config.yaml",
 		Group:    env,
 		Type:     "yaml",
 		OnChange: nil,
 	}, func(s string, parser nacos.ConfigParser) {
+		klog.Info("远程配置文件变更")
+
 		err = yaml.Unmarshal([]byte(s), conf)
 		if err != nil {
 			klog.Error("转换配置失败 - %v", err)
 		}
-
+		klog.Info("远程配置文件加载成功")
+		klog.Debug(pretty.Sprintf("%+v", conf))
 	}, 100)
 
 	klog.Info("远程配置文件加载成功")
-	klog.Info(pretty.Sprint(conf))
 
 	return nil
 }
