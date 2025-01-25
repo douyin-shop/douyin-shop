@@ -4,10 +4,11 @@ import (
 	"context"
 	"github.com/bytedance/gopkg/cloud/metainfo"
 	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal/redis"
+	"github.com/douyin-shop/douyin-shop/app/auth/biz/utils"
 	"github.com/douyin-shop/douyin-shop/app/auth/conf"
 	auth "github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth"
 	"github.com/golang-jwt/jwt"
-	"strconv"
 )
 
 type VerifyTokenByRPCService struct {
@@ -31,14 +32,35 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 
 	klog.Infof("claims: %v", claims)
 
-	userId := int(claims.Claims.(jwt.MapClaims)["user_id"].(float64))
+	userId := int32(claims.Claims.(jwt.MapClaims)["user_id"].(float64))
+
+	// 从Redis中取出token，与当前token比较，如果不同就直接返回
+	tokenId := utils.GenerateTokenKey(userId)
+	result, err := redis.RedisClient.Get(context.Background(), tokenId).Result()
+
+	if err != nil {
+		klog.Error("redis get error: ", err)
+		return nil, err
+	}
+
+	if result == "" || result != token {
+		klog.Info("token检验不通过，可能已经过期！！！", result, token, "用户id：", userId)
+		resp = &auth.VerifyResp{
+			Res: false,
+		}
+		return
+	}
 
 	klog.Debug("userID:", userId)
 
 	// 在metadata中设置用户id
-	ok := metainfo.SendBackwardValue(s.ctx, "user_id", strconv.Itoa(userId))
+	ok := metainfo.SendBackwardValue(s.ctx, "user_id", string(userId))
 
-	if claims.Valid && ok {
+	if !ok {
+		klog.Error("set user_id in metadata error")
+	}
+
+	if claims.Valid {
 		resp = &auth.VerifyResp{
 			Res: true,
 		}
