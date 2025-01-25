@@ -1,11 +1,11 @@
 // idl/api.proto; 注解拓展
-syntax = "proto2";
+syntax = "proto3";
 
 package api;
 
 import "google/protobuf/descriptor.proto";
 
-option go_package = "/api";
+option go_package = "/frontend/api";
 
 extend google.protobuf.FieldOptions {
   optional string raw_body = 50101;
