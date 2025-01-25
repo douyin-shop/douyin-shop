@@ -30,7 +30,11 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 
 	klog.Infof("claims: %v", claims)
 
-	klog.Debug("userID:", claims.Claims.(jwt.MapClaims)["user_id"])
+	userId := claims.Claims.(jwt.MapClaims)["user_id"]
+	klog.Debug("userID:", userId)
+
+	// 在context中设置用户id
+	s.ctx = context.WithValue(s.ctx, "user_id", userId)
 
 	if claims.Valid {
 		resp = &auth.VerifyResp{
