@@ -1,0 +1,19 @@
+name: Deploy FrontEnd Service
+
+on:
+  push:
+    branches: ['main']
+    paths:
+      - 'app/frontend/**'
+      - 'idl/frontend.proto'
+      - '.github/workflows/deploy-frontend.yaml'
+      - '.github/workflows/deploy.yaml'
+      - 'common/*'
+  workflow_dispatch: # 添加手动触发
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      service_name: frontend
+    secrets: inherit
