@@ -2,16 +2,10 @@ syntax = "proto3";
 
 package frontend;
 
-option go_package = "/frontend";
+option go_package = "frontend";
 
-import "api.proto";
+import "api-tools.proto";
 
-service FrontendService {
-  rpc Login(LoginReq) returns (LoginResp) {
-    option (api.get) = "/login";
-  }
-  rpc VerifyToken(VerifyTokenReq) returns (VerifyTokenResp) {}
-}
 
 message LoginReq {
   string email = 1;
@@ -30,4 +24,11 @@ message VerifyTokenReq {
 message VerifyTokenResp {
   bool valid = 1;
   int32 user_id = 2;
+}
+
+service FrontendService {
+  rpc Login(LoginReq) returns (LoginResp) {
+    option (api.get) = "/login";
+  }
+  rpc VerifyToken(VerifyTokenReq) returns (VerifyTokenResp) {}
 }
