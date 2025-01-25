@@ -4,6 +4,8 @@ package frontend
 
 import (
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/douyin-shop/douyin-shop/app/frontend/biz/middleware"
 )
 
 func rootMw() []app.HandlerFunc {
@@ -14,4 +16,17 @@ func rootMw() []app.HandlerFunc {
 func _loginMw() []app.HandlerFunc {
 	// your code...
 	return nil
+}
+
+func _cartMw() []app.HandlerFunc {
+
+	return nil
+}
+
+func _getcartMw() []app.HandlerFunc {
+	hlog.Debug("getcart middleware")
+	hlog.Info("getcart middleware")
+	return []app.HandlerFunc{
+		middleware.VerifyTokenMiddleware(), // 用于校验token并获取user_id
+	}
 }

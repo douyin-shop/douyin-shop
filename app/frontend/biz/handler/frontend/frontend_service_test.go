@@ -35,3 +35,23 @@ func TestLogin(t *testing.T) {
 	// assert.DeepEqual(t, 200, resp.StatusCode())
 	// assert.DeepEqual(t, "null", string(resp.Body()))
 }
+
+func TestGetCart(t *testing.T) {
+	h := server.Default()
+	h.GET("cart/get_cart", GetCart)
+	path := "cart/get_cart"                                   // todo: you can customize query
+	body := &ut.Body{Body: bytes.NewBufferString(""), Len: 1} // todo: you can customize body
+	w := ut.PerformRequest(h.Engine, "GET", path, body, ut.Header{
+		Key:   "Content-Type",
+		Value: "application/json",
+	}, ut.Header{
+		Key:   "Authorization",
+		Value: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mzc4MjA0ODEsInVzZXJfaWQiOjF9.l8RrWRL0iRLrUMuWm4LNvYaD7_Fz0BWRgqMMIFNweN4",
+	})
+	resp := w.Result()
+	t.Log(string(resp.Body()))
+
+	// todo edit your unit test.
+	// assert.DeepEqual(t, 200, resp.StatusCode())
+	// assert.DeepEqual(t, "null", string(resp.Body()))
+}
