@@ -2,11 +2,12 @@ package service
 
 import (
 	"context"
-	"github.com/douyin-shop/douyin-shop/app/auth/conf"
-
+	"github.com/bytedance/gopkg/cloud/metainfo"
 	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/douyin-shop/douyin-shop/app/auth/conf"
 	auth "github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth"
 	"github.com/golang-jwt/jwt"
+	"strconv"
 )
 
 type VerifyTokenByRPCService struct {
@@ -30,13 +31,14 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 
 	klog.Infof("claims: %v", claims)
 
-	userId := claims.Claims.(jwt.MapClaims)["user_id"]
+	userId := int(claims.Claims.(jwt.MapClaims)["user_id"].(float64))
+
 	klog.Debug("userID:", userId)
 
-	// 在context中设置用户id
-	s.ctx = context.WithValue(s.ctx, "user_id", userId)
+	// 在metadata中设置用户id
+	ok := metainfo.SendBackwardValue(s.ctx, "user_id", strconv.Itoa(userId))
 
-	if claims.Valid {
+	if claims.Valid && ok {
 		resp = &auth.VerifyResp{
 			Res: true,
 		}
