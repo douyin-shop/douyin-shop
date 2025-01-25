@@ -26,6 +26,7 @@ type Config struct {
 	Redis    Redis    `yaml:"redis"`
 	Registry Registry `yaml:"registry"`
 	Nacos    Nacos    `yaml:"nacos"`
+	Jwt      Jwt      `yaml:"jwt"`
 }
 
 type MySQL struct {
@@ -67,6 +68,10 @@ type Nacos struct {
 	LogLevel            string `yaml:"log_level"`
 	TimeoutMs           uint64 `yaml:"timeout_ms"`
 	NotLoadCacheAtStart bool   `yaml:"not_load_cache_at_start"`
+}
+
+type Jwt struct {
+	Secret string `yaml:"secret"`
 }
 
 // GetConf gets configuration instance
@@ -116,7 +121,6 @@ func initConf() {
 // LoadRemoteConf 从远程加载配置
 func LoadRemoteConf(env string) error {
 
-	klog.Info("kitexInit")
 	// 从公共配置中加载 Nacos 配置
 	nacosConfig := common_conf.GetConf().Nacos
 
