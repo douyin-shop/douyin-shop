@@ -1,17 +1,20 @@
 package main
 
 import (
-	"github.com/douyin-shop/douyin-shop/common/nacos"
+	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal"
 	"io"
 	"net"
 	"os"
 	"time"
+
+	"github.com/douyin-shop/douyin-shop/common/nacos"
 
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	"github.com/douyin-shop/douyin-shop/app/auth/conf"
 	"github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth/authservice"
+
 	kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -29,6 +32,10 @@ func main() {
 }
 
 func kitexInit() (opts []server.Option) {
+
+	// 初始化数据库
+	dal.Init()
+
 	// address
 	addr, err := net.ResolveTCPAddr("tcp", conf.GetConf().Kitex.Address)
 	if err != nil {
@@ -55,6 +62,7 @@ func kitexInit() (opts []server.Option) {
 			MaxSize:    conf.GetConf().Kitex.LogMaxSize,
 			MaxBackups: conf.GetConf().Kitex.LogMaxBackups,
 			MaxAge:     conf.GetConf().Kitex.LogMaxAge,
+			LocalTime:  true,
 		}),
 		FlushInterval: time.Minute,
 	}

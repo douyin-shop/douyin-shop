@@ -5,12 +5,12 @@ import (
 	"github.com/cloudwego/kitex/pkg/discovery"
 	register "github.com/cloudwego/kitex/pkg/registry"
 	"github.com/douyin-shop/douyin-shop/common/conf"
-	"github.com/kitex-contrib/registry-nacos/registry"
-	"github.com/kitex-contrib/registry-nacos/resolver"
-	"github.com/nacos-group/nacos-sdk-go/clients"
-	"github.com/nacos-group/nacos-sdk-go/clients/naming_client"
-	"github.com/nacos-group/nacos-sdk-go/common/constant"
-	"github.com/nacos-group/nacos-sdk-go/vo"
+	"github.com/kitex-contrib/registry-nacos/v2/registry"
+	"github.com/kitex-contrib/registry-nacos/v2/resolver"
+	"github.com/nacos-group/nacos-sdk-go/v2/clients"
+	"github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client"
+	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
+	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"log"
 )
 
