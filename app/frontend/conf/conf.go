@@ -1,6 +1,10 @@
 package conf
 
 import (
+	"github.com/cloudwego/kitex/pkg/klog"
+	common_conf "github.com/douyin-shop/douyin-shop/common/conf"
+	"github.com/kitex-contrib/config-nacos/v2/nacos"
+	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -76,8 +80,10 @@ func GetConf() *Config {
 }
 
 func initConf() {
+	env := GetEnv()
+
 	prefix := "conf"
-	confFileRelPath := filepath.Join(prefix, filepath.Join(GetEnv(), "conf.yaml"))
+	confFileRelPath := filepath.Join(prefix, filepath.Join(env, "conf.yaml"))
 	content, err := ioutil.ReadFile(confFileRelPath)
 	if err != nil {
 		panic(err)
@@ -89,6 +95,13 @@ func initConf() {
 		hlog.Error("parse yaml error - %v", err)
 		panic(err)
 	}
+
+	err = LoadRemoteConf(env)
+	if err != nil {
+		klog.Error("load remote config error - %v", err)
+		panic(err)
+	}
+
 	if err := validator.Validate(conf); err != nil {
 		hlog.Error("validate config error - %v", err)
 		panic(err)
@@ -97,6 +110,44 @@ func initConf() {
 	conf.Env = GetEnv()
 
 	pretty.Printf("%+v\n", conf)
+}
+
+// LoadRemoteConf 从远程加载配置
+func LoadRemoteConf(env string) error {
+
+	klog.Info("kitexInit")
+	// 从公共配置中加载 Nacos 配置
+	nacosConfig := common_conf.GetConf().Nacos
+
+	client, err := nacos.NewClient(nacos.Options{
+		Address:     nacosConfig.Address,
+		Port:        nacosConfig.Port,
+		NamespaceID: nacosConfig.Namespace,
+		Group:       nacosConfig.Group,
+	})
+
+	if err != nil {
+		return err
+	}
+	client.RegisterConfigCallback(vo.ConfigParam{
+		DataId:   "common-config.yaml",
+		Group:    env,
+		Type:     "yaml",
+		OnChange: nil,
+	}, func(s string, parser nacos.ConfigParser) {
+		klog.Info("远程配置文件变更")
+
+		err = yaml.Unmarshal([]byte(s), conf)
+		if err != nil {
+			klog.Error("转换配置失败 - %v", err)
+		}
+		klog.Info("远程配置文件加载成功")
+		klog.Debug(pretty.Sprintf("%+v", conf))
+	}, 100)
+
+	klog.Info("远程配置文件加载成功")
+
+	return nil
 }
 
 func GetEnv() string {
