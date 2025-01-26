@@ -8,6 +8,7 @@ import (
 	"github.com/douyin-shop/douyin-shop/app/auth/conf"
 	auth "github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth"
 	"github.com/golang-jwt/jwt"
+	"strconv"
 )
 
 type VerifyTokenByRPCService struct {
@@ -56,8 +57,10 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 		}, nil
 	}
 
+	// 将userId从int32 转化成string
+
 	// 在metadata中设置用户id
-	ok := metainfo.SendBackwardValue(s.ctx, "user_id", string(userId))
+	ok := metainfo.SendBackwardValue(s.ctx, "user_id", strconv.Itoa(int(userId)))
 
 	if !ok {
 		klog.Error("set user_id in metadata error")
