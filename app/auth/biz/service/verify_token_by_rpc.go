@@ -38,7 +38,12 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 
 	klog.Debug("token验证通过，UserId:", userId)
 
-	// TODO  根据userId获取用户状态，如果用户已经进入黑名单，则直接返回false
+	// TODO 根据userId获取用户状态，如果用户已经进入黑名单，则直接返回false
+	// TODO 先从Redis中获取当前用户状态，如果状态为黑名单，则直接返回false
+	// TODO 如果Redis中没有当前用户状态，则从数据库中获取用户状态，并且存入Redis中
+	// TODO 如果用户状态为黑名单，则直接返回false
+	// TODO 如果用户状态不为黑名单，则返回true
+	// TODO 在将用户加入黑名单的时候，需要将用户状态存入Redis中，修改其状态从正常到黑名单
 
 	// 使用Redis Set检查用户是否在黑名单中
 	blackListKey := "user:blacklist" // 存储所有黑名单用户ID的Set key
@@ -56,8 +61,6 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 			Res: false,
 		}, nil
 	}
-
-	// 将userId从int32 转化成string
 
 	// 在metadata中设置用户id
 	ok := metainfo.SendBackwardValue(s.ctx, "user_id", strconv.Itoa(int(userId)))
