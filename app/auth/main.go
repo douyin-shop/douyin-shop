@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal"
+	"github.com/douyin-shop/douyin-shop/common/custom_logger"
 	"io"
 	"net"
 	"os"
@@ -54,6 +55,8 @@ func kitexInit() (opts []server.Option) {
 
 	// klog
 	logger := kitexlogrus.NewLogger()
+	logger.Logger().SetReportCaller(true)
+	logger.Logger().SetFormatter(&custom_logger.CustomFormatter{})
 	klog.SetLogger(logger)
 	klog.SetLevel(conf.LogLevel())
 	asyncWriter := &zapcore.BufferedWriteSyncer{

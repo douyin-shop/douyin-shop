@@ -29,12 +29,10 @@ func (s *DeliverTokenByRPCService) Run(req *auth.DeliverTokenReq) (resp *auth.De
 
 	result, err := redis.RedisClient.Get(context.Background(), utils.GenerateTokenKey(userId)).Result()
 
-	// 如果redis中有token，直接返回
+	// 如果redis中有token，说明用户已经登录过，直接返回
 	if err == nil && result != "" {
-		resp = &auth.DeliveryResp{
-			Token: result,
-		}
-		return
+
+		return nil, errors.New("用户已登陆")
 	}
 
 	// 如果redis中有错误，直接返回

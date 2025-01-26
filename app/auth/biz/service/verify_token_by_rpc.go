@@ -5,7 +5,6 @@ import (
 	"github.com/bytedance/gopkg/cloud/metainfo"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal/redis"
-	"github.com/douyin-shop/douyin-shop/app/auth/biz/utils"
 	"github.com/douyin-shop/douyin-shop/app/auth/conf"
 	auth "github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth"
 	"github.com/golang-jwt/jwt"
@@ -26,7 +25,9 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 	claims, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		return []byte(conf.GetConf().Jwt.Secret), nil
 	})
+
 	if err != nil {
+		klog.Error("parse token error: ", err)
 		return nil, err
 	}
 
@@ -34,24 +35,26 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 
 	userId := int32(claims.Claims.(jwt.MapClaims)["user_id"].(float64))
 
-	// 从Redis中取出token，与当前token比较，如果不同就直接返回
-	tokenId := utils.GenerateTokenKey(userId)
-	result, err := redis.RedisClient.Get(context.Background(), tokenId).Result()
+	klog.Debug("token验证通过，UserId:", userId)
 
+	// TODO  根据userId获取用户状态，如果用户已经进入黑名单，则直接返回false
+
+	// 使用Redis Set检查用户是否在黑名单中
+	blackListKey := "user:blacklist" // 存储所有黑名单用户ID的Set key
+	isMember, err := redis.RedisClient.SIsMember(context.Background(), blackListKey, userId).Result()
+
+	// Redis存在错误，返回报错
 	if err != nil {
-		klog.Error("redis get error: ", err)
+		klog.Error("redis SISMEMBER error: ", err)
 		return nil, err
 	}
 
-	if result == "" || result != token {
-		klog.Info("token检验不通过，可能已经过期！！！", result, token, "用户id：", userId)
-		resp = &auth.VerifyResp{
+	// isMember为true说明用户在黑名单中，返回false，表示用户被拒绝
+	if isMember {
+		return &auth.VerifyResp{
 			Res: false,
-		}
-		return
+		}, nil
 	}
-
-	klog.Debug("userID:", userId)
 
 	// 在metadata中设置用户id
 	ok := metainfo.SendBackwardValue(s.ctx, "user_id", string(userId))
