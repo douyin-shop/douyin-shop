@@ -28,3 +28,6 @@ nacos:
 
 jwt:
   secret: "123456"
+
+black_list:
+  max_expire_time: 86400
