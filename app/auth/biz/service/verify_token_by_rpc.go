@@ -44,11 +44,11 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 
 	klog.Debug("token验证通过，UserId:", userId)
 
-	// TODO 根据userId获取用户状态，如果用户已经进入黑名单，则直接返回false
-	// TODO 先从Redis中获取当前用户状态，如果状态为黑名单，则直接返回false
-	// TODO 如果Redis中没有当前用户状态，则从数据库中获取用户状态，并且存入Redis中
-	// TODO 如果用户状态为黑名单，则直接返回false
-	// TODO 如果用户状态不为黑名单，则返回true
+	// 根据userId获取用户状态，如果用户已经进入黑名单，则直接返回false
+	// 先从Redis中获取当前用户状态，如果状态为黑名单，则直接返回false
+	// 如果Redis中没有当前用户状态，则从数据库中获取用户状态，并且存入Redis中
+	// 如果用户状态为黑名单，则直接返回false
+	// 如果用户状态不为黑名单，则返回true
 	// TODO 在将用户加入黑名单的时候，需要将用户状态存入Redis中，修改其状态从正常到黑名单
 
 	// 使用Redis String存储用户状态
@@ -79,7 +79,7 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 		if userStatus == model.Ban {
 			klog.Infof("用户id: %d 在黑名单中,阻止请求！", userId)
 			// 最多
-			redis.RedisClient.Set(context.Background(), userStatusKey, model.Ban, time.Duration(expire)*time.Second)
+			redis.RedisClient.Set(context.Background(), userStatusKey, string(model.Ban), time.Duration(expire)*time.Second)
 			return &auth.VerifyResp{
 				Res: false,
 			}, nil
@@ -87,7 +87,7 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 		}
 
 		// 存储用户状态到Redis中,过期时间为24h
-		_, err = redis.RedisClient.Set(context.Background(), userStatusKey, model.Normal, time.Hour*24).Result()
+		_, err = redis.RedisClient.Set(context.Background(), userStatusKey, string(model.Normal), time.Hour*24).Result()
 		if err != nil {
 			klog.Error("redis Set error: ", err)
 			return nil, err

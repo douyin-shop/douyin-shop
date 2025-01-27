@@ -4,6 +4,7 @@ package model
 import (
 	"context"
 	"errors"
+	"github.com/cloudwego/kitex/pkg/klog"
 	"gorm.io/gorm"
 )
 
@@ -36,8 +37,25 @@ func GetUserStatusFromDB(db *gorm.DB, ctx context.Context, userId int32) (status
 		return Normal, 0, nil
 	}
 	if err != nil {
+		klog.Error("查询数据库失败:", err)
 		return Normal, 0, err
 	}
 
 	return Ban, blackList.Expire, nil
+}
+
+// AddUserToBlackList 添加用户到黑名单
+func AddUserToBlackList(db *gorm.DB, ctx context.Context, userId int32, expire int64) error {
+	result := db.Create(&BlackList{
+		UserId: userId,
+		Expire: expire,
+	})
+	return result.Error
+}
+
+// DeleteFromBlackList 从黑名单中删除用户
+func DeleteFromBlackList(db *gorm.DB, ctx context.Context, userId int32) error {
+	res := db.Where("user_id = ?", userId).Delete(&BlackList{})
+	klog.Debug("DeleteFromBlackList result: ", res.RowsAffected)
+	return res.Error
 }
