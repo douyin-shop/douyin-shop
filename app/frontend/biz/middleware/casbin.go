@@ -14,10 +14,24 @@ import (
 	"github.com/hertz-contrib/casbin"
 	"log"
 	"regexp"
+	"sync"
 )
 
+var (
+	casbinMiddleware *casbin.Middleware
+	once             sync.Once
+)
+
+// GetCasbinMiddleware 获取casbin中间件单例
+func GetCasbinMiddleware() *casbin.Middleware {
+	once.Do(func() {
+		casbinMiddleware = initCasbinMiddleware()
+	})
+	return casbinMiddleware
+}
+
 // CasbinMiddleware casbin中间件
-func CasbinMiddleware() *casbin.Middleware {
+func initCasbinMiddleware() *casbin.Middleware {
 	casbinAdapter, err := gormadapter.NewAdapterByDB(mysql.DB)
 	if err != nil {
 		hlog.Fatal(err)
@@ -26,6 +40,8 @@ func CasbinMiddleware() *casbin.Middleware {
 	model, err := casbin_model.NewModelFromFile(fmt.Sprintf("./conf/%s/model.conf", conf.GetConf().Env))
 
 	enforcer, err := casbin_sdk.NewCachedEnforcer(model, casbinAdapter)
+
+	// 注册自定义函数
 	enforcer.AddFunction("RegexRouterMatcher", RegexRouterMatcherFunc)
 	if err != nil {
 		hlog.Fatal(err)
@@ -37,7 +53,7 @@ func CasbinMiddleware() *casbin.Middleware {
 			// 从ctx中获取user_id
 			userID := ctx.Value("user_id")
 
-			// 如果user_id不是string类型
+			// 如果user_id不是string类型, 则返回空字符串
 			if _, ok := userID.(string); !ok {
 				return ""
 			}

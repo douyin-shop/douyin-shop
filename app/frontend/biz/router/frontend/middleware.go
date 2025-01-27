@@ -21,7 +21,7 @@ func _cartMw() []app.HandlerFunc {
 
 	return []app.HandlerFunc{
 		middleware.VerifyTokenMiddleware(),
-		middleware.CasbinMiddleware().RequiresPermissions("/cart:*"),
+		middleware.GetCasbinMiddleware().RequiresPermissions("/cart:*"),
 	}
 }
 
