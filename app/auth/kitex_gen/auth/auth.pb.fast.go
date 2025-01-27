@@ -112,6 +112,146 @@ func (x *VerifyResp) fastReadField1(buf []byte, _type int8) (offset int, err err
 	return offset, err
 }
 
+func (x *Blacklist) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+	switch number {
+	case 1:
+		offset, err = x.fastReadField1(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 2:
+		offset, err = x.fastReadField2(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	default:
+		offset, err = fastpb.Skip(buf, _type, number)
+		if err != nil {
+			goto SkipFieldError
+		}
+	}
+	return offset, nil
+SkipFieldError:
+	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
+ReadFieldError:
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_Blacklist[number], err)
+}
+
+func (x *Blacklist) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+	x.UserId, offset, err = fastpb.ReadInt32(buf, _type)
+	return offset, err
+}
+
+func (x *Blacklist) fastReadField2(buf []byte, _type int8) (offset int, err error) {
+	x.Exp, offset, err = fastpb.ReadInt64(buf, _type)
+	return offset, err
+}
+
+func (x *AddBlackListReq) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+	switch number {
+	case 1:
+		offset, err = x.fastReadField1(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	default:
+		offset, err = fastpb.Skip(buf, _type, number)
+		if err != nil {
+			goto SkipFieldError
+		}
+	}
+	return offset, nil
+SkipFieldError:
+	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
+ReadFieldError:
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_AddBlackListReq[number], err)
+}
+
+func (x *AddBlackListReq) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+	var v Blacklist
+	offset, err = fastpb.ReadMessage(buf, _type, &v)
+	if err != nil {
+		return offset, err
+	}
+	x.Blacklist = &v
+	return offset, nil
+}
+
+func (x *AddBlackListResp) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+	switch number {
+	case 1:
+		offset, err = x.fastReadField1(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	default:
+		offset, err = fastpb.Skip(buf, _type, number)
+		if err != nil {
+			goto SkipFieldError
+		}
+	}
+	return offset, nil
+SkipFieldError:
+	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
+ReadFieldError:
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_AddBlackListResp[number], err)
+}
+
+func (x *AddBlackListResp) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+	x.Res, offset, err = fastpb.ReadBool(buf, _type)
+	return offset, err
+}
+
+func (x *DeleteBlackListReq) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+	switch number {
+	case 1:
+		offset, err = x.fastReadField1(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	default:
+		offset, err = fastpb.Skip(buf, _type, number)
+		if err != nil {
+			goto SkipFieldError
+		}
+	}
+	return offset, nil
+SkipFieldError:
+	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
+ReadFieldError:
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_DeleteBlackListReq[number], err)
+}
+
+func (x *DeleteBlackListReq) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+	x.UserId, offset, err = fastpb.ReadInt32(buf, _type)
+	return offset, err
+}
+
+func (x *DeleteBlackListResp) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+	switch number {
+	case 1:
+		offset, err = x.fastReadField1(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	default:
+		offset, err = fastpb.Skip(buf, _type, number)
+		if err != nil {
+			goto SkipFieldError
+		}
+	}
+	return offset, nil
+SkipFieldError:
+	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
+ReadFieldError:
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_DeleteBlackListResp[number], err)
+}
+
+func (x *DeleteBlackListResp) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+	x.Res, offset, err = fastpb.ReadBool(buf, _type)
+	return offset, err
+}
+
 func (x *DeliverTokenReq) FastWrite(buf []byte) (offset int) {
 	if x == nil {
 		return offset
@@ -169,6 +309,95 @@ func (x *VerifyResp) FastWrite(buf []byte) (offset int) {
 }
 
 func (x *VerifyResp) fastWriteField1(buf []byte) (offset int) {
+	if !x.Res {
+		return offset
+	}
+	offset += fastpb.WriteBool(buf[offset:], 1, x.GetRes())
+	return offset
+}
+
+func (x *Blacklist) FastWrite(buf []byte) (offset int) {
+	if x == nil {
+		return offset
+	}
+	offset += x.fastWriteField1(buf[offset:])
+	offset += x.fastWriteField2(buf[offset:])
+	return offset
+}
+
+func (x *Blacklist) fastWriteField1(buf []byte) (offset int) {
+	if x.UserId == 0 {
+		return offset
+	}
+	offset += fastpb.WriteInt32(buf[offset:], 1, x.GetUserId())
+	return offset
+}
+
+func (x *Blacklist) fastWriteField2(buf []byte) (offset int) {
+	if x.Exp == 0 {
+		return offset
+	}
+	offset += fastpb.WriteInt64(buf[offset:], 2, x.GetExp())
+	return offset
+}
+
+func (x *AddBlackListReq) FastWrite(buf []byte) (offset int) {
+	if x == nil {
+		return offset
+	}
+	offset += x.fastWriteField1(buf[offset:])
+	return offset
+}
+
+func (x *AddBlackListReq) fastWriteField1(buf []byte) (offset int) {
+	if x.Blacklist == nil {
+		return offset
+	}
+	offset += fastpb.WriteMessage(buf[offset:], 1, x.GetBlacklist())
+	return offset
+}
+
+func (x *AddBlackListResp) FastWrite(buf []byte) (offset int) {
+	if x == nil {
+		return offset
+	}
+	offset += x.fastWriteField1(buf[offset:])
+	return offset
+}
+
+func (x *AddBlackListResp) fastWriteField1(buf []byte) (offset int) {
+	if !x.Res {
+		return offset
+	}
+	offset += fastpb.WriteBool(buf[offset:], 1, x.GetRes())
+	return offset
+}
+
+func (x *DeleteBlackListReq) FastWrite(buf []byte) (offset int) {
+	if x == nil {
+		return offset
+	}
+	offset += x.fastWriteField1(buf[offset:])
+	return offset
+}
+
+func (x *DeleteBlackListReq) fastWriteField1(buf []byte) (offset int) {
+	if x.UserId == 0 {
+		return offset
+	}
+	offset += fastpb.WriteInt32(buf[offset:], 1, x.GetUserId())
+	return offset
+}
+
+func (x *DeleteBlackListResp) FastWrite(buf []byte) (offset int) {
+	if x == nil {
+		return offset
+	}
+	offset += x.fastWriteField1(buf[offset:])
+	return offset
+}
+
+func (x *DeleteBlackListResp) fastWriteField1(buf []byte) (offset int) {
 	if !x.Res {
 		return offset
 	}
@@ -240,6 +469,95 @@ func (x *VerifyResp) sizeField1() (n int) {
 	return n
 }
 
+func (x *Blacklist) Size() (n int) {
+	if x == nil {
+		return n
+	}
+	n += x.sizeField1()
+	n += x.sizeField2()
+	return n
+}
+
+func (x *Blacklist) sizeField1() (n int) {
+	if x.UserId == 0 {
+		return n
+	}
+	n += fastpb.SizeInt32(1, x.GetUserId())
+	return n
+}
+
+func (x *Blacklist) sizeField2() (n int) {
+	if x.Exp == 0 {
+		return n
+	}
+	n += fastpb.SizeInt64(2, x.GetExp())
+	return n
+}
+
+func (x *AddBlackListReq) Size() (n int) {
+	if x == nil {
+		return n
+	}
+	n += x.sizeField1()
+	return n
+}
+
+func (x *AddBlackListReq) sizeField1() (n int) {
+	if x.Blacklist == nil {
+		return n
+	}
+	n += fastpb.SizeMessage(1, x.GetBlacklist())
+	return n
+}
+
+func (x *AddBlackListResp) Size() (n int) {
+	if x == nil {
+		return n
+	}
+	n += x.sizeField1()
+	return n
+}
+
+func (x *AddBlackListResp) sizeField1() (n int) {
+	if !x.Res {
+		return n
+	}
+	n += fastpb.SizeBool(1, x.GetRes())
+	return n
+}
+
+func (x *DeleteBlackListReq) Size() (n int) {
+	if x == nil {
+		return n
+	}
+	n += x.sizeField1()
+	return n
+}
+
+func (x *DeleteBlackListReq) sizeField1() (n int) {
+	if x.UserId == 0 {
+		return n
+	}
+	n += fastpb.SizeInt32(1, x.GetUserId())
+	return n
+}
+
+func (x *DeleteBlackListResp) Size() (n int) {
+	if x == nil {
+		return n
+	}
+	n += x.sizeField1()
+	return n
+}
+
+func (x *DeleteBlackListResp) sizeField1() (n int) {
+	if !x.Res {
+		return n
+	}
+	n += fastpb.SizeBool(1, x.GetRes())
+	return n
+}
+
 var fieldIDToName_DeliverTokenReq = map[int32]string{
 	1: "UserId",
 }
@@ -253,5 +571,26 @@ var fieldIDToName_DeliveryResp = map[int32]string{
 }
 
 var fieldIDToName_VerifyResp = map[int32]string{
+	1: "Res",
+}
+
+var fieldIDToName_Blacklist = map[int32]string{
+	1: "UserId",
+	2: "Exp",
+}
+
+var fieldIDToName_AddBlackListReq = map[int32]string{
+	1: "Blacklist",
+}
+
+var fieldIDToName_AddBlackListResp = map[int32]string{
+	1: "Res",
+}
+
+var fieldIDToName_DeleteBlackListReq = map[int32]string{
+	1: "UserId",
+}
+
+var fieldIDToName_DeleteBlackListResp = map[int32]string{
 	1: "Res",
 }
