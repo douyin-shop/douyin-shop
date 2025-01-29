@@ -26,6 +26,12 @@ nacos:
   timeous_ms: 5000
   not_load_cache_at_start: true
 
+<<<<<<< Updated upstream
 bcrypt:
   cost: 12
 
+=======
+
+bcrypt:
+  cost: 12
+>>>>>>> Stashed changes

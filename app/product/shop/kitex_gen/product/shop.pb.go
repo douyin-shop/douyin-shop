@@ -2,7 +2,11 @@
 // versions:
 // 	protoc-gen-go v1.28.1
 // 	protoc        v3.19.4
+<<<<<<< Updated upstream:app/product/shop/kitex_gen/product/shop.pb.go
 // source: shop.proto
+=======
+// source: product.proto
+>>>>>>> Stashed changes:app/product/kitex_gen/product/product.pb.go
 
 package product
 
