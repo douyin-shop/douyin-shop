@@ -1,6 +1,11 @@
 package conf
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"sync"
+
 	"github.com/cloudwego/kitex/pkg/klog"
 	remote_config "github.com/douyin-shop/douyin-shop/common/conf"
 	"github.com/kitex-contrib/config-nacos/v2/nacos"
@@ -8,10 +13,6 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"gopkg.in/validator.v2"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"sync"
 )
 
 var (
@@ -26,6 +27,7 @@ type Config struct {
 	Redis    Redis    `yaml:"redis"`
 	Registry Registry `yaml:"registry"`
 	Nacos    Nacos    `yaml:"nacos"`
+	Bcrypt    Bcrypt    `yaml:"bcrypt"`
 }
 
 type MySQL struct {
@@ -67,6 +69,10 @@ type Nacos struct {
 	LogLevel            string `yaml:"log_level"`
 	TimeoutMs           uint64 `yaml:"timeout_ms"`
 	NotLoadCacheAtStart bool   `yaml:"not_load_cache_at_start"`
+}
+
+type Bcrypt struct{
+	Cost int `yaml:"cost"`
 }
 
 // GetConf gets configuration instance
