@@ -7,6 +7,7 @@ import (
 	"github.com/douyin-shop/douyin-shop/app/user/biz/model"
 	"github.com/douyin-shop/douyin-shop/app/user/biz/utils/code"
 	user "github.com/douyin-shop/douyin-shop/app/user/kitex_gen/user"
+	"github.com/cloudwego/kitex/pkg/kerrors"
 )
 
 type RegisterService struct {

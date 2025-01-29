@@ -1,6 +1,6 @@
 kitex:
-  service: "user"
-  address: ":8007"
+  service: "product"
+  address: ":8006"
   log_level: info
   log_file_name: "log/kitex.log"
   log_max_size: 10
@@ -12,6 +12,7 @@ registry:
     - 127.0.0.1:2379
   username: ""
   password: ""
+
 
 nacos:
   address: "127.0.0.1"
@@ -26,6 +27,3 @@ nacos:
   timeous_ms: 5000
   not_load_cache_at_start: true
 
-
-bcrypt:
-  cost: 12
