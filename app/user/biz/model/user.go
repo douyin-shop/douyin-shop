@@ -9,26 +9,26 @@ import (
 	"gorm.io/gorm"
 )
 
-type User struct{
+type User struct {
 	gorm.Model
 	PassWord string `gorm:"varchar(20);not null;" json:"password" binding:"required,min=6 max=12" label:"用户密码"`
-	Email string `gorm:"varchar(30);not null;" json:"email" binding:"required,email" label:"用户邮箱"`
-	Role int `gorm:"tinyint;not null;" json:"role" label:"用户权限"`
+	Email    string `gorm:"varchar(30);not null;" json:"email" binding:"required,email" label:"用户邮箱"`
+	Role     int    `gorm:"tinyint;not null;" json:"role" label:"用户权限"`
 }
 
 // 检查用户是否存在
-func CheckUserExist(email string) (int,*User) {
+func CheckUserExist(email string) (int, *User) {
 	var user User
 	mysql.DB.Where("email = ?", email).First(&user)
-	if(user.ID!=0){
-		return code.UserExist,&user
+	if user.ID != 0 {
+		return code.UserExist, &user
 	}
-	return code.UserNotExist,nil
+	return code.UserNotExist, nil
 }
 
-//触发器:负责在添加用户信息时,对用户密码进行加密
-func (u *User)BeforeSave(tx *gorm.DB) (err error) {
-	u.PassWord=ScriptPassWord(u.PassWord)
+// 触发器:负责在添加用户信息时,对用户密码进行加密
+func (u *User) BeforeSave(tx *gorm.DB) (err error) {
+	u.PassWord = ScriptPassWord(u.PassWord)
 	return
 }
 
@@ -40,10 +40,30 @@ func CreateUser(user *User) (userId uint, err error) {
 	return user.ID, nil
 }
 
-func ScriptPassWord(password string)string{
-	hashpass,err:=bcrypt.GenerateFromPassword([]byte(password),conf.GetConf().Bcrypt.Cost)
-	if err!=nil{
-	    klog.Error("password encrypt failed",err)
+func ScriptPassWord(password string) string {
+	hashpass, err := bcrypt.GenerateFromPassword([]byte(password), conf.GetConf().Bcrypt.Cost)
+	if err != nil {
+		klog.Error("password encrypt failed", err)
 	}
 	return string(hashpass)
+}
+
+// 通过用户id检查用户是否存在
+func CheckUserIDExist(userId int32) (int, *User) {
+	var user User
+	mysql.DB.Where("UserId = ?", userId).First(&user)
+
+	if user.ID != 0 {
+		return code.UserExist, &user
+	}
+	return code.UserNotExist, nil
+}
+
+// 通过用户id删除用户
+func DeleteUserByID(u *User, userId int32) error {
+	result := mysql.DB.Where("id = ?", userId).Delete(u)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
