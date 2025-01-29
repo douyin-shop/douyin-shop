@@ -5,8 +5,17 @@ import (
 
 	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/douyin-shop/douyin-shop/app/user/biz/model"
+<<<<<<< HEAD
 	"github.com/douyin-shop/douyin-shop/app/user/biz/utils/code"
 
+=======
+<<<<<<< Updated upstream
+	"github.com/douyin-shop/douyin-shop/app/user/code"
+=======
+	"github.com/douyin-shop/douyin-shop/app/user/biz/utils/code"
+
+>>>>>>> Stashed changes
+>>>>>>> ae6c4a5 (测试)
 	user "github.com/douyin-shop/douyin-shop/app/user/kitex_gen/user"
 	"golang.org/x/crypto/bcrypt"
 )

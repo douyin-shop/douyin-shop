@@ -3,7 +3,15 @@ package model
 import (
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal/mysql"
+<<<<<<< HEAD
 	"github.com/douyin-shop/douyin-shop/app/user/biz/utils/code"
+=======
+<<<<<<< Updated upstream
+	"github.com/douyin-shop/douyin-shop/app/user/code"
+=======
+	"github.com/douyin-shop/douyin-shop/app/user/biz/utils/code"
+>>>>>>> Stashed changes
+>>>>>>> ae6c4a5 (测试)
 	"github.com/douyin-shop/douyin-shop/app/user/conf"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
