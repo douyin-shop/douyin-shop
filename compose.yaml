@@ -37,6 +37,55 @@ services:
 #            - "8858:8858"
 #        networks:
 #            - micro-service-net
+
+        # RocketMQ Nameserver
+    rocketmq-namesrv:
+        image: apache/rocketmq:5.3.1
+        container_name: rocketmq-namesrv
+        ports:
+            - 9876:9876
+#        volumes:
+#            - ./rocketmq/namesrv/logs:/home/rocketmq/logs
+#            - ./rocketmq/namesrv/store:/home/rocketmq/store
+        command: sh mqnamesrv
+        environment:
+            - JAVA_OPT_EXT=-server -Xms512m -Xmx512m
+        networks:
+            - micro-service-net
+
+    # RocketMQ Broker
+    rocketmq-broker:
+        image: apache/rocketmq:5.3.1
+        container_name: rocketmq-broker
+        ports:
+            - 10909:10909
+            - 10911:10911
+            - 10912:10912
+        volumes:
+#            - ./rocketmq/broker/logs:/home/rocketmq/logs
+#            - ./rocketmq/broker/store:/home/rocketmq/store
+            - ./rocketmq/broker/conf/broker.conf:/home/rocketmq/rocketmq-5.3.1/conf/broker.conf
+        command: sh mqbroker -n rocketmq-namesrv:9876 -c ../conf/broker.conf
+        depends_on:
+            - rocketmq-namesrv
+        environment:
+            - JAVA_OPT_EXT=-server -Xms512m -Xmx512m
+            - NAMESRV_ADDR=rocketmq-namesrv:9876
+        networks:
+            - micro-service-net
+
+    # RocketMQ Dashboard
+    rocketmq-dashboard:
+        image: apacherocketmq/rocketmq-dashboard:latest
+        container_name: rocketmq-dashboard
+        ports:
+            - 808:8080
+        environment:
+            - JAVA_OPTS=-Drocketmq.namesrv.addr=rocketmq-namesrv:9876
+        depends_on:
+            - rocketmq-namesrv
+        networks:
+            - micro-service-net
     redis:
         image: redis:6.2.6
         container_name: redis
@@ -56,7 +105,18 @@ services:
             - "3306:3306" # 映射容器的3306端口到主机的3306端口
         volumes:
             - db_data:/var/lib/mysql # 挂载宿主机的目录到容器的MySQL数据目录，用于持久化数据
-
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.17.1
+        container_name: elasticsearch
+        environment:
+            - discovery.type=single-node
+            - ES_JAVA_OPTS=-Xms512m -Xmx512m
+            - xpack.security.enabled=false
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+        networks:
+            - micro-service-net
 networks:
     micro-service-net:
         driver: bridge
