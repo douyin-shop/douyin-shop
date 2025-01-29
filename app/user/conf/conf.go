@@ -1,17 +1,18 @@
 package conf
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"sync"
+
 	"github.com/cloudwego/kitex/pkg/klog"
-	common_conf "github.com/douyin-shop/douyin-shop/common/conf"
+	remote_config "github.com/douyin-shop/douyin-shop/common/conf"
 	"github.com/kitex-contrib/config-nacos/v2/nacos"
 	"github.com/kr/pretty"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"gopkg.in/validator.v2"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"sync"
 )
 
 var (
@@ -26,7 +27,7 @@ type Config struct {
 	Redis    Redis    `yaml:"redis"`
 	Registry Registry `yaml:"registry"`
 	Nacos    Nacos    `yaml:"nacos"`
-	Jwt      Jwt      `yaml:"jwt"`
+	Bcrypt    Bcrypt    `yaml:"bcrypt"`
 }
 
 type MySQL struct {
@@ -70,8 +71,8 @@ type Nacos struct {
 	NotLoadCacheAtStart bool   `yaml:"not_load_cache_at_start"`
 }
 
-type Jwt struct {
-	Secret string `yaml:"secret"`
+type Bcrypt struct{
+	Cost int `yaml:"cost"`
 }
 
 // GetConf gets configuration instance
@@ -121,9 +122,8 @@ func initConf() {
 // LoadRemoteConf 从远程加载配置
 func LoadRemoteConf(env string) error {
 
-	klog.Info("kitexInit")
 	// 从公共配置中加载 Nacos 配置
-	nacosConfig := common_conf.GetConf().Nacos
+	nacosConfig := remote_config.GetConf().Nacos
 
 	client, err := nacos.NewClient(nacos.Options{
 		Address:     nacosConfig.Address,
