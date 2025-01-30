@@ -5,6 +5,7 @@ package main
 import (
 	"context"
 	"github.com/douyin-shop/douyin-shop/app/frontend/biz/dal"
+	"github.com/douyin-shop/douyin-shop/app/frontend/infra/mtl"
 	"io"
 	"os"
 	"time"
@@ -21,6 +22,7 @@ import (
 	"github.com/hertz-contrib/gzip"
 	"github.com/hertz-contrib/logger/accesslog"
 	hertzlogrus "github.com/hertz-contrib/logger/logrus"
+	hertzotelprovider "github.com/hertz-contrib/obs-opentelemetry/provider"
 	"github.com/hertz-contrib/pprof"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -29,6 +31,13 @@ import (
 func main() {
 	// init dal
 	dal.Init()
+
+	p := hertzotelprovider.NewOpenTelemetryProvider(
+		hertzotelprovider.WithSdkTracerProvider(mtl.TracerProvider),
+		hertzotelprovider.WithEnableMetrics(false),
+	)
+	defer p.Shutdown(context.Background())
+
 	address := conf.GetConf().Hertz.Address
 	h := server.New(server.WithHostPorts(address))
 
