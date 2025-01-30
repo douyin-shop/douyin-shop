@@ -4,13 +4,10 @@ import (
 	"context"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/cloudwego/kitex/client"
 	"github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth"
-	"github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth/authservice"
 	frontend "github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend"
+	"github.com/douyin-shop/douyin-shop/app/frontend/infra/rpc"
 	"github.com/douyin-shop/douyin-shop/app/user/kitex_gen/user"
-	"github.com/douyin-shop/douyin-shop/app/user/kitex_gen/user/userservice"
-	"github.com/douyin-shop/douyin-shop/common/nacos"
 )
 
 type LoginService struct {
@@ -29,9 +26,7 @@ func (h *LoginService) Run(req *frontend.LoginReq) (resp *frontend.LoginResp, er
 	}()
 
 	// 通过微服务调用user服务
-	resolver := nacos.GetNacosResolver()
-	userClient := userservice.MustNewClient("user", client.WithResolver(resolver))
-	checkUserRes, err := userClient.Login(h.Context, &user.LoginReq{
+	checkUserRes, err := rpc.UserClient.Login(h.Context, &user.LoginReq{
 		Email:    req.Email,
 		Password: req.Password,
 	})
@@ -44,8 +39,7 @@ func (h *LoginService) Run(req *frontend.LoginReq) (resp *frontend.LoginResp, er
 	hlog.Debug("账号密码校验成功，正在准备请求Auth分发token： ", checkUserRes.UserId)
 
 	// 通过微服务调用auth服务
-	authService := authservice.MustNewClient("auth", client.WithResolver(resolver))
-	authRes, err := authService.DeliverTokenByRPC(h.Context, &auth.DeliverTokenReq{UserId: checkUserRes.UserId})
+	authRes, err := rpc.AuthClient.DeliverTokenByRPC(h.Context, &auth.DeliverTokenReq{UserId: checkUserRes.UserId})
 
 	if err != nil {
 		hlog.Error("authService.DeliverTokenByRPC err: ", err)
