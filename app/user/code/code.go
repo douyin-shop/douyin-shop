@@ -7,6 +7,7 @@ const (
 	UserCreateFailed = 1003
 	PassWordError    = 1004
 	DeleteError      = 1005
+	UpdateError      = 1006
 )
 
 var CodeMessage = map[int]string{
@@ -16,6 +17,7 @@ var CodeMessage = map[int]string{
 	UserCreateFailed: "user create failed",
 	PassWordError:    "password error",
 	DeleteError:      "delete error",
+	UpdateError:      "update error",
 }
 
 func GetMsg(code int) string {

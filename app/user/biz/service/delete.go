@@ -18,6 +18,9 @@ func NewDeleteService(ctx context.Context) *DeleteService {
 // Run create note info
 func (s *DeleteService) Run(req *user.DeleteReq) (resp *user.DeleteResp, err error) {
 	var u *model.User
+	//if req.UserId == 0 {
+	//	return nil, kerrors.NewGRPCBizStatusError(code.UserNotExist, "UserId不存在")
+	//}
 	userCode, u := model.CheckUserIDExist(req.UserId)
 	if userCode == code.UserExist {
 		err := model.DeleteUserByID(u, req.UserId)

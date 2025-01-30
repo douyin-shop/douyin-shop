@@ -2,11 +2,13 @@ package service
 
 import (
 	"context"
-	"testing"
+	"github.com/douyin-shop/douyin-shop/app/user/biz/dal"
 	user "github.com/douyin-shop/douyin-shop/app/user/kitex_gen/user"
+	"testing"
 )
 
 func TestDelete_Run(t *testing.T) {
+	dal.Init()
 	ctx := context.Background()
 	s := NewDeleteService(ctx)
 	// init req and assert value

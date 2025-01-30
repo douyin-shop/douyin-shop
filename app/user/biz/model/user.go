@@ -67,3 +67,11 @@ func DeleteUserByID(u *User, userId int32) error {
 	}
 	return nil
 }
+
+func UpdateUser(u *User) error {
+	res := mysql.DB.Updates(u)
+	if res.Error != nil {
+		return res.Error
+	}
+	return nil
+}
