@@ -29,3 +29,6 @@ nacos:
 
 opentelemetry:
   address: "127.0.0.1:4317"
+
+bcrypt:
+  cost: 12
