@@ -20,13 +20,14 @@ var (
 )
 
 type Config struct {
-	Env           string
-	Kitex         Kitex         `yaml:"kitex"`
-	MySQL         MySQL         `yaml:"mysql"`
-	Redis         Redis         `yaml:"redis"`
-	Registry      Registry      `yaml:"registry"`
-	Nacos         Nacos         `yaml:"nacos"`
-	Jwt           Jwt           `yaml:"jwt"`
+	Env      string
+	Kitex    Kitex    `yaml:"kitex"`
+	MySQL    MySQL    `yaml:"mysql"`
+	Redis    Redis    `yaml:"redis"`
+	Registry Registry `yaml:"registry"`
+	Nacos    Nacos    `yaml:"nacos"`
+	Jwt      Jwt      `yaml:"jwt"`
+	Bcrypt    Bcrypt    `yaml:"bcrypt"`
 	OpenTelemetry OpenTelemetry `yaml:"opentelemetry"`
 }
 
@@ -73,6 +74,10 @@ type Nacos struct {
 
 type Jwt struct {
 	Secret string `yaml:"secret"`
+}
+
+type Bcrypt struct{
+	Cost int `yaml:"cost"`
 }
 
 type OpenTelemetry struct {
