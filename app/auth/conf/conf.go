@@ -20,14 +20,15 @@ var (
 )
 
 type Config struct {
-	Env       string
-	Kitex     Kitex     `yaml:"kitex"`
-	MySQL     MySQL     `yaml:"mysql"`
-	Redis     Redis     `yaml:"redis"`
-	Registry  Registry  `yaml:"registry"`
-	Nacos     Nacos     `yaml:"nacos"`
-	Jwt       Jwt       `yaml:"jwt"`
-	BlackList BlackList `yaml:"black_list"`
+	Env           string
+	Kitex         Kitex         `yaml:"kitex"`
+	MySQL         MySQL         `yaml:"mysql"`
+	Redis         Redis         `yaml:"redis"`
+	Registry      Registry      `yaml:"registry"`
+	Nacos         Nacos         `yaml:"nacos"`
+	Jwt           Jwt           `yaml:"jwt"`
+	BlackList     BlackList     `yaml:"black_list"`
+	OpenTelemetry OpenTelemetry `yaml:"opentelemetry"`
 }
 
 type MySQL struct {
@@ -77,6 +78,10 @@ type Jwt struct {
 
 type BlackList struct {
 	MaxExpireTime int64 `yaml:"max_expire_time"`
+}
+
+type OpenTelemetry struct {
+	Address string `yaml:"address"`
 }
 
 // GetConf gets configuration instance

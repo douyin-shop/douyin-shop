@@ -31,3 +31,7 @@ nacos:
   log_level: "debug"
   timeous_ms: 5000
   not_load_cache_at_start: true
+
+
+opentelemetry:
+  address: "127.0.0.1:4317"

@@ -1,11 +1,9 @@
-// @Author Adrian.Wang 2025/1/30 11:26:00
+// Package mtl @Author Adrian.Wang 2025/1/30 11:14:00
 package mtl
 
 import (
 	"context"
-	"github.com/douyin-shop/douyin-shop/app/frontend/conf"
-
-	"github.com/cloudwego/hertz/pkg/route"
+	"github.com/cloudwego/kitex/server"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -15,20 +13,19 @@ import (
 
 var TracerProvider *tracesdk.TracerProvider
 
-func InitTracing() route.CtxCallback {
+func InitTracing(serviceName string) {
 	exporter, err := otlptracegrpc.New(context.Background())
 	if err != nil {
 		panic(err)
 	}
+	server.RegisterShutdownHook(func() {
+		exporter.Shutdown(context.Background()) //nolint:errcheck
+	})
 	processor := tracesdk.NewBatchSpanProcessor(exporter)
-	res, err := resource.New(context.Background(), resource.WithAttributes(semconv.ServiceNameKey.String(conf.GetConf().Hertz.Service)))
+	res, err := resource.New(context.Background(), resource.WithAttributes(semconv.ServiceNameKey.String(serviceName)))
 	if err != nil {
 		res = resource.Default()
 	}
 	TracerProvider = tracesdk.NewTracerProvider(tracesdk.WithSpanProcessor(processor), tracesdk.WithResource(res))
 	otel.SetTracerProvider(TracerProvider)
-
-	return func(ctx context.Context) {
-		exporter.Shutdown(ctx) //nolint:errcheck
-	}
 }

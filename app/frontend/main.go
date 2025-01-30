@@ -5,7 +5,8 @@ package main
 import (
 	"context"
 	"github.com/douyin-shop/douyin-shop/app/frontend/biz/dal"
-	"github.com/douyin-shop/douyin-shop/app/frontend/infra/mtl"
+	"github.com/douyin-shop/douyin-shop/app/frontend/infra/rpc"
+	"github.com/hertz-contrib/obs-opentelemetry/provider"
 	"io"
 	"os"
 	"time"
@@ -22,7 +23,8 @@ import (
 	"github.com/hertz-contrib/gzip"
 	"github.com/hertz-contrib/logger/accesslog"
 	hertzlogrus "github.com/hertz-contrib/logger/logrus"
-	hertzotelprovider "github.com/hertz-contrib/obs-opentelemetry/provider"
+	hertztracing "github.com/hertz-contrib/obs-opentelemetry/tracing"
+
 	"github.com/hertz-contrib/pprof"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -31,15 +33,20 @@ import (
 func main() {
 	// init dal
 	dal.Init()
+	// 初始化 rpc 客户端
+	rpc.InitClient()
 
-	p := hertzotelprovider.NewOpenTelemetryProvider(
-		hertzotelprovider.WithSdkTracerProvider(mtl.TracerProvider),
-		hertzotelprovider.WithEnableMetrics(false),
+	p := provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(conf.GetConf().Hertz.Service),
+		provider.WithExportEndpoint(conf.GetConf().OpenTelemetry.Address),
+		provider.WithInsecure(),
 	)
 	defer p.Shutdown(context.Background())
+	tracer, cfg := hertztracing.NewServerTracer()
 
 	address := conf.GetConf().Hertz.Address
-	h := server.New(server.WithHostPorts(address))
+	h := server.New(server.WithHostPorts(address), tracer)
+	h.Use(hertztracing.ServerMiddleware(cfg))
 
 	registerMiddleware(h)
 

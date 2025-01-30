@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal"
 	"github.com/douyin-shop/douyin-shop/common/custom_logger"
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"io"
 	"net"
 	"os"
@@ -36,6 +39,16 @@ func kitexInit() (opts []server.Option) {
 
 	// 初始化数据库
 	dal.Init()
+
+	// OpenTelemetry
+	p := provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(conf.GetConf().Kitex.Service),
+		provider.WithExportEndpoint(conf.GetConf().OpenTelemetry.Address),
+		provider.WithInsecure(),
+	)
+	defer p.Shutdown(context.Background())
+
+	opts = append(opts, server.WithSuite(tracing.NewServerSuite()))
 
 	// address
 	addr, err := net.ResolveTCPAddr("tcp", conf.GetConf().Kitex.Address)
@@ -75,5 +88,6 @@ func kitexInit() (opts []server.Option) {
 	server.RegisterShutdownHook(func() {
 		asyncWriter.Sync()
 	})
+
 	return
 }
