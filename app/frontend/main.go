@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"github.com/douyin-shop/douyin-shop/app/frontend/biz/dal"
 	"io"
 	"os"
 	"time"
@@ -27,7 +28,7 @@ import (
 
 func main() {
 	// init dal
-	// dal.Init()
+	dal.Init()
 	address := conf.GetConf().Hertz.Address
 	h := server.New(server.WithHostPorts(address))
 

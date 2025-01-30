@@ -22,3 +22,17 @@ func (s *AuthServiceImpl) VerifyTokenByRPC(ctx context.Context, req *auth.Verify
 
 	return resp, err
 }
+
+// AddBlacklist implements the AuthServiceImpl interface.
+func (s *AuthServiceImpl) AddBlacklist(ctx context.Context, req *auth.AddBlackListReq) (resp *auth.AddBlackListResp, err error) {
+	resp, err = service.NewAddBlacklistService(ctx).Run(req)
+
+	return resp, err
+}
+
+// DeleteBlacklist implements the AuthServiceImpl interface.
+func (s *AuthServiceImpl) DeleteBlacklist(ctx context.Context, req *auth.DeleteBlackListReq) (resp *auth.DeleteBlackListResp, err error) {
+	resp, err = service.NewDeleteBlacklistService(ctx).Run(req)
+
+	return resp, err
+}

@@ -13,6 +13,8 @@ import (
 type Client interface {
 	DeliverTokenByRPC(ctx context.Context, Req *auth.DeliverTokenReq, callOptions ...callopt.Option) (r *auth.DeliveryResp, err error)
 	VerifyTokenByRPC(ctx context.Context, Req *auth.VerifyTokenReq, callOptions ...callopt.Option) (r *auth.VerifyResp, err error)
+	AddBlacklist(ctx context.Context, Req *auth.AddBlackListReq, callOptions ...callopt.Option) (r *auth.AddBlackListResp, err error)
+	DeleteBlacklist(ctx context.Context, Req *auth.DeleteBlackListReq, callOptions ...callopt.Option) (r *auth.DeleteBlackListResp, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -52,4 +54,14 @@ func (p *kAuthServiceClient) DeliverTokenByRPC(ctx context.Context, Req *auth.De
 func (p *kAuthServiceClient) VerifyTokenByRPC(ctx context.Context, Req *auth.VerifyTokenReq, callOptions ...callopt.Option) (r *auth.VerifyResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.VerifyTokenByRPC(ctx, Req)
+}
+
+func (p *kAuthServiceClient) AddBlacklist(ctx context.Context, Req *auth.AddBlackListReq, callOptions ...callopt.Option) (r *auth.AddBlackListResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.AddBlacklist(ctx, Req)
+}
+
+func (p *kAuthServiceClient) DeleteBlacklist(ctx context.Context, Req *auth.DeleteBlackListReq, callOptions ...callopt.Option) (r *auth.DeleteBlackListResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.DeleteBlacklist(ctx, Req)
 }

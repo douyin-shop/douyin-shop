@@ -46,7 +46,7 @@ func TestGetCart(t *testing.T) {
 		Value: "application/json",
 	}, ut.Header{
 		Key:   "Authorization",
-		Value: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mzc4MjA0ODEsInVzZXJfaWQiOjF9.l8RrWRL0iRLrUMuWm4LNvYaD7_Fz0BWRgqMMIFNweN4",
+		Value: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mzc5MDU4MjMsInVzZXJfaWQiOjF9.UFoL-XTHXfpT1ZVN1UcU-joB13oRMTH-5g-zfIAXYao",
 	})
 	resp := w.Result()
 	t.Log(string(resp.Body()))
