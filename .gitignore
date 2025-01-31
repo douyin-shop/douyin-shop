@@ -6,3 +6,7 @@
 /nacos/
 
 cache/
+
+__debug*
+
+.vscode/

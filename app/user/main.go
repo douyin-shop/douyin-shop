@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/douyin-shop/douyin-shop/app/user/biz/dal"
 	"github.com/douyin-shop/douyin-shop/common/nacos"
 	"github.com/kitex-contrib/obs-opentelemetry/provider"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
@@ -32,6 +33,8 @@ func main() {
 }
 
 func kitexInit() (opts []server.Option) {
+
+	dal.Init()
 
 	// OpenTelemetry
 	p := provider.NewOpenTelemetryProvider(
