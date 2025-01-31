@@ -1,7 +1,7 @@
 package mysql
 
 import (
-	"github.com/douyin-shop/douyin-shop/app/user/biz/model"
+	"github.com/douyin-shop/douyin-shop/app/user/biz/dal/model"
 	"github.com/douyin-shop/douyin-shop/app/user/conf"
 
 	"gorm.io/driver/mysql"
