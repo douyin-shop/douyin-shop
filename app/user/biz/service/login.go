@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/douyin-shop/douyin-shop/app/user/biz/dal/model"
 	"github.com/douyin-shop/douyin-shop/app/user/biz/dal/mysql"
 
@@ -24,7 +25,7 @@ func (s *LoginService) Run(req *user.LoginReq) (resp *user.LoginResp, err error)
 	var u *model.User
 	userCode, u := model.CheckUserExist(mysql.DB, req.Email)
 	if userCode == code.UserExist {
-		Passworderr := bcrypt.CompareHashAndPassword([]byte(req.Password), []byte(u.PassWord))
+		Passworderr := bcrypt.CompareHashAndPassword([]byte(u.PassWord), []byte(req.Password))
 		if Passworderr != nil {
 			return nil, kerrors.NewGRPCBizStatusError(code.PassWordError, code.GetMsg(code.PassWordError))
 		} else {
