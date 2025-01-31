@@ -29,3 +29,8 @@ func _getcartMw() []app.HandlerFunc {
 
 	return nil
 }
+
+func _registerMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

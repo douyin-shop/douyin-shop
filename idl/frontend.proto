@@ -7,6 +7,15 @@ option go_package = "frontend";
 import "api-tools.proto";
 
 
+message RegisterReq {
+  string email = 1;
+  string password = 2;
+}
+
+message RegisterResp {
+  int32 user_id = 1;
+}
+
 message LoginReq {
   string email = 1;
   string password = 2;
@@ -16,6 +25,8 @@ message LoginResp {
   int32 user_id = 1;
   string token = 2;
 }
+
+
 
 message VerifyTokenReq {
   string token = 1;
@@ -46,9 +57,15 @@ message GetCartResp {
 }
 
 service FrontendService {
+  rpc Register(RegisterReq) returns (RegisterResp) {
+    option (api.post) = "/register";
+  }  //注册服务/创建用户
+
   rpc Login(LoginReq) returns (LoginResp) {
     option (api.post) = "/login";
   }
+
+  // deprecated
   rpc VerifyToken(VerifyTokenReq) returns (VerifyTokenResp) {}
 
   rpc GetCart(GetCartReq) returns (GetCartResp) {
