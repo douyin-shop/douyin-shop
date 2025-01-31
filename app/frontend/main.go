@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"github.com/cloudwego/hertz/pkg/common/tracer/stats"
 	"github.com/douyin-shop/douyin-shop/app/frontend/biz/dal"
 	"github.com/douyin-shop/douyin-shop/app/frontend/infra/rpc"
 	"github.com/hertz-contrib/obs-opentelemetry/provider"
@@ -45,7 +46,11 @@ func main() {
 	tracer, cfg := hertztracing.NewServerTracer()
 
 	address := conf.GetConf().Hertz.Address
-	h := server.New(server.WithHostPorts(address), tracer)
+	h := server.New(
+		server.WithHostPorts(address),
+		tracer,
+		server.WithTraceLevel(stats.LevelDetailed), // 开启细粒度的跟踪
+	)
 	h.Use(hertztracing.ServerMiddleware(cfg))
 
 	registerMiddleware(h)
