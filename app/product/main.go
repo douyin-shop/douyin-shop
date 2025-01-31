@@ -1,7 +1,10 @@
 package main
 
 import (
+	"context"
 	"github.com/douyin-shop/douyin-shop/common/nacos"
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"io"
 	"net"
 	"os"
@@ -29,6 +32,17 @@ func main() {
 }
 
 func kitexInit() (opts []server.Option) {
+
+	// OpenTelemetry
+	p := provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(conf.GetConf().Kitex.Service),
+		provider.WithExportEndpoint(conf.GetConf().OpenTelemetry.Address),
+		provider.WithInsecure(),
+	)
+	defer p.Shutdown(context.Background())
+
+	opts = append(opts, server.WithSuite(tracing.NewServerSuite()))
+
 	// address
 	addr, err := net.ResolveTCPAddr("tcp", conf.GetConf().Kitex.Address)
 	if err != nil {

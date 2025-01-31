@@ -28,3 +28,9 @@ nacos:
 
 jwt:
   secret: "123456"
+
+black_list:
+  max_expire_time: 86400
+
+opentelemetry:
+  address: "127.0.0.1:4317"

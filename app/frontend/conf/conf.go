@@ -24,11 +24,12 @@ var (
 type Config struct {
 	Env string
 
-	Hertz Hertz `yaml:"hertz"`
-	MySQL MySQL `yaml:"mysql"`
-	Redis Redis `yaml:"redis"`
-	Nacos Nacos `yaml:"nacos"`
-	Jwt   Jwt   `yaml:"jwt"`
+	Hertz         Hertz         `yaml:"hertz"`
+	MySQL         MySQL         `yaml:"mysql"`
+	Redis         Redis         `yaml:"redis"`
+	Nacos         Nacos         `yaml:"nacos"`
+	Jwt           Jwt           `yaml:"jwt"`
+	OpenTelemetry OpenTelemetry `yaml:"opentelemetry"`
 }
 
 type MySQL struct {
@@ -71,6 +72,10 @@ type Nacos struct {
 
 type Jwt struct {
 	Secret string `yaml:"secret"`
+}
+
+type OpenTelemetry struct {
+	Address string `yaml:"address"`
 }
 
 // GetConf gets configuration instance

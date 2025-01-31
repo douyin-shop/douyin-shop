@@ -27,3 +27,5 @@ nacos:
   not_load_cache_at_start: true
 
 
+opentelemetry:
+  address: "127.0.0.1:4317"
