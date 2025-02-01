@@ -7,6 +7,7 @@ option go_package="/auth";
 service AuthService {
     rpc DeliverTokenByRPC(DeliverTokenReq) returns (DeliveryResp) {}
     rpc VerifyTokenByRPC(VerifyTokenReq) returns (VerifyResp) {}
+    rpc Logout(LogoutReq) returns (LogoutResp) {}
     // 新增用户到黑名单
     rpc AddBlacklist(AddBlackListReq) returns (AddBlackListResp) {}
     // 删除黑名单用户
@@ -27,6 +28,15 @@ message DeliveryResp {
 
 message VerifyResp {
     bool res = 1;
+}
+
+message LogoutReq {
+    string token = 1;
+}
+
+
+message LogoutResp {
+    bool success = 1;
 }
 
 message Blacklist {
