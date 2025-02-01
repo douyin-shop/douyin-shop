@@ -18,6 +18,7 @@ func Register(r *server.Hertz) {
 
 	root := r.Group("/", rootMw()...)
 	root.POST("/login", append(_loginMw(), frontend.Login)...)
+	root.GET("/logout", append(_logoutMw(), frontend.Logout)...)
 	root.POST("/register", append(_registerMw(), frontend.Register)...)
 	{
 		_cart := root.Group("/cart", _cartMw()...)

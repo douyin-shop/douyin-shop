@@ -2,9 +2,11 @@ syntax = "proto3";
 
 package frontend;
 
+import "google/protobuf/empty.proto";
+import "api-tools.proto";
+
 option go_package = "frontend";
 
-import "api-tools.proto";
 
 
 message RegisterReq {
@@ -27,6 +29,9 @@ message LoginResp {
 }
 
 
+message LogoutResp {
+  bool success = 1;
+}
 
 message VerifyTokenReq {
   string token = 1;
@@ -64,6 +69,11 @@ service FrontendService {
   rpc Login(LoginReq) returns (LoginResp) {
     option (api.post) = "/login";
   }
+
+  rpc Logout(google.protobuf.Empty) returns (LogoutResp) {
+    option (api.get) = "/logout";
+  }
+
 
   // deprecated
   rpc VerifyToken(VerifyTokenReq) returns (VerifyTokenResp) {}
