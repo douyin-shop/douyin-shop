@@ -15,6 +15,12 @@ type User struct {
 	Role     int    `gorm:"tinyint;not null;" json:"role" label:"用户权限"`
 }
 
+// BeforeSave 触发器:负责在添加用户信息时,对用户密码进行加密
+func (u *User) BeforeSave(tx *gorm.DB) (err error) {
+	u.PassWord = ScriptPassWord(u.PassWord)
+	return
+}
+
 // CheckUserExist 检查用户是否存在
 func CheckUserExist(db *gorm.DB, email string) (int, *User) {
 	var user User
@@ -23,12 +29,6 @@ func CheckUserExist(db *gorm.DB, email string) (int, *User) {
 		return code.UserExist, &user
 	}
 	return code.UserNotExist, nil
-}
-
-// BeforeSave 触发器:负责在添加用户信息时,对用户密码进行加密
-func (u *User) BeforeSave(tx *gorm.DB) (err error) {
-	u.PassWord = ScriptPassWord(u.PassWord)
-	return
 }
 
 func CreateUser(db *gorm.DB, user *User) (userId uint, err error) {
