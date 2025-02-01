@@ -1,14 +1,15 @@
 package conf
 
 import (
-	"github.com/cloudwego/kitex/pkg/klog"
-	common_conf "github.com/douyin-shop/douyin-shop/common/conf"
-	"github.com/kitex-contrib/config-nacos/v2/nacos"
-	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/cloudwego/kitex/pkg/klog"
+	common_conf "github.com/douyin-shop/douyin-shop/common/conf"
+	"github.com/kitex-contrib/config-nacos/v2/nacos"
+	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/kr/pretty"
@@ -30,6 +31,7 @@ type Config struct {
 	Nacos         Nacos         `yaml:"nacos"`
 	Jwt           Jwt           `yaml:"jwt"`
 	OpenTelemetry OpenTelemetry `yaml:"opentelemetry"`
+	Casbin        Casbin        `yaml:"casbin"`
 }
 
 type MySQL struct {
@@ -76,6 +78,17 @@ type Jwt struct {
 
 type OpenTelemetry struct {
 	Address string `yaml:"address"`
+}
+
+type Rule struct {
+	Role   string `yaml:"role"`
+	Path   string `yaml:"path"`
+	Method string `yaml:"method"`
+}
+
+type Casbin struct {
+	ModelPath string `yaml:"model_path"`
+	Rules     []Rule `yaml:"rules"`
 }
 
 // GetConf gets configuration instance
