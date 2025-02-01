@@ -2,9 +2,11 @@
 package utils
 
 import (
-	"github.com/douyin-shop/douyin-shop/app/frontend/biz/dal"
 	"os"
 	"testing"
+
+	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal/mysql"
+	"github.com/douyin-shop/douyin-shop/app/frontend/biz/dal"
 )
 
 func TestAddPermission(t *testing.T) {
@@ -14,6 +16,6 @@ func TestAddPermission(t *testing.T) {
 		return
 	}
 	dal.Init()
-	AddPermission()
+	AddPermission(mysql.DB)
 	t.Log("success")
 }

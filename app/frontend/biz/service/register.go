@@ -5,6 +5,8 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/douyin-shop/douyin-shop/app/frontend/biz/dal/mysql"
+	"github.com/douyin-shop/douyin-shop/app/frontend/biz/utils"
 	frontend "github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend"
 	"github.com/douyin-shop/douyin-shop/app/frontend/infra/rpc"
 	"github.com/douyin-shop/douyin-shop/app/user/kitex_gen/user"
@@ -37,6 +39,9 @@ func (h *RegisterService) Run(req *frontend.RegisterReq) (resp *frontend.Registe
 	}
 
 	hlog.Debug("账号注册成功 ", registerRes.UserId)
+
+	// 为用户添加角色
+	utils.AddRoleToUser(mysql.DB, registerRes.UserId, "user")
 
 	// 返回结果
 	resp = &frontend.RegisterResp{

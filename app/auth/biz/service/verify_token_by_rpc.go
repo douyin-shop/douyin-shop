@@ -4,17 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/bytedance/gopkg/cloud/metainfo"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal/model"
+	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal/mysql"
 	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal/redis"
 	"github.com/douyin-shop/douyin-shop/app/auth/conf"
 	auth "github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth"
-	"github.com/douyin-shop/douyin-shop/app/frontend/biz/dal/mysql"
 	"github.com/golang-jwt/jwt"
 	redis_core "github.com/redis/go-redis/v9"
-	"strconv"
-	"time"
 )
 
 type VerifyTokenByRPCService struct {
@@ -64,6 +65,7 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 
 	// 如果Redis中无用户状态，从数据库中获取用户状态
 	if err != nil && errors.Is(err, redis_core.Nil) {
+		err = nil
 		// 从数据库中获取用户状态
 		userStatus, expire, err := model.GetUserStatusFromDB(mysql.DB, context.Background(), userId)
 		if err != nil {
@@ -107,6 +109,8 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 	if !ok {
 		klog.Error("set user_id in metadata error")
 	}
+
+	klog.Infof("用户id: %d 验证通过！", userId)
 
 	// 返回true，表示用户通过验证
 	if claims.Valid {
