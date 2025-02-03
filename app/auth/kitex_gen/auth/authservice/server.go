@@ -2,23 +2,13 @@
 package authservice
 
 import (
-	klog "github.com/cloudwego/kitex/pkg/klog"
-	rpcinfo "github.com/cloudwego/kitex/pkg/rpcinfo"
 	server "github.com/cloudwego/kitex/server"
 	auth "github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth"
-	registry "github.com/kitex-contrib/registry-nacos/registry"
 )
 
 // NewServer creates a server.Server with the given handler and options.
 func NewServer(handler auth.AuthService, opts ...server.Option) server.Server {
 	var options []server.Option
-	r, err := registry.NewDefaultNacosRegistry()
-	if err != nil {
-		klog.Fatal(err)
-	}
-	options = append(options, server.WithRegistry(r), server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
-		ServiceName: "auth",
-	}))
 
 	options = append(options, opts...)
 

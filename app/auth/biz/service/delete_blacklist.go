@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal/model"
 	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal/mysql"
@@ -35,11 +36,11 @@ func (s *DeleteBlacklistService) Run(req *auth.DeleteBlackListReq) (resp *auth.D
 	if err := model.DeleteFromBlackList(mysql.DB, context.Background(), userId); err != nil {
 		klog.Errorf("从黑名单删除用户失败: %v", err)
 		resp.Res = false
+		err = kerrors.NewBizStatusError(502, err.Error())
 		return resp, err
 	}
 
 	resp.Res = true
 	return resp, nil
 
-	return
 }

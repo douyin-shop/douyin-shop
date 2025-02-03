@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
+	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal/redis"
 	"github.com/douyin-shop/douyin-shop/app/auth/biz/utils"
@@ -31,13 +31,14 @@ func (s *DeliverTokenByRPCService) Run(req *auth.DeliverTokenReq) (resp *auth.De
 
 	// 如果redis中有token，说明用户已经登录过，直接返回
 	if err == nil && result != "" {
-
-		return nil, errors.New("用户已登陆")
+		err = kerrors.NewBizStatusError(400, "用户已登陆")
+		return nil, err
 	}
 
 	// 如果redis中有错误，直接返回
 	if err != nil && !errors.Is(err, redis_core.Nil) {
 		klog.Error("redis get error: ", err)
+		err = kerrors.NewBizStatusError(502, err.Error())
 		return nil, err
 	}
 
@@ -50,7 +51,9 @@ func (s *DeliverTokenByRPCService) Run(req *auth.DeliverTokenReq) (resp *auth.De
 
 	tokenString, err := token.SignedString([]byte(conf.GetConf().Jwt.Secret))
 	if err != nil {
-		return nil, fmt.Errorf("failed to sign token: %w", err)
+		err = kerrors.NewBizStatusError(502, err.Error())
+
+		return nil, err
 	}
 
 	// 将token存入redis
@@ -58,6 +61,8 @@ func (s *DeliverTokenByRPCService) Run(req *auth.DeliverTokenReq) (resp *auth.De
 
 	if err != nil {
 		klog.Error("redis set error: ", err)
+		err = kerrors.NewBizStatusError(502, err.Error())
+
 		return nil, err
 	}
 

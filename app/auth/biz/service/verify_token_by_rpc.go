@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/cloudwego/kitex/pkg/kerrors"
 	"strconv"
 	"time"
 
@@ -36,6 +37,7 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 
 	if err != nil {
 		klog.Error("parse token error: ", err)
+		err = kerrors.NewBizStatusError(502, err.Error())
 		return nil, err
 	}
 
@@ -45,12 +47,13 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 
 	klog.Debug("token验证通过，UserId:", userId)
 
+	//=======================黑名单相关逻辑==================================
 	// 根据userId获取用户状态，如果用户已经进入黑名单，则直接返回false
 	// 先从Redis中获取当前用户状态，如果状态为黑名单，则直接返回false
 	// 如果Redis中没有当前用户状态，则从数据库中获取用户状态，并且存入Redis中
 	// 如果用户状态为黑名单，则直接返回false
 	// 如果用户状态不为黑名单，则返回true
-	// TODO 在将用户加入黑名单的时候，需要将用户状态存入Redis中，修改其状态从正常到黑名单
+	// 在将用户加入黑名单的时候，需要将用户状态存入Redis中，修改其状态从正常到黑名单
 
 	// 使用Redis String存储用户状态
 	userStatusKey := fmt.Sprintf("user:%d:status", userId)
@@ -60,38 +63,52 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 	// Redis存在错误，返回报错
 	if err != nil && !errors.Is(err, redis_core.Nil) {
 		klog.Error("redis Get error: ", err)
+		err = kerrors.NewBizStatusError(502, err.Error())
 		return nil, err
 	}
 
 	// 如果Redis中无用户状态，从数据库中获取用户状态
 	if err != nil && errors.Is(err, redis_core.Nil) {
 		err = nil
+
+		maxExpire := conf.GetConf().BlackList.MaxExpireTime
+
 		// 从数据库中获取用户状态
 		userStatus, expire, err := model.GetUserStatusFromDB(mysql.DB, context.Background(), userId)
 		if err != nil {
 			klog.Error("GetUserStatusFromDB error: ", err)
+			err = kerrors.NewBizStatusError(502, err.Error())
 			return nil, err
-		}
-
-		// expire过期时间最多为24h，以减少Redis中的数据量
-		if expire > 24*3600 {
-			expire = 24 * 3600
 		}
 
 		if userStatus == model.Ban {
 			klog.Infof("用户id: %d 在黑名单中,阻止请求！", userId)
-			// 最多
+
+			// expire过期时间最多为设置的最大值，以减少Redis中的数据量
+			if expire > maxExpire {
+				expire = maxExpire
+			} else {
+				// 现在expire属于短期黑名单，需要从数据库中删除
+				err = model.DeleteFromBlackList(mysql.DB, context.Background(), userId)
+				if err != nil {
+					klog.Error("DeleteFromBlackList error: ", err)
+					err = kerrors.NewBizStatusError(502, err.Error())
+					return nil, err
+				}
+			}
+
+			// 更新Redis中的用户状态
 			redis.RedisClient.Set(context.Background(), userStatusKey, string(model.Ban), time.Duration(expire)*time.Second)
 			return &auth.VerifyResp{
 				Res: false,
 			}, nil
-
 		}
 
-		// 存储用户状态到Redis中,过期时间为24h
-		_, err = redis.RedisClient.Set(context.Background(), userStatusKey, string(model.Normal), time.Hour*24).Result()
+		// 存储用户状态到Redis中,过期时间为最大值
+		_, err = redis.RedisClient.Set(context.Background(), userStatusKey, string(model.Normal), time.Duration(maxExpire)*time.Second).Result()
 		if err != nil {
 			klog.Error("redis Set error: ", err)
+			err = kerrors.NewBizStatusError(502, err.Error())
 			return nil, err
 		}
 	}
@@ -103,6 +120,7 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 			Res: false,
 		}, nil
 	}
+	//====================================================================
 
 	// 在metadata中设置用户id,以供调用链使用
 	ok := metainfo.SendBackwardValue(s.ctx, "user_id", strconv.Itoa(int(userId)))

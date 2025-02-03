@@ -47,7 +47,7 @@ jobs:
           tar czf /tmp/service.tar.gz *
 
           # 2. 创建远程目录
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "mkdir -p /root/services/${{ inputs.service_name }}"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "mkdir -p /root/services/${{ inputs.service_name }} && rm -rf /root/services/${{ inputs.service_name }}/*"
 
           # 3. 单次传输压缩包
           scp -o StrictHostKeyChecking=no /tmp/service.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/${{ inputs.service_name }}/
