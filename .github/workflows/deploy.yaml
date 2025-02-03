@@ -53,7 +53,7 @@ jobs:
           scp -o StrictHostKeyChecking=no /tmp/service.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/services/${{ inputs.service_name }}/
 
            # 4. 远程解压并重启
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "export GO_ENV=online && cd /root/services/${{ inputs.service_name }} && tar xzf service.tar.gz && rm -f service.tar.gz && chmod +x bootstrap.sh && nohup ./bootstrap.sh restart > ./service.log 2>&1 &"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd /root/services/${{ inputs.service_name }} && tar xzf service.tar.gz && rm -f service.tar.gz && systemctl restart ${{ inputs.service_name }}.service"
 
           # # 创建目录并复制文件
           # ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "mkdir -p /root/services/${{ inputs.service_name }}"
