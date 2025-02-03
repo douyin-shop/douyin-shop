@@ -40,4 +40,4 @@ casbin:
   rules:
     - role: 'user'
       path: '^/cart.*$'
-      methods: '.*'
+      method: '.*'
