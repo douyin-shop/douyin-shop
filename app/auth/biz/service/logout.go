@@ -2,7 +2,8 @@ package service
 
 import (
 	"context"
-	"errors"
+	"fmt"
+	"github.com/cloudwego/kitex/pkg/kerrors"
 
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal/redis"
@@ -31,6 +32,7 @@ func (s *LogoutService) Run(req *auth.LogoutReq) (resp *auth.LogoutResp, err err
 
 	if err != nil {
 		klog.Error("parse token error: ", err)
+		err = kerrors.NewBizStatusError(502, fmt.Sprintf("parse token error: %s", err.Error()))
 		return nil, err
 	}
 
@@ -49,10 +51,12 @@ func (s *LogoutService) Run(req *auth.LogoutReq) (resp *auth.LogoutResp, err err
 	// Redis删除了0个key，说明token不存在
 	if n == 0 {
 		klog.Error("用户未登录")
-		return nil, errors.New("用户未登录")
+		err = kerrors.NewBizStatusError(400, "用户未登录")
+		return nil, err
 	}
 
 	if err != nil {
+		err = kerrors.NewBizStatusError(502, err.Error())
 		return nil, err
 	}
 

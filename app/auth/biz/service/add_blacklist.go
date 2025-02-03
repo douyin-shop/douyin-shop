@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/cloudwego/kitex/pkg/kerrors"
 	"time"
 
 	"github.com/cloudwego/kitex/pkg/klog"
@@ -42,6 +43,7 @@ func (s *AddBlacklistService) Run(req *auth.AddBlackListReq) (resp *auth.AddBlac
 
 			klog.Error("更新MySQL失败:", err)
 			resp.Res = false
+			err = kerrors.NewBizStatusError(502, err.Error())
 			return resp, err
 		}
 	}
@@ -50,6 +52,8 @@ func (s *AddBlacklistService) Run(req *auth.AddBlackListReq) (resp *auth.AddBlac
 	if err := redis.RedisClient.Del(context.Background(), userStatusKey).Err(); err != nil && !errors.Is(err, redis_core.Nil) {
 		klog.Error("删除Redis缓存失败:", err)
 		resp.Res = false
+		err = kerrors.NewBizStatusError(502, err.Error())
+
 		return resp, err
 	}
 
@@ -63,6 +67,7 @@ func (s *AddBlacklistService) Run(req *auth.AddBlackListReq) (resp *auth.AddBlac
 	if err := redis.RedisClient.Set(context.Background(), userStatusKey, string(model.Ban), time.Duration(expireTime)*time.Second).Err(); err != nil {
 		klog.Error("写入Redis缓存失败:", err)
 		resp.Res = false
+		err = kerrors.NewBizStatusError(502, err.Error())
 		return resp, err
 	}
 

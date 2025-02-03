@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/cloudwego/kitex/pkg/kerrors"
 	"strconv"
 	"time"
 
@@ -36,6 +37,7 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 
 	if err != nil {
 		klog.Error("parse token error: ", err)
+		err = kerrors.NewBizStatusError(502, err.Error())
 		return nil, err
 	}
 
@@ -45,6 +47,7 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 
 	klog.Debug("token验证通过，UserId:", userId)
 
+	//=======================黑名单相关逻辑==================================
 	// 根据userId获取用户状态，如果用户已经进入黑名单，则直接返回false
 	// 先从Redis中获取当前用户状态，如果状态为黑名单，则直接返回false
 	// 如果Redis中没有当前用户状态，则从数据库中获取用户状态，并且存入Redis中
@@ -60,6 +63,7 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 	// Redis存在错误，返回报错
 	if err != nil && !errors.Is(err, redis_core.Nil) {
 		klog.Error("redis Get error: ", err)
+		err = kerrors.NewBizStatusError(502, err.Error())
 		return nil, err
 	}
 
@@ -73,6 +77,7 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 		userStatus, expire, err := model.GetUserStatusFromDB(mysql.DB, context.Background(), userId)
 		if err != nil {
 			klog.Error("GetUserStatusFromDB error: ", err)
+			err = kerrors.NewBizStatusError(502, err.Error())
 			return nil, err
 		}
 
@@ -87,6 +92,7 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 				err = model.DeleteFromBlackList(mysql.DB, context.Background(), userId)
 				if err != nil {
 					klog.Error("DeleteFromBlackList error: ", err)
+					err = kerrors.NewBizStatusError(502, err.Error())
 					return nil, err
 				}
 			}
@@ -102,6 +108,7 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 		_, err = redis.RedisClient.Set(context.Background(), userStatusKey, string(model.Normal), time.Duration(maxExpire)*time.Second).Result()
 		if err != nil {
 			klog.Error("redis Set error: ", err)
+			err = kerrors.NewBizStatusError(502, err.Error())
 			return nil, err
 		}
 	}
@@ -113,6 +120,7 @@ func (s *VerifyTokenByRPCService) Run(req *auth.VerifyTokenReq) (resp *auth.Veri
 			Res: false,
 		}, nil
 	}
+	//====================================================================
 
 	// 在metadata中设置用户id,以供调用链使用
 	ok := metainfo.SendBackwardValue(s.ctx, "user_id", strconv.Itoa(int(userId)))
