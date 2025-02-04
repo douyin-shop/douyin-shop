@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	snoyflake "github.com/douyin-shop/douyin-shop/app/product/biz/util/snowflake"
 	"github.com/douyin-shop/douyin-shop/app/user/biz/dal"
 	"github.com/douyin-shop/douyin-shop/common/nacos"
 	"github.com/joho/godotenv"
@@ -13,9 +14,6 @@ import (
 	"net"
 	"os"
 	"time"
-
-	snoyflake "github.com/douyin-shop/douyin-shop/app/product/biz/util/snowflake"
-
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
