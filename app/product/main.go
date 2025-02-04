@@ -2,16 +2,15 @@ package main
 
 import (
 	"context"
+	"github.com/douyin-shop/douyin-shop/common/nacos"
+	"github.com/joho/godotenv"
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"io"
 	"log"
 	"net"
 	"os"
 	"time"
-
-	"github.com/douyin-shop/douyin-shop/common/nacos"
-	"github.com/kitex-contrib/obs-opentelemetry/provider"
-	"github.com/kitex-contrib/obs-opentelemetry/tracing"
-
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
