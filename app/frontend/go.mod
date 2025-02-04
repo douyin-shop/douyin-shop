@@ -21,6 +21,7 @@ require (
 	github.com/hertz-contrib/obs-opentelemetry/provider v0.3.0
 	github.com/hertz-contrib/obs-opentelemetry/tracing v0.4.1
 	github.com/hertz-contrib/pprof v0.1.2
+	github.com/joho/godotenv v1.5.1
 	github.com/kitex-contrib/config-nacos/v2 v2.0.0-20241203120505-63d6739ba3a2
 	github.com/kitex-contrib/obs-opentelemetry v0.2.9
 	github.com/kr/pretty v0.3.1

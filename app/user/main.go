@@ -4,10 +4,12 @@ import (
 	"context"
 	"github.com/douyin-shop/douyin-shop/app/user/biz/dal"
 	"github.com/douyin-shop/douyin-shop/common/nacos"
+	"github.com/joho/godotenv"
 	"github.com/kitex-contrib/obs-opentelemetry/provider"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
+	"log"
 	"net"
 	"os"
 	"time"
@@ -22,11 +24,17 @@ import (
 )
 
 func main() {
+	// 读取环境变量
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("环境变量文件加载失败", err)
+	}
+
 	opts := kitexInit()
 
 	svr := userservice.NewServer(new(UserServiceImpl), opts...)
 
-	err := svr.Run()
+	err = svr.Run()
 	if err != nil {
 		klog.Error(err.Error())
 	}
