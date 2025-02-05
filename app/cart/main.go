@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal"
+	"github.com/douyin-shop/douyin-shop/app/cart/rpc"
 	"github.com/douyin-shop/douyin-shop/common/nacos"
 	"github.com/joho/godotenv"
 	"github.com/kitex-contrib/obs-opentelemetry/provider"
@@ -40,6 +42,9 @@ func main() {
 }
 
 func kitexInit() (opts []server.Option) {
+
+	dal.Init()
+	rpc.InitClient()
 
 	// OpenTelemetry
 	p := provider.NewOpenTelemetryProvider(
