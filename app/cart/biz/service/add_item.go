@@ -26,7 +26,7 @@ func (s *AddItemService) Run(req *cart.AddItemReq) (resp *cart.AddItemResp, err 
 		return nil, err
 	}
 
-	if productResp == nil || productResp.Product.Id == 0 {
+	if productResp == nil || productResp.Product == nil || productResp.Product.Id == 0 {
 		return nil, code.GetError(code.NotFoundProduct)
 	}
 
