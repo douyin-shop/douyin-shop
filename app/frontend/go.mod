@@ -11,8 +11,10 @@ require (
 	github.com/cloudwego/hertz v0.9.5
 	github.com/cloudwego/kitex v0.12.1
 	github.com/douyin-shop/douyin-shop/app/auth v0.0.0-20250126032705-a267cdc270cb
+	github.com/douyin-shop/douyin-shop/app/cart v0.0.0-20250203124345-ca77d837a1dc
+	github.com/douyin-shop/douyin-shop/app/product v0.0.0-20250203124345-ca77d837a1dc
 	github.com/douyin-shop/douyin-shop/app/user v0.0.0-20250122081223-927f29400e88
-	github.com/douyin-shop/douyin-shop/common v0.0.0-20250122081223-927f29400e88
+	github.com/douyin-shop/douyin-shop/common v0.0.0-20250130021656-6c3ec6f2d8b1
 	github.com/hertz-contrib/casbin v0.1.0
 	github.com/hertz-contrib/cors v0.1.0
 	github.com/hertz-contrib/gzip v0.0.3

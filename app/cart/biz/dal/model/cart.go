@@ -4,6 +4,7 @@ package model
 import (
 	"context"
 	"errors"
+	"github.com/cloudwego/kitex/pkg/klog"
 	"gorm.io/gorm"
 )
 
@@ -30,6 +31,7 @@ func AddItem(ctx context.Context, db *gorm.DB, item *Cart) error {
 		First(&row).Error
 
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		klog.Error("查询购物车商品失败")
 		return err
 	}
 

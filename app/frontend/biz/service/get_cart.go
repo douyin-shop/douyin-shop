@@ -23,10 +23,12 @@ func NewGetCartService(Context context.Context, RequestContext *app.RequestConte
 }
 
 func (h *GetCartService) Run(req *cart.GetCartReq) (resp *cart.GetCartResp, err error) {
+
 	defer func() {
 		hlog.CtxInfof(h.Context, "req = %+v", req)
 		hlog.CtxInfof(h.Context, "resp = %+v", resp)
 	}()
+
 	userId := h.Context.Value("user_id")
 
 	hlog.Info("请求用户id:", userId)
@@ -55,12 +57,14 @@ func (h *GetCartService) Run(req *cart.GetCartReq) (resp *cart.GetCartResp, err 
 			return nil, err
 		}
 
+		p := productResp.Product
+
 		productDetail := &product.Product{
 			Id:          productId,
-			Name:        productResp.Product.Name,
-			Description: productResp.Product.Description,
-			Picture:     productResp.Product.Picture,
-			Price:       productResp.Product.Price,
+			Name:        p.Name,
+			Description: p.Description,
+			Picture:     p.Picture,
+			Price:       p.Price, // TODO 其实这里价格不应该用浮点数，应该用整数，但是这里为了简化，就直接用浮点数了
 			Categories:  productResp.Product.Categories,
 		}
 
