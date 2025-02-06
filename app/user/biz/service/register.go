@@ -3,8 +3,25 @@ package service
 import (
 	"context"
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+	"github.com/cloudwego/kitex/pkg/kerrors"
+	"github.com/douyin-shop/douyin-shop/app/user/biz/model"
+	"github.com/douyin-shop/douyin-shop/app/user/biz/utils/code"
+=======
+<<<<<<< Updated upstream
 	"github.com/douyin-shop/douyin-shop/app/user/biz/model"
 	"github.com/douyin-shop/douyin-shop/app/user/code"
+=======
+	"github.com/cloudwego/kitex/pkg/kerrors"
+	"github.com/douyin-shop/douyin-shop/app/user/biz/model"
+	"github.com/douyin-shop/douyin-shop/app/user/biz/utils/code"
+>>>>>>> Stashed changes
+>>>>>>> ae6c4a5 (测试)
+=======
+	"github.com/douyin-shop/douyin-shop/app/user/biz/model"
+	"github.com/douyin-shop/douyin-shop/app/user/code"
+>>>>>>> 72916bb (测试)
 	user "github.com/douyin-shop/douyin-shop/app/user/kitex_gen/user"
 	"github.com/cloudwego/kitex/pkg/kerrors"
 )

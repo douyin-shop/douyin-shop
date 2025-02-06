@@ -1,20 +1,21 @@
-name: Deploy Shop Service
+name: Deploy Product Service
 
 on:
   push:
     branches: ['main']
     paths:
-      - 'app/shop/**'
-      - 'idl/shop.proto'
-      - '.github/workflows/deploy-shop.yaml'
+      - 'app/product/**'
+      - '../../idl/product.proto'
+      - 'deploy-product.yaml'
       - '.github/workflows/deploy.yaml'
+      - 'common/*'
   workflow_dispatch: # 添加手动触发
 
 jobs:
   deploy:
     uses: ./.github/workflows/deploy.yaml
     with:
-      service_name: shop
+      service_name: product
     secrets: inherit
 # name: Deploy Auth Service
 

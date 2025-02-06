@@ -25,3 +25,6 @@ nacos:
   log_level: "debug"
   timeous_ms: 5000
   not_load_cache_at_start: true
+
+jwt:
+  secret: "123456"

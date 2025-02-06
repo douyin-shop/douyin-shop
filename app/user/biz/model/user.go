@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal/mysql"
+	"github.com/douyin-shop/douyin-shop/app/user/biz/utils/code"
 	"github.com/douyin-shop/douyin-shop/app/user/code"
 	"github.com/douyin-shop/douyin-shop/app/user/conf"
 	"golang.org/x/crypto/bcrypt"

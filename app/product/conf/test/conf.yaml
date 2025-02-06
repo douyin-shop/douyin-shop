@@ -1,6 +1,6 @@
 kitex:
-  service: "auth"
-  address: ":8001"
+  service: "product"
+  address: ":8006"
   log_level: info
   log_file_name: "log/kitex.log"
   log_max_size: 10
@@ -12,6 +12,7 @@ registry:
     - 127.0.0.1:2379
   username: ""
   password: ""
+
 
 nacos:
   address: "127.0.0.1"
@@ -26,11 +27,3 @@ nacos:
   timeous_ms: 5000
   not_load_cache_at_start: true
 
-mysql:
-  dsn: "root:88888888@tcp(127.0.0.1:3306)/douyin-shop?charset=utf8mb4&parseTime=True&loc=Local"
-
-redis:
-  address: "127.0.0.1:6379"
-  username: ""
-  password: ""
-  db: 0

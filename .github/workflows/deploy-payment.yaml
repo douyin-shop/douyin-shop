@@ -8,6 +8,7 @@ on:
       - 'idl/payment.proto'
       - '.github/workflows/deploy-payment.yaml'
       - '.github/workflows/deploy.yaml'
+      - 'common/*'
   workflow_dispatch: # 添加手动触发
 
 jobs:

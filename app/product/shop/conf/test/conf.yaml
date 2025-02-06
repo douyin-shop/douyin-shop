@@ -1,5 +1,5 @@
 kitex:
-  service: "shop"
+  service: "product"
   address: ":8006"
   log_level: info
   log_file_name: "log/kitex.log"
@@ -13,6 +13,7 @@ registry:
   username: ""
   password: ""
 
+
 nacos:
   address: "127.0.0.1"
   port: 8848
@@ -25,3 +26,4 @@ nacos:
   log_level: "debug"
   timeous_ms: 5000
   not_load_cache_at_start: true
+

@@ -8,6 +8,7 @@ on:
       - 'idl/cart.proto'
       - '.github/workflows/deploy-cart.yaml'
       - '.github/workflows/deploy.yaml'
+      - 'common/*'
   workflow_dispatch: # 添加手动触发
 
 jobs:
