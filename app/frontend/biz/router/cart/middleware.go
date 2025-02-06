@@ -19,6 +19,11 @@ func _addcartitemMw() []app.HandlerFunc {
 }
 
 func _getcartMw() []app.HandlerFunc {
+	return nil
+}
+
+func _cartMw() []app.HandlerFunc {
+	// your code...
 	return []app.HandlerFunc{
 		middleware.VerifyTokenMiddleware(),
 		middleware.GetCasbinMiddleware().RequiresPermissions("/cart:*"),
