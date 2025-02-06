@@ -1,3 +1,0 @@
-GET http://localhost:8080/cart/get_cart
-Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzgzMzg4MDQsInVzZXJfaWQiOjJ9.4VhS-7oag3_vVM2VxrMO-3ezM8B1l2TqT7L-YBUlaHc

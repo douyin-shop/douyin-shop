@@ -1,4 +1,4 @@
-package frontend
+package user
 
 import (
 	"context"
@@ -7,22 +7,43 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/douyin-shop/douyin-shop/app/frontend/biz/service"
 	"github.com/douyin-shop/douyin-shop/app/frontend/biz/utils"
-	frontend "github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	common "github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend/common"
+	user "github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend/user"
 )
 
-// Login .
-// @router /login [GET]
-func Login(ctx context.Context, c *app.RequestContext) {
+// Register .
+// @router /register [POST]
+func Register(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req frontend.LoginReq
+	var req user.RegisterReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		utils.SendErrResponse(ctx, c, consts.StatusOK, err)
 		return
 	}
 
-	resp := &frontend.LoginResp{}
+	resp := &user.RegisterResp{}
+	resp, err = service.NewRegisterService(ctx, c).Run(&req)
+	if err != nil {
+		utils.SendErrResponse(ctx, c, consts.StatusOK, err)
+		return
+	}
+
+	utils.SendSuccessResponse(ctx, c, consts.StatusOK, resp)
+}
+
+// Login .
+// @router /login [POST]
+func Login(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req user.LoginReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		utils.SendErrResponse(ctx, c, consts.StatusOK, err)
+		return
+	}
+
+	resp := &user.LoginResp{}
 	resp, err = service.NewLoginService(ctx, c).Run(&req)
 	if err != nil {
 		utils.SendErrResponse(ctx, c, consts.StatusOK, err)
@@ -32,62 +53,23 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	utils.SendSuccessResponse(ctx, c, consts.StatusOK, resp)
 }
 
-// GetCart .
-// @router cart/get_cart [POST]
-func GetCart(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req frontend.GetCartReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		utils.SendErrResponse(ctx, c, consts.StatusOK, err)
-		return
-	}
-
-	resp, err := service.NewGetCartService(ctx, c).Run(&req)
-
-	if err != nil {
-		utils.SendErrResponse(ctx, c, consts.StatusOK, err)
-		return
-	}
-	utils.SendSuccessResponse(ctx, c, consts.StatusOK, resp)
-}
-
-// Register .
-// @router /register [POST]
-func Register(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req frontend.RegisterReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		utils.SendErrResponse(ctx, c, consts.StatusOK, err)
-		return
-	}
-
-	resp, err := service.NewRegisterService(ctx, c).Run(&req)
-
-	if err != nil {
-		utils.SendErrResponse(ctx, c, consts.StatusOK, err)
-		return
-	}
-	utils.SendSuccessResponse(ctx, c, consts.StatusOK, resp)
-}
-
 // Logout .
 // @router /logout [GET]
 func Logout(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req emptypb.Empty
+	var req common.Empty
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		utils.SendErrResponse(ctx, c, consts.StatusOK, err)
 		return
 	}
 
-	resp, err := service.NewLogoutService(ctx, c).Run(&req)
-
+	resp := &user.LogoutResp{}
+	resp, err = service.NewLogoutService(ctx, c).Run(&req)
 	if err != nil {
 		utils.SendErrResponse(ctx, c, consts.StatusOK, err)
 		return
 	}
+
 	utils.SendSuccessResponse(ctx, c, consts.StatusOK, resp)
 }

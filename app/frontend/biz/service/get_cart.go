@@ -2,9 +2,10 @@ package service
 
 import (
 	"context"
-	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	frontend "github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	common "github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend/common"
 )
 
 type GetCartService struct {
@@ -16,15 +17,9 @@ func NewGetCartService(Context context.Context, RequestContext *app.RequestConte
 	return &GetCartService{RequestContext: RequestContext, Context: Context}
 }
 
-func (h *GetCartService) Run(req *frontend.GetCartReq) (resp *frontend.GetCartResp, err error) {
-	//defer func() {
-	// hlog.CtxInfof(h.Context, "req = %+v", req)
-	// hlog.CtxInfof(h.Context, "resp = %+v", resp)
-	//}()
-
+func (h *GetCartService) Run(req *common.Empty) (resp *common.Empty, err error) {
 	userId := h.Context.Value("user_id")
 
 	hlog.Info("GetCartService:", userId)
-
 	return
 }

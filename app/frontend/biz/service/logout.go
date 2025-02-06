@@ -2,13 +2,13 @@ package service
 
 import (
 	"context"
-
-	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth"
-	frontend "github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend"
 	"github.com/douyin-shop/douyin-shop/app/frontend/infra/rpc"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	common "github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend/common"
+	user "github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend/user"
 )
 
 type LogoutService struct {
@@ -20,7 +20,7 @@ func NewLogoutService(Context context.Context, RequestContext *app.RequestContex
 	return &LogoutService{RequestContext: RequestContext, Context: Context}
 }
 
-func (h *LogoutService) Run(req *emptypb.Empty) (resp *frontend.LogoutResp, err error) {
+func (h *LogoutService) Run(req *common.Empty) (resp *user.LogoutResp, err error) {
 	defer func() {
 		hlog.CtxInfof(h.Context, "req = %+v", req)
 		hlog.CtxInfof(h.Context, "resp = %+v", resp)
@@ -38,7 +38,7 @@ func (h *LogoutService) Run(req *emptypb.Empty) (resp *frontend.LogoutResp, err 
 	}
 
 	// 返回结果
-	resp = &frontend.LogoutResp{
+	resp = &user.LogoutResp{
 		Success: logoutRes.Success,
 	}
 

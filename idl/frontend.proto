@@ -9,38 +9,6 @@ option go_package = "frontend";
 
 
 
-message RegisterReq {
-  string email = 1;
-  string password = 2;
-}
-
-message RegisterResp {
-  int32 user_id = 1;
-}
-
-message LoginReq {
-  string email = 1;
-  string password = 2;
-}
-
-message LoginResp {
-  int32 user_id = 1;
-  string token = 2;
-}
-
-
-message LogoutResp {
-  bool success = 1;
-}
-
-message VerifyTokenReq {
-  string token = 1;
-}
-
-message VerifyTokenResp {
-  bool valid = 1;
-  int32 user_id = 2;
-}
 
 
 message CartItem {
@@ -62,21 +30,7 @@ message GetCartResp {
 }
 
 service FrontendService {
-  rpc Register(RegisterReq) returns (RegisterResp) {
-    option (api.post) = "/register";
-  }  //注册服务/创建用户
 
-  rpc Login(LoginReq) returns (LoginResp) {
-    option (api.post) = "/login";
-  }
-
-  rpc Logout(google.protobuf.Empty) returns (LogoutResp) {
-    option (api.get) = "/logout";
-  }
-
-
-  // deprecated
-  rpc VerifyToken(VerifyTokenReq) returns (VerifyTokenResp) {}
 
   rpc GetCart(GetCartReq) returns (GetCartResp) {
     option (api.get) = "cart/get_cart";
