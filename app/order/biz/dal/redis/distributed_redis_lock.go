@@ -68,7 +68,7 @@ func (d *DistributeRedisLock) Lock() error {
 
 func (d *DistributeRedisLock) Watchdog() {
 	// 创建一个定时器NewTicker, 每过期时间的2分之1触发一次
-	loopTime := time.Duration(d.expireTime*1000*1/1) * time.Millisecond
+	loopTime := time.Duration(d.expireTime*1000*1/2) * time.Millisecond
 	expTicker := time.NewTicker(loopTime)
 	for {
 		select {
