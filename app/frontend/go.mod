@@ -11,8 +11,10 @@ require (
 	github.com/cloudwego/hertz v0.9.5
 	github.com/cloudwego/kitex v0.12.1
 	github.com/douyin-shop/douyin-shop/app/auth v0.0.0-20250126032705-a267cdc270cb
+	github.com/douyin-shop/douyin-shop/app/cart v0.0.0-20250203124345-ca77d837a1dc
+	github.com/douyin-shop/douyin-shop/app/product v0.0.0-20250203124345-ca77d837a1dc
 	github.com/douyin-shop/douyin-shop/app/user v0.0.0-20250122081223-927f29400e88
-	github.com/douyin-shop/douyin-shop/common v0.0.0-20250122081223-927f29400e88
+	github.com/douyin-shop/douyin-shop/common v0.0.0-20250130021656-6c3ec6f2d8b1
 	github.com/hertz-contrib/casbin v0.1.0
 	github.com/hertz-contrib/cors v0.1.0
 	github.com/hertz-contrib/gzip v0.0.3
@@ -21,6 +23,7 @@ require (
 	github.com/hertz-contrib/obs-opentelemetry/provider v0.3.0
 	github.com/hertz-contrib/obs-opentelemetry/tracing v0.4.1
 	github.com/hertz-contrib/pprof v0.1.2
+	github.com/joho/godotenv v1.5.1
 	github.com/kitex-contrib/config-nacos/v2 v2.0.0-20241203120505-63d6739ba3a2
 	github.com/kitex-contrib/obs-opentelemetry v0.2.9
 	github.com/kr/pretty v0.3.1

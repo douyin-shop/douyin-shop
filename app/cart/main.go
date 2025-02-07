@@ -2,10 +2,14 @@ package main
 
 import (
 	"context"
+	"github.com/douyin-shop/douyin-shop/app/cart/biz/dal"
+	"github.com/douyin-shop/douyin-shop/app/cart/rpc"
 	"github.com/douyin-shop/douyin-shop/common/nacos"
+	"github.com/joho/godotenv"
 	"github.com/kitex-contrib/obs-opentelemetry/provider"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"io"
+	"log"
 	"net"
 	"os"
 	"time"
@@ -21,17 +25,26 @@ import (
 )
 
 func main() {
+
+	// 读取环境变量
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("环境变量文件加载失败", err)
+	}
 	opts := kitexInit()
 
 	svr := cartservice.NewServer(new(CartServiceImpl), opts...)
 
-	err := svr.Run()
+	err = svr.Run()
 	if err != nil {
 		klog.Error(err.Error())
 	}
 }
 
 func kitexInit() (opts []server.Option) {
+
+	dal.Init()
+	rpc.InitClient()
 
 	// OpenTelemetry
 	p := provider.NewOpenTelemetryProvider(

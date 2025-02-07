@@ -8,7 +8,9 @@ import (
 	"github.com/douyin-shop/douyin-shop/app/frontend/biz/dal"
 	"github.com/douyin-shop/douyin-shop/app/frontend/infra/rpc"
 	"github.com/hertz-contrib/obs-opentelemetry/provider"
+	"github.com/joho/godotenv"
 	"io"
+	"log"
 	"os"
 	"time"
 
@@ -32,6 +34,12 @@ import (
 )
 
 func main() {
+	// 读取环境变量
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("环境变量文件加载失败", err)
+	}
+
 	// init dal
 	dal.Init()
 	// 初始化 rpc 客户端

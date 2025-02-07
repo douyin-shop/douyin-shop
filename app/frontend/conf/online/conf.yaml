@@ -20,7 +20,8 @@ redis:
   db: 0
 
 nacos:
-  address: 'mse-160d8470-p.nacos-ans.mse.aliyuncs.com'
+  #  address: 'mse-160d8470-p.nacos-ans.mse.aliyuncs.com'
+  address: '127.0.0.1'
   port: 8848
   namespace: ''
   group: 'DEFAULT_GROUP'

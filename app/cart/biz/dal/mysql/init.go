@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"github.com/douyin-shop/douyin-shop/app/cart/biz/dal/model"
 	"github.com/douyin-shop/douyin-shop/app/cart/conf"
 
 	"gorm.io/driver/mysql"
@@ -19,6 +20,11 @@ func Init() {
 			SkipDefaultTransaction: true,
 		},
 	)
+	if err != nil {
+		panic(err)
+	}
+
+	err = DB.AutoMigrate(&model.Cart{})
 	if err != nil {
 		panic(err)
 	}
