@@ -2,9 +2,9 @@ package redis
 
 import (
 	"context"
+	"github.com/douyin-shop/douyin-shop/app/order/conf"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/douyin-shop/douyin-shop/app/order/conf"
 )
 
 var (
@@ -21,4 +21,8 @@ func Init() {
 	if err := RedisClient.Ping(context.Background()).Err(); err != nil {
 		panic(err)
 	}
+}
+
+func DB() *redis.Client {
+	return RedisClient
 }
