@@ -14,7 +14,5 @@ func NewDeleteService(ctx context.Context) *DeleteService {
 
 // Run create note info
 func (s *DeleteService) Run(req *user.DeleteReq) (resp *user.DeleteResp, err error) {
-	// Finish your business logic.
-
 	return
 }
