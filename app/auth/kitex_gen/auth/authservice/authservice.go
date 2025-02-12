@@ -29,6 +29,27 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingUnary),
 	),
+	"Logout": kitex.NewMethodInfo(
+		logoutHandler,
+		newLogoutArgs,
+		newLogoutResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingUnary),
+	),
+	"AddBlacklist": kitex.NewMethodInfo(
+		addBlacklistHandler,
+		newAddBlacklistArgs,
+		newAddBlacklistResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingUnary),
+	),
+	"DeleteBlacklist": kitex.NewMethodInfo(
+		deleteBlacklistHandler,
+		newDeleteBlacklistArgs,
+		newDeleteBlacklistResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingUnary),
+	),
 }
 
 var (
@@ -401,6 +422,465 @@ func (p *VerifyTokenByRPCResult) GetResult() interface{} {
 	return p.Success
 }
 
+func logoutHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	switch s := arg.(type) {
+	case *streaming.Args:
+		st := s.Stream
+		req := new(auth.LogoutReq)
+		if err := st.RecvMsg(req); err != nil {
+			return err
+		}
+		resp, err := handler.(auth.AuthService).Logout(ctx, req)
+		if err != nil {
+			return err
+		}
+		return st.SendMsg(resp)
+	case *LogoutArgs:
+		success, err := handler.(auth.AuthService).Logout(ctx, s.Req)
+		if err != nil {
+			return err
+		}
+		realResult := result.(*LogoutResult)
+		realResult.Success = success
+		return nil
+	default:
+		return errInvalidMessageType
+	}
+}
+func newLogoutArgs() interface{} {
+	return &LogoutArgs{}
+}
+
+func newLogoutResult() interface{} {
+	return &LogoutResult{}
+}
+
+type LogoutArgs struct {
+	Req *auth.LogoutReq
+}
+
+func (p *LogoutArgs) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetReq() {
+		p.Req = new(auth.LogoutReq)
+	}
+	return p.Req.FastRead(buf, _type, number)
+}
+
+func (p *LogoutArgs) FastWrite(buf []byte) (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.FastWrite(buf)
+}
+
+func (p *LogoutArgs) Size() (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.Size()
+}
+
+func (p *LogoutArgs) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetReq() {
+		return out, nil
+	}
+	return proto.Marshal(p.Req)
+}
+
+func (p *LogoutArgs) Unmarshal(in []byte) error {
+	msg := new(auth.LogoutReq)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Req = msg
+	return nil
+}
+
+var LogoutArgs_Req_DEFAULT *auth.LogoutReq
+
+func (p *LogoutArgs) GetReq() *auth.LogoutReq {
+	if !p.IsSetReq() {
+		return LogoutArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+func (p *LogoutArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *LogoutArgs) GetFirstArgument() interface{} {
+	return p.Req
+}
+
+type LogoutResult struct {
+	Success *auth.LogoutResp
+}
+
+var LogoutResult_Success_DEFAULT *auth.LogoutResp
+
+func (p *LogoutResult) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetSuccess() {
+		p.Success = new(auth.LogoutResp)
+	}
+	return p.Success.FastRead(buf, _type, number)
+}
+
+func (p *LogoutResult) FastWrite(buf []byte) (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.FastWrite(buf)
+}
+
+func (p *LogoutResult) Size() (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.Size()
+}
+
+func (p *LogoutResult) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetSuccess() {
+		return out, nil
+	}
+	return proto.Marshal(p.Success)
+}
+
+func (p *LogoutResult) Unmarshal(in []byte) error {
+	msg := new(auth.LogoutResp)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Success = msg
+	return nil
+}
+
+func (p *LogoutResult) GetSuccess() *auth.LogoutResp {
+	if !p.IsSetSuccess() {
+		return LogoutResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+func (p *LogoutResult) SetSuccess(x interface{}) {
+	p.Success = x.(*auth.LogoutResp)
+}
+
+func (p *LogoutResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *LogoutResult) GetResult() interface{} {
+	return p.Success
+}
+
+func addBlacklistHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	switch s := arg.(type) {
+	case *streaming.Args:
+		st := s.Stream
+		req := new(auth.AddBlackListReq)
+		if err := st.RecvMsg(req); err != nil {
+			return err
+		}
+		resp, err := handler.(auth.AuthService).AddBlacklist(ctx, req)
+		if err != nil {
+			return err
+		}
+		return st.SendMsg(resp)
+	case *AddBlacklistArgs:
+		success, err := handler.(auth.AuthService).AddBlacklist(ctx, s.Req)
+		if err != nil {
+			return err
+		}
+		realResult := result.(*AddBlacklistResult)
+		realResult.Success = success
+		return nil
+	default:
+		return errInvalidMessageType
+	}
+}
+func newAddBlacklistArgs() interface{} {
+	return &AddBlacklistArgs{}
+}
+
+func newAddBlacklistResult() interface{} {
+	return &AddBlacklistResult{}
+}
+
+type AddBlacklistArgs struct {
+	Req *auth.AddBlackListReq
+}
+
+func (p *AddBlacklistArgs) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetReq() {
+		p.Req = new(auth.AddBlackListReq)
+	}
+	return p.Req.FastRead(buf, _type, number)
+}
+
+func (p *AddBlacklistArgs) FastWrite(buf []byte) (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.FastWrite(buf)
+}
+
+func (p *AddBlacklistArgs) Size() (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.Size()
+}
+
+func (p *AddBlacklistArgs) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetReq() {
+		return out, nil
+	}
+	return proto.Marshal(p.Req)
+}
+
+func (p *AddBlacklistArgs) Unmarshal(in []byte) error {
+	msg := new(auth.AddBlackListReq)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Req = msg
+	return nil
+}
+
+var AddBlacklistArgs_Req_DEFAULT *auth.AddBlackListReq
+
+func (p *AddBlacklistArgs) GetReq() *auth.AddBlackListReq {
+	if !p.IsSetReq() {
+		return AddBlacklistArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+func (p *AddBlacklistArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *AddBlacklistArgs) GetFirstArgument() interface{} {
+	return p.Req
+}
+
+type AddBlacklistResult struct {
+	Success *auth.AddBlackListResp
+}
+
+var AddBlacklistResult_Success_DEFAULT *auth.AddBlackListResp
+
+func (p *AddBlacklistResult) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetSuccess() {
+		p.Success = new(auth.AddBlackListResp)
+	}
+	return p.Success.FastRead(buf, _type, number)
+}
+
+func (p *AddBlacklistResult) FastWrite(buf []byte) (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.FastWrite(buf)
+}
+
+func (p *AddBlacklistResult) Size() (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.Size()
+}
+
+func (p *AddBlacklistResult) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetSuccess() {
+		return out, nil
+	}
+	return proto.Marshal(p.Success)
+}
+
+func (p *AddBlacklistResult) Unmarshal(in []byte) error {
+	msg := new(auth.AddBlackListResp)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Success = msg
+	return nil
+}
+
+func (p *AddBlacklistResult) GetSuccess() *auth.AddBlackListResp {
+	if !p.IsSetSuccess() {
+		return AddBlacklistResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+func (p *AddBlacklistResult) SetSuccess(x interface{}) {
+	p.Success = x.(*auth.AddBlackListResp)
+}
+
+func (p *AddBlacklistResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *AddBlacklistResult) GetResult() interface{} {
+	return p.Success
+}
+
+func deleteBlacklistHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	switch s := arg.(type) {
+	case *streaming.Args:
+		st := s.Stream
+		req := new(auth.DeleteBlackListReq)
+		if err := st.RecvMsg(req); err != nil {
+			return err
+		}
+		resp, err := handler.(auth.AuthService).DeleteBlacklist(ctx, req)
+		if err != nil {
+			return err
+		}
+		return st.SendMsg(resp)
+	case *DeleteBlacklistArgs:
+		success, err := handler.(auth.AuthService).DeleteBlacklist(ctx, s.Req)
+		if err != nil {
+			return err
+		}
+		realResult := result.(*DeleteBlacklistResult)
+		realResult.Success = success
+		return nil
+	default:
+		return errInvalidMessageType
+	}
+}
+func newDeleteBlacklistArgs() interface{} {
+	return &DeleteBlacklistArgs{}
+}
+
+func newDeleteBlacklistResult() interface{} {
+	return &DeleteBlacklistResult{}
+}
+
+type DeleteBlacklistArgs struct {
+	Req *auth.DeleteBlackListReq
+}
+
+func (p *DeleteBlacklistArgs) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetReq() {
+		p.Req = new(auth.DeleteBlackListReq)
+	}
+	return p.Req.FastRead(buf, _type, number)
+}
+
+func (p *DeleteBlacklistArgs) FastWrite(buf []byte) (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.FastWrite(buf)
+}
+
+func (p *DeleteBlacklistArgs) Size() (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.Size()
+}
+
+func (p *DeleteBlacklistArgs) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetReq() {
+		return out, nil
+	}
+	return proto.Marshal(p.Req)
+}
+
+func (p *DeleteBlacklistArgs) Unmarshal(in []byte) error {
+	msg := new(auth.DeleteBlackListReq)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Req = msg
+	return nil
+}
+
+var DeleteBlacklistArgs_Req_DEFAULT *auth.DeleteBlackListReq
+
+func (p *DeleteBlacklistArgs) GetReq() *auth.DeleteBlackListReq {
+	if !p.IsSetReq() {
+		return DeleteBlacklistArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+func (p *DeleteBlacklistArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *DeleteBlacklistArgs) GetFirstArgument() interface{} {
+	return p.Req
+}
+
+type DeleteBlacklistResult struct {
+	Success *auth.DeleteBlackListResp
+}
+
+var DeleteBlacklistResult_Success_DEFAULT *auth.DeleteBlackListResp
+
+func (p *DeleteBlacklistResult) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetSuccess() {
+		p.Success = new(auth.DeleteBlackListResp)
+	}
+	return p.Success.FastRead(buf, _type, number)
+}
+
+func (p *DeleteBlacklistResult) FastWrite(buf []byte) (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.FastWrite(buf)
+}
+
+func (p *DeleteBlacklistResult) Size() (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.Size()
+}
+
+func (p *DeleteBlacklistResult) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetSuccess() {
+		return out, nil
+	}
+	return proto.Marshal(p.Success)
+}
+
+func (p *DeleteBlacklistResult) Unmarshal(in []byte) error {
+	msg := new(auth.DeleteBlackListResp)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Success = msg
+	return nil
+}
+
+func (p *DeleteBlacklistResult) GetSuccess() *auth.DeleteBlackListResp {
+	if !p.IsSetSuccess() {
+		return DeleteBlacklistResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+func (p *DeleteBlacklistResult) SetSuccess(x interface{}) {
+	p.Success = x.(*auth.DeleteBlackListResp)
+}
+
+func (p *DeleteBlacklistResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *DeleteBlacklistResult) GetResult() interface{} {
+	return p.Success
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -426,6 +906,36 @@ func (p *kClient) VerifyTokenByRPC(ctx context.Context, Req *auth.VerifyTokenReq
 	_args.Req = Req
 	var _result VerifyTokenByRPCResult
 	if err = p.c.Call(ctx, "VerifyTokenByRPC", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) Logout(ctx context.Context, Req *auth.LogoutReq) (r *auth.LogoutResp, err error) {
+	var _args LogoutArgs
+	_args.Req = Req
+	var _result LogoutResult
+	if err = p.c.Call(ctx, "Logout", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) AddBlacklist(ctx context.Context, Req *auth.AddBlackListReq) (r *auth.AddBlackListResp, err error) {
+	var _args AddBlacklistArgs
+	_args.Req = Req
+	var _result AddBlacklistResult
+	if err = p.c.Call(ctx, "AddBlacklist", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) DeleteBlacklist(ctx context.Context, Req *auth.DeleteBlackListReq) (r *auth.DeleteBlackListResp, err error) {
+	var _args DeleteBlacklistArgs
+	_args.Req = Req
+	var _result DeleteBlacklistResult
+	if err = p.c.Call(ctx, "DeleteBlacklist", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

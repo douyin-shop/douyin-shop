@@ -2,15 +2,13 @@ package service
 
 import (
 	"context"
-	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/cloudwego/kitex/client"
 	"github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth"
-	"github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth/authservice"
-	frontend "github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend"
-	"github.com/douyin-shop/douyin-shop/app/user/kitex_gen/user"
-	"github.com/douyin-shop/douyin-shop/app/user/kitex_gen/user/userservice"
-	"github.com/douyin-shop/douyin-shop/common/nacos"
+	"github.com/douyin-shop/douyin-shop/app/frontend/infra/rpc"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	user "github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend/user"
+	userService "github.com/douyin-shop/douyin-shop/app/user/kitex_gen/user"
 )
 
 type LoginService struct {
@@ -22,16 +20,14 @@ func NewLoginService(Context context.Context, RequestContext *app.RequestContext
 	return &LoginService{RequestContext: RequestContext, Context: Context}
 }
 
-func (h *LoginService) Run(req *frontend.LoginReq) (resp *frontend.LoginResp, err error) {
+func (h *LoginService) Run(req *user.LoginReq) (resp *user.LoginResp, err error) {
 	defer func() {
 		hlog.CtxInfof(h.Context, "req = %+v", req)
 		hlog.CtxInfof(h.Context, "resp = %+v", resp)
 	}()
 
 	// 通过微服务调用user服务
-	resolver := nacos.GetNacosResolver()
-	userClient := userservice.MustNewClient("user", client.WithResolver(resolver))
-	checkUserRes, err := userClient.Login(h.Context, &user.LoginReq{
+	checkUserRes, err := rpc.UserClient.Login(h.Context, &userService.LoginReq{
 		Email:    req.Email,
 		Password: req.Password,
 	})
@@ -44,8 +40,7 @@ func (h *LoginService) Run(req *frontend.LoginReq) (resp *frontend.LoginResp, er
 	hlog.Debug("账号密码校验成功，正在准备请求Auth分发token： ", checkUserRes.UserId)
 
 	// 通过微服务调用auth服务
-	authService := authservice.MustNewClient("auth", client.WithResolver(resolver))
-	authRes, err := authService.DeliverTokenByRPC(h.Context, &auth.DeliverTokenReq{UserId: checkUserRes.UserId})
+	authRes, err := rpc.AuthClient.DeliverTokenByRPC(h.Context, &auth.DeliverTokenReq{UserId: checkUserRes.UserId})
 
 	if err != nil {
 		hlog.Error("authService.DeliverTokenByRPC err: ", err)
@@ -55,7 +50,7 @@ func (h *LoginService) Run(req *frontend.LoginReq) (resp *frontend.LoginResp, er
 	hlog.Debug("token分发成功，正在返回结果： ", authRes.Token)
 
 	// 返回结果
-	resp = &frontend.LoginResp{
+	resp = &user.LoginResp{
 		UserId: checkUserRes.UserId,
 		Token:  authRes.Token,
 	}

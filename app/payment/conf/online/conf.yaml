@@ -1,8 +1,8 @@
 kitex:
-  service: "payment"
-  address: ":8005"
+  service: 'payment'
+  address: ':8005'
   log_level: info
-  log_file_name: "log/kitex.log"
+  log_file_name: 'log/kitex.log'
   log_max_size: 10
   log_max_age: 3
   log_max_backups: 50
@@ -10,19 +10,32 @@ kitex:
 registry:
   registry_address:
     - 127.0.0.1:2379
-  username: ""
-  password: ""
+  username: ''
+  password: ''
 
 nacos:
-  address: "127.0.0.1"
+  #  address: 'mse-160d8470-p.nacos-ans.mse.aliyuncs.com'
+  address: '127.0.0.1'
   port: 8848
-  namespace: ""
-  group: "DEFAULT_GROUP"
-  username: ""
-  password: ""
-  log_dir: "/tmp/nacos/log"
-  cache_dir: "/tmp/nacos/cache"
-  log_level: "debug"
+  namespace: ''
+  group: 'DEFAULT_GROUP'
+  username: ''
+  password: ''
+  log_dir: '/tmp/nacos/log'
+  cache_dir: '/tmp/nacos/cache'
+  log_level: 'debug'
   timeous_ms: 5000
   not_load_cache_at_start: true
 
+mysql:
+#  dsn: "root:88888888@tcp(127.0.0.1:3306)/douyin-shop?charset=utf8mb4&parseTime=True&loc=Local"
+  dsn: "root:Q1w2e3r4@tcp(rm-cn-em943mba000039.rwlb.rds.aliyuncs.com:3306)/douyin-shop?charset=utf8mb4&parseTime=True&loc=Local"
+
+redis:
+  address: "127.0.0.1:6379"
+  username: ""
+  password: ""
+  db: 0
+
+opentelemetry:
+  address: "127.0.0.1:4317"

@@ -3,8 +3,8 @@ package redis
 import (
 	"context"
 
-	"github.com/redis/go-redis/v9"
 	"github.com/douyin-shop/douyin-shop/app/auth/conf"
+	"github.com/redis/go-redis/v9"
 )
 
 var (

@@ -20,13 +20,14 @@ var (
 )
 
 type Config struct {
-	Env      string
-	Kitex    Kitex    `yaml:"kitex"`
-	MySQL    MySQL    `yaml:"mysql"`
-	Redis    Redis    `yaml:"redis"`
-	Registry Registry `yaml:"registry"`
-	Nacos    Nacos    `yaml:"nacos"`
-	Jwt      Jwt      `yaml:"jwt"`
+	Env           string
+	Kitex         Kitex         `yaml:"kitex"`
+	MySQL         MySQL         `yaml:"mysql"`
+	Redis         Redis         `yaml:"redis"`
+	Registry      Registry      `yaml:"registry"`
+	Nacos         Nacos         `yaml:"nacos"`
+	Jwt           Jwt           `yaml:"jwt"`
+	OpenTelemetry OpenTelemetry `yaml:"opentelemetry"`
 }
 
 type MySQL struct {
@@ -72,6 +73,10 @@ type Nacos struct {
 
 type Jwt struct {
 	Secret string `yaml:"secret"`
+}
+
+type OpenTelemetry struct {
+	Address string `yaml:"address"`
 }
 
 // GetConf gets configuration instance

@@ -1,6 +1,8 @@
 package mysql
 
 import (
+	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal/model"
 	"github.com/douyin-shop/douyin-shop/app/auth/conf"
 
 	"gorm.io/driver/mysql"
@@ -20,6 +22,12 @@ func Init() {
 		},
 	)
 	if err != nil {
+		panic(err)
+	}
+
+	err := DB.AutoMigrate(&model.BlackList{})
+	if err != nil {
+		klog.Fatal("AutoMigrate BlackList error: ", err)
 		panic(err)
 	}
 }

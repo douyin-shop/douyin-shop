@@ -1,5 +1,66 @@
 services:
 
+
+    # 链路跟踪
+    otel-collector:
+        image: otel/opentelemetry-collector-contrib:0.52.0
+        command: [ "--config=/etc/otel-collector-config.yaml", "${OTELCOL_ARGS}" ]
+        volumes:
+            - ./opentelemetry/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+        ports:
+            - "1888:1888"   # pprof extension
+            - "8888"   # Prometheus metrics exposed by the collector
+            - "8889:8889"   # Prometheus exporter metrics
+            - "13133:13133" # health_check extension
+            - "4317:4317"   # OTLP gRPC receiver
+            - "55679" # zpages extension
+        depends_on:
+            - jaeger-all-in-one
+        restart: always
+
+    # Jaeger
+    jaeger-all-in-one:
+        image: jaegertracing/all-in-one:latest
+        restart: always
+        environment:
+            - COLLECTOR_OTLP_ENABLED=true
+        ports:
+            - "16686:16686"
+            - "14268"
+            - "14250:14250"
+            - "6831:6831"
+    #      - "4317:4317"   # OTLP gRPC receiver
+
+    # Victoriametrics
+    victoriametrics:
+        container_name: victoriametrics
+        image: victoriametrics/victoria-metrics
+        ports:
+            - "8428:8428"
+            - "8089:8089"
+            - "8089:8089/udp"
+            - "2003:2003"
+            - "2003:2003/udp"
+            - "4242:4242"
+        command:
+            - '--storageDataPath=/storage'
+            - '--graphiteListenAddr=:2003'
+            - '--opentsdbListenAddr=:4242'
+            - '--httpListenAddr=:8428'
+            - '--influxListenAddr=:8089'
+        restart: always
+
+    # Grafana
+    grafana:
+        image: grafana/grafana:latest
+        restart: always
+        environment:
+            - GF_AUTH_ANONYMOUS_ENABLED=true
+            - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+            - GF_AUTH_DISABLE_LOGIN_FORM=true
+        ports:
+            - "3000:3000"
+
 #    consul:
 #        image: hashicorp/consul:latest
 #        ports:
@@ -17,10 +78,10 @@ services:
     nacos:
         image: nacos/nacos-server:v2.4.0
         container_name: nacos
-
+        restart: always
         ports:
             - "8848:8848"
-            - "9849:9849"
+            - "9848:9848"
             - "9849:9849"
         volumes:
             -   ./nacos/logs:/home/nacos/logs
@@ -37,8 +98,61 @@ services:
 #            - "8858:8858"
 #        networks:
 #            - micro-service-net
+
+        # RocketMQ Nameserver
+    rocketmq-namesrv:
+        image: apache/rocketmq:5.3.1
+        container_name: rocketmq-namesrv
+        restart: always
+        ports:
+            - 9876:9876
+#        volumes:
+#            - ./rocketmq/namesrv/logs:/home/rocketmq/logs
+#            - ./rocketmq/namesrv/store:/home/rocketmq/store
+        command: sh mqnamesrv
+        environment:
+            - JAVA_OPT_EXT=-server -Xms512m -Xmx512m
+        networks:
+            - micro-service-net
+
+    # RocketMQ Broker
+    rocketmq-broker:
+        image: apache/rocketmq:5.3.1
+        container_name: rocketmq-broker
+        restart: always
+        ports:
+            - 10909:10909
+            - 10911:10911
+            - 10912:10912
+        volumes:
+#            - ./rocketmq/broker/logs:/home/rocketmq/logs
+#            - ./rocketmq/broker/store:/home/rocketmq/store
+            - ./rocketmq/broker/conf/broker.conf:/home/rocketmq/rocketmq-5.3.1/conf/broker.conf
+        command: sh mqbroker -n rocketmq-namesrv:9876 -c ../conf/broker.conf
+        depends_on:
+            - rocketmq-namesrv
+        environment:
+            - JAVA_OPT_EXT=-server -Xms512m -Xmx512m
+            - NAMESRV_ADDR=rocketmq-namesrv:9876
+        networks:
+            - micro-service-net
+
+    # RocketMQ Dashboard
+    rocketmq-dashboard:
+        image: apacherocketmq/rocketmq-dashboard:latest
+        container_name: rocketmq-dashboard
+        restart: always
+        ports:
+            - 808:8080
+        environment:
+            - JAVA_OPTS=-Drocketmq.namesrv.addr=rocketmq-namesrv:9876
+        depends_on:
+            - rocketmq-namesrv
+        networks:
+            - micro-service-net
     redis:
         image: redis:6.2.6
+        restart: always
         container_name: redis
         ports:
             - "6379:6379"
@@ -46,6 +160,7 @@ services:
             - micro-service-net
     mysql:
         image: mysql:8.0 # 使用MySQL官方镜像，版本8
+
         restart: always # 容器退出后总是重启
         environment:
             MYSQL_ROOT_PASSWORD: 88888888 # 设置root用户的密码，生产环境中请使用更复杂的密码
@@ -56,7 +171,19 @@ services:
             - "3307:3306" # 映射容器的3306端口到主机的3306端口
         volumes:
             - db_data:/var/lib/mysql # 挂载宿主机的目录到容器的MySQL数据目录，用于持久化数据
-
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.17.1
+        container_name: elasticsearch
+        restart: always
+        environment:
+            - discovery.type=single-node
+            - ES_JAVA_OPTS=-Xms512m -Xmx512m
+            - xpack.security.enabled=false
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+        networks:
+            - micro-service-net
 networks:
     micro-service-net:
         driver: bridge
