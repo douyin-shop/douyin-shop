@@ -3,6 +3,7 @@ package model
 
 import (
 	"context"
+	"github.com/douyin-shop/douyin-shop/app/payment/biz/utils/code"
 	"gorm.io/gorm"
 	"time"
 )
@@ -24,4 +25,17 @@ func (PaymentLog) TableName() string {
 // CreatePaymentLog 创建支付日志
 func CreatePaymentLog(db *gorm.DB, ctx context.Context, paymentLog *PaymentLog) error {
 	return db.WithContext(ctx).Model(&PaymentLog{}).Create(paymentLog).Error
+}
+
+func GetOrderIDByTransaction(db *gorm.DB, ctx context.Context, transactionID string) (int, error) {
+	var paymentLog PaymentLog
+	result := db.WithContext(ctx).
+		Select("order_id").
+		Where("transaction_id = ?", transactionID).
+		First(&paymentLog)
+	err := result.Error
+	if err != nil {
+		return code.FailedPayment, err
+	}
+	return code.Success, nil
 }

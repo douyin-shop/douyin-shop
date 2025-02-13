@@ -1,7 +1,7 @@
 module github.com/douyin-shop/douyin-shop/app/product
 
 go 1.22.9
-<<<<<<< HEAD
+
 
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
@@ -100,5 +100,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
-=======
->>>>>>> c69dda4 (废弃了登出功能，完成了登录与注册功能的开发)
+
