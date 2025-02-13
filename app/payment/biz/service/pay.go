@@ -67,15 +67,6 @@ func (s *ChargeService) HandlePaymentSuccess(transactionID string) int {
 }
 
 // 启动Redis过期监听
-func (s *ChargeService) handleOvertime(transactionID string) int {
-
-	paymentKey := fmt.Sprintf("payment:%s", transactionID)
-	if err := s.redis.Del(s.ctx, paymentKey).Err(); err != nil {
-		return code.FailedPayment
-	}
-
-	return code.Overtime
-}
 
 type PaymentMessage struct {
 	OrderID       int
