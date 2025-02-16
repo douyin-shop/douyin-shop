@@ -11,10 +11,12 @@ import (
 	"net"
 	"os"
 	"time"
-
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
+	"github.com/douyin-shop/douyin-shop/app/product/biz/dal"
+	"github.com/douyin-shop/douyin-shop/app/product/biz/util/mq"
+	snoyflake "github.com/douyin-shop/douyin-shop/app/product/biz/util/snowflake"
 	"github.com/douyin-shop/douyin-shop/app/product/conf"
 	"github.com/douyin-shop/douyin-shop/app/product/kitex_gen/product/productcatalogservice"
 	kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
@@ -29,6 +31,17 @@ func main() {
 		log.Fatal("环境变量文件加载失败", err)
 	}
 	opts := kitexInit()
+
+	// init model
+	dal.Init()
+
+	// init mq
+	mq.InitMq()
+	defer mq.ShutdownMq()
+
+	//init snowflake
+	snoyflake.Init(conf.GetConf().Snowflake.StartTime,conf.GetConf().Snowflake.MachineId)
+
 
 	svr := productcatalogservice.NewServer(new(ProductCatalogServiceImpl), opts...)
 

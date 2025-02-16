@@ -28,10 +28,31 @@ type Config struct {
 	Nacos         Nacos         `yaml:"nacos"`
 	Jwt           Jwt           `yaml:"jwt"`
 	OpenTelemetry OpenTelemetry `yaml:"opentelemetry"`
+	ElasticSearch  ElasticSearch `yaml:"elasticsearch"`
+	OSS           OSS           `yaml:"oss"`
+	Pool Pool          `yaml:"goroutine-pool"`
+	Snowflake Snowflake `yaml:"snowflake"`
+	RocketMQ RocketMQ `yaml:"rocketmq"`
+}
+
+type RocketMQ struct {
+	NameServer string `yaml:"name_server"`
+	CustomGroup string `yaml:"custom_group"`
+	Topic string `yaml:"topic"`
 }
 
 type MySQL struct {
-	DSN string `yaml:"dsn"`
+	Address  string `yaml:"address"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+	Port     int    `yaml:"port"`
+	DbName   string `yaml:"dbname"`
+	ServerId uint32 `yaml:"serverid"`
+}
+
+type ElasticSearch struct {
+    Address string `yaml:"address"`
+	IndexName string `yaml:"index_name"`
 }
 
 type Redis struct {
@@ -39,6 +60,19 @@ type Redis struct {
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
 	DB       int    `yaml:"db"`
+}
+
+type OSS struct {
+    AccessKey     string `yaml:"access_key"`
+    SecretKey string `yaml:"secret_key"`
+    Domain       string `yaml:"endpoint"`
+    Bucket          string `yaml:"bucket"`
+	Zone          int `yaml:"zone"`  //类型不能直接为需要的，使用int表示，转换方式参考oss包
+}
+
+type Pool struct {
+    Size int `yaml:"size"`
+	Queue int `yaml:"queue"`
 }
 
 type Kitex struct {
@@ -73,6 +107,11 @@ type Nacos struct {
 
 type Jwt struct {
 	Secret string `yaml:"secret"`
+}
+
+type Snowflake struct {
+	MachineId uint16 `yaml:"machine_id"`
+	StartTime string `yaml:"start_time"`
 }
 
 type OpenTelemetry struct {

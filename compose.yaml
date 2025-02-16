@@ -179,13 +179,16 @@ services:
             - discovery.type=single-node
             - ES_JAVA_OPTS=-Xms512m -Xmx512m
             - xpack.security.enabled=false
+        volumes:
+            - ./tools/elasticsearch-analysis-ik-8.17.1/:/usr/share/elasticsearch/plugins/analysis-ik
         ports:
             - "9200:9200"
             - "9300:9300"
         networks:
             - micro-service-net
+        
 networks:
     micro-service-net:
         driver: bridge
 volumes:
-    db_data:
+  db_data:
