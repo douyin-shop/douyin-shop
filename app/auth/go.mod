@@ -11,8 +11,6 @@ require (
 	github.com/cloudwego/kitex v0.12.1
 	github.com/douyin-shop/douyin-shop/common v0.0.0-20250130021656-6c3ec6f2d8b1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/joho/godotenv v1.5.1
-	github.com/kitex-contrib/config-nacos/v2 v2.0.0-20241203120505-63d6739ba3a2
 	github.com/kitex-contrib/obs-opentelemetry v0.2.9
 	github.com/kitex-contrib/obs-opentelemetry/logging/logrus v0.0.0-20241120035129-55da83caab1b
 	github.com/kr/pretty v0.3.1
