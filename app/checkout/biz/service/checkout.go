@@ -8,7 +8,6 @@ import (
 	checkout "github.com/douyin-shop/douyin-shop/app/checkout/kitex_gen/checkout"
 	"github.com/douyin-shop/douyin-shop/app/checkout/rpc"
 	"github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend/product"
-	cart2 "github.com/douyin-shop/douyin-shop/app/order/kitex_gen/cart"
 	"github.com/douyin-shop/douyin-shop/app/order/kitex_gen/order"
 	"github.com/douyin-shop/douyin-shop/app/payment/kitex_gen/payment"
 	productService "github.com/douyin-shop/douyin-shop/app/product/kitex_gen/product"
@@ -61,9 +60,9 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		cost := productDetail.Price * float32(quantity)
 		totalProductPrice += cost
 		orderItems = append(orderItems, &order.OrderItem{
-			Item: &cart2.CartItem{
-				ProductId: cartItem.ProductId,
-				Quantity:  cartItem.Quantity,
+			Item: &order.CartItem{
+				ProductId: 0,
+				Quantity:  0,
 			},
 			Cost: cost,
 		})
