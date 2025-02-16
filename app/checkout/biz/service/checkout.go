@@ -33,7 +33,7 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		return nil, code.GetError(code.CartEmpty)
 	}
 
-	// 总价
+	// 计算总价
 	var totalProductPrice float32
 	var orderItems []*order.OrderItem
 	for _, cartItem := range cartResp.Cart.Items {
