@@ -234,3 +234,27 @@ p span {
     font-weight: bold;
     color: #007bff;
 }
+
+.checkout-form {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+input, select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+.form-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f5f5f5;
+}

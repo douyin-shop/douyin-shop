@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <title>Shopping Cart</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .checkout-btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 <h1>Shopping Cart</h1>
@@ -19,6 +29,7 @@
     <tbody id="cartItems"></tbody>
 </table>
 <p>Total Price: $<span id="totalPrice">0.00</span></p>
+<button onclick="window.location.href='checkout.html'" class="checkout-btn">Proceed to Checkout</button>
 
 <script src="js/cart.js"></script>
 </body>

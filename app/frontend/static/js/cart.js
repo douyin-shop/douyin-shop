@@ -36,3 +36,22 @@ function renderCart(cart) {
 
     document.getElementById('totalPrice').textContent = cart.total_price.toFixed(2);
 }
+
+// 在 cart.js 中添加
+async function proceedToCheckout() {
+    try {
+        const response = await fetch(`${API_BASE}/cart/get_all`, {
+            headers: {
+                'Authorization': localStorage.getItem('authToken')
+            }
+        });
+        const cart = await response.json();
+        if (cart.data.cart.items.length === 0) {
+            alert('Your cart is empty!');
+            return;
+        }
+        window.location.href = 'checkout.html';
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
