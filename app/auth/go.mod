@@ -16,7 +16,6 @@ require (
 	github.com/kitex-contrib/obs-opentelemetry v0.2.9
 	github.com/kitex-contrib/obs-opentelemetry/logging/logrus v0.0.0-20241120035129-55da83caab1b
 	github.com/kr/pretty v0.3.1
-	github.com/nacos-group/nacos-sdk-go/v2 v2.2.7
 	github.com/redis/go-redis/v9 v9.7.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/protobuf v1.36.3
@@ -28,8 +27,8 @@ require (
 )
 
 require (
-	github.com/alibabacloud-go/debug v1.0.0 // indirect
-	github.com/alibabacloud-go/tea v1.1.17 // indirect
+	github.com/alibabacloud-go/debug v1.0.1 // indirect
+	github.com/alibabacloud-go/tea v1.2.2 // indirect
 	github.com/alibabacloud-go/tea-utils v1.4.4 // indirect
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1800 // indirect
 	github.com/aliyun/alibabacloud-dkms-gcs-go-sdk v0.2.2 // indirect
@@ -74,6 +73,8 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/gls v0.0.0-20220109145502-612d0167dce5 // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/nacos-group/nacos-sdk-go v1.1.5 // indirect
+	github.com/nacos-group/nacos-sdk-go/v2 v2.2.8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.18.0 // indirect
@@ -114,8 +115,7 @@ require (
 	google.golang.org/genproto v0.0.0-20240227224415-6ceb2ff114de // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250115164207-1a7da9e5054f // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
-	google.golang.org/grpc v1.69.4 // indirect
-	gopkg.in/ini.v1 v1.66.2 // indirect
+	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )

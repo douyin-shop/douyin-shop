@@ -14,10 +14,12 @@ import (
 	"os"
 	"time"
 
+	snoyflake "github.com/douyin-shop/douyin-shop/app/product/biz/util/snowflake"
+
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
-	"github.com/douyin-shop/douyin-shop/app/user/conf"
+	"github.com/douyin-shop/douyin-shop/app/product/conf"
 	"github.com/douyin-shop/douyin-shop/app/user/kitex_gen/user/userservice"
 	kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
 	"go.uber.org/zap/zapcore"
@@ -43,6 +45,8 @@ func main() {
 func kitexInit() (opts []server.Option) {
 
 	dal.Init()
+
+	snoyflake.Init(conf.GetConf().Snowflake.StartTime,conf.GetConf().Snowflake.MachineId)  //初始化雪花算法
 
 	// OpenTelemetry
 	p := provider.NewOpenTelemetryProvider(
