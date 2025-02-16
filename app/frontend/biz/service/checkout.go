@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	checkout "github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend/checkout"
@@ -17,10 +18,15 @@ func NewCheckoutService(Context context.Context, RequestContext *app.RequestCont
 }
 
 func (h *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.CheckoutResp, err error) {
-	//defer func() {
-	// hlog.CtxInfof(h.Context, "req = %+v", req)
-	// hlog.CtxInfof(h.Context, "resp = %+v", resp)
-	//}()
-	// todo edit your code
+	defer func() {
+		hlog.CtxInfof(h.Context, "req = %+v", req)
+		hlog.CtxInfof(h.Context, "resp = %+v", resp)
+	}()
+
+	resp = &checkout.CheckoutResp{
+		OrderId:       "1",
+		TransactionId: "1",
+	}
+
 	return
 }
