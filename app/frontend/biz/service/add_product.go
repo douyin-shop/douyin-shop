@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	product "github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend/product"
 )
 
@@ -17,10 +17,10 @@ func NewAddProductService(Context context.Context, RequestContext *app.RequestCo
 }
 
 func (h *AddProductService) Run(req *product.AddProductReq) (resp *product.AddProductResp, err error) {
-	//defer func() {
-	// hlog.CtxInfof(h.Context, "req = %+v", req)
-	// hlog.CtxInfof(h.Context, "resp = %+v", resp)
-	//}()
-	// todo edit your code
+	defer func() {
+		hlog.CtxInfof(h.Context, "req = %+v", req)
+		hlog.CtxInfof(h.Context, "resp = %+v", resp)
+	}()
+
 	return
 }
