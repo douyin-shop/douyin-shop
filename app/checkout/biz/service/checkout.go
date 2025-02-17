@@ -11,6 +11,7 @@ import (
 	"github.com/douyin-shop/douyin-shop/app/order/kitex_gen/order"
 	"github.com/douyin-shop/douyin-shop/app/payment/kitex_gen/payment"
 	productService "github.com/douyin-shop/douyin-shop/app/product/kitex_gen/product"
+	"github.com/jinzhu/copier"
 	"strconv"
 )
 
@@ -47,13 +48,19 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 
 		p := productResp.Product
 
-		productDetail := &product.Product{
-			Id:          productId,
-			Name:        p.Name,
-			Description: p.Description,
-			Picture:     p.Picture,
-			Price:       p.Price, // TODO 其实这里价格不应该用浮点数，应该用整数，但是这里为了简化，就直接用浮点数了
-			Categories:  productResp.Product.Categories,
+		//productDetail := &product.Product{
+		//	Id:          productId,
+		//	Name:        p.Name,
+		//	Description: p.Description,
+		//	Picture:     p.Picture,
+		//	Price:       p.Price, // TODO 其实这里价格不应该用浮点数，应该用整数，但是这里为了简化，就直接用浮点数了
+		//	Categories:  productResp.Product.Categories,
+		//}
+
+		productDetail := &product.Product{}
+		err = copier.Copy(productDetail, p)
+		if err != nil {
+			return nil, err
 		}
 
 		// 计算购物车商品总价
@@ -73,37 +80,69 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 	if err != nil {
 		return nil, code.GetError(code.ZipCodeError)
 	}
-	placeOrderResp, err := rpc.OrderClient.PlaceOrder(s.ctx, &order.PlaceOrderReq{
-		UserId:       req.UserId,
-		UserCurrency: "",
-		Address: &order.Address{
-			StreetAddress: req.Address.StreetAddress,
-			City:          req.Address.City,
-			State:         req.Address.State,
-			Country:       req.Address.Country,
-			ZipCode:       int32(zipCode),
-		},
-		Email:      req.Email,
-		OrderItems: orderItems,
-	})
+
+	remotePlaceOrderReq := &order.PlaceOrderReq{}
+
+	err = copier.Copy(remotePlaceOrderReq, req)
 	if err != nil {
+		return nil, err
+	}
+	remotePlaceOrderReq.Address.ZipCode = int32(zipCode)
+	remotePlaceOrderReq.OrderItems = orderItems
+
+	//placeOrderResp, err := rpc.OrderClient.PlaceOrder(s.ctx, &order.PlaceOrderReq{
+	//	UserId:       req.UserId,
+	//	UserCurrency: "",
+	//	Address: &order.Address{
+	//		StreetAddress: req.Address.StreetAddress,
+	//		City:          req.Address.City,
+	//		State:         req.Address.State,
+	//		Country:       req.Address.Country,
+	//		ZipCode:       int32(zipCode),
+	//	},
+	//	Email:      req.Email,
+	//	OrderItems: orderItems,
+	//})
+
+	placeOrderResp, err := rpc.OrderClient.PlaceOrder(s.ctx, remotePlaceOrderReq)
+
+	if err != nil {
+		return nil, code.GetError(code.PlaceOrderError)
+	}
+
+	// 订单id，可能会获取失败，需要处理
+	if placeOrderResp.Order == nil || placeOrderResp.Order.OrderId == "" {
+		return nil, code.GetError(code.PlaceOrderError)
+	}
+
+	if placeOrderResp.Order == nil || placeOrderResp.Order.OrderId == "" {
 		return nil, code.GetError(code.PlaceOrderError)
 	}
 
 	orderId := placeOrderResp.Order.OrderId
 
-	// 支付操作
-	payReq := &payment.ChargeReq{
-		Amount: totalProductPrice,
-		CreditCard: &payment.CreditCardInfo{
-			CreditCardNumber:          req.CreditCard.CreditCardNumber,
-			CreditCardCvv:             req.CreditCard.CreditCardCvv,
-			CreditCardExpirationYear:  req.CreditCard.CreditCardExpirationYear,
-			CreditCardExpirationMonth: req.CreditCard.CreditCardExpirationMonth,
-		},
-		OrderId: orderId,
-		UserId:  req.UserId,
+	payReq := &payment.ChargeReq{}
+
+	err = copier.Copy(payReq, req)
+	if err != nil {
+		return nil, err
 	}
+
+	payReq.Amount = totalProductPrice
+	payReq.OrderId = orderId
+	//
+	//// 支付操作
+	//payReq := &payment.ChargeReq{
+	//	Amount: totalProductPrice,
+	//	CreditCard: &payment.CreditCardInfo{
+	//		CreditCardNumber:          req.CreditCard.CreditCardNumber,
+	//		CreditCardCvv:             req.CreditCard.CreditCardCvv,
+	//		CreditCardExpirationYear:  req.CreditCard.CreditCardExpirationYear,
+	//		CreditCardExpirationMonth: req.CreditCard.CreditCardExpirationMonth,
+	//	},
+	//	OrderId: orderId,
+	//	UserId:  req.UserId,
+	//}
 
 	// 清空购物车
 	_, err = rpc.CartClient.EmptyCart(s.ctx, &cart.EmptyCartReq{UserId: req.UserId})
