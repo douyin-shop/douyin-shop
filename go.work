@@ -10,5 +10,4 @@ use (
 	./app/product
 	./app/user
 	./common
-	app/ai-agent
 )
