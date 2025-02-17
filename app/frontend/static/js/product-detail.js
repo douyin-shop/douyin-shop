@@ -39,7 +39,7 @@ async function addToCart() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                'Authorization': `${localStorage.getItem('authToken')}`
             },
             body: JSON.stringify({
                 product_id: parseInt(new URLSearchParams(window.location.search).get('id')),

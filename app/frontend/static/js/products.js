@@ -48,13 +48,22 @@ async function searchProducts() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                'Authorization': `${localStorage.getItem('authToken')}`
             },
             body: JSON.stringify({ query })
         });
 
         const data = await response.json();
-        renderProducts(data.results);
+        if(data.code === -1){
+            alert('No results found');
+            return
+        }
+        if (data.data.results.length === 0) {
+            alert('No results found');
+            return
+        }
+
+        renderProducts(data.data.results);
     } catch (error) {
         console.error('Search error:', error);
     }
