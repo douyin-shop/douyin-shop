@@ -4,6 +4,7 @@ package product
 
 import (
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/douyin-shop/douyin-shop/app/frontend/biz/middleware"
 )
 
 func rootMw() []app.HandlerFunc {
@@ -29,4 +30,25 @@ func _listproductsMw() []app.HandlerFunc {
 func _searchproductsMw() []app.HandlerFunc {
 	// your code...
 	return nil
+}
+
+func _addproductMw() []app.HandlerFunc {
+	return []app.HandlerFunc{
+		middleware.VerifyTokenMiddleware(),
+		middleware.GetCasbinMiddleware().RequiresPermissions("/product:edit"),
+	}
+}
+
+func _deleteproductMw() []app.HandlerFunc {
+	return []app.HandlerFunc{
+		middleware.VerifyTokenMiddleware(),
+		middleware.GetCasbinMiddleware().RequiresPermissions("/product:edit"),
+	}
+}
+
+func _updateproductMw() []app.HandlerFunc {
+	return []app.HandlerFunc{
+		middleware.VerifyTokenMiddleware(),
+		middleware.GetCasbinMiddleware().RequiresPermissions("/product:edit"),
+	}
 }

@@ -47,3 +47,6 @@ casbin:
     - role: 'user'
       path: '^/checkout.*$'
       method: '.*'
+    - role: 'product_admin'
+      path: '^/product.*$'
+      method: '.*'
