@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"github.com/douyin-shop/douyin-shop/app/payment/biz/dal/model"
 	"github.com/douyin-shop/douyin-shop/app/payment/conf"
 
 	"gorm.io/driver/mysql"
@@ -19,6 +20,10 @@ func Init() {
 			SkipDefaultTransaction: true,
 		},
 	)
+	if err != nil {
+		panic(err)
+	}
+	err := DB.AutoMigrate(&model.PaymentLog{})
 	if err != nil {
 		panic(err)
 	}

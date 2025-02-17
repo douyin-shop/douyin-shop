@@ -5,6 +5,8 @@ go 1.22.9
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
+	github.com/brianvoe/gofakeit/v6 v6.28.0
+	github.com/bxcodec/faker/v3 v3.8.1
 	github.com/cloudwego/fastpb v0.0.5
 	github.com/cloudwego/kitex v0.12.1
 	github.com/douyin-shop/douyin-shop/common v0.0.0-20250122041239-0985442f9cfc
