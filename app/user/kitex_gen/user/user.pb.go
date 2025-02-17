@@ -421,6 +421,9 @@ type UpdateReq struct {
 	UserId   int32  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Email    string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
 	Password string `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	Phone    string `gorm:"varchar(20);not null;" json:"phone" binding:"required" label:"用户电话"`
+	Nickname string `gorm:"varchar(20);not null;" json:"nick_name" binding:"required" label:"用户昵称"`
+	Address  string `gorm:"varchar(100);not null;" json:"address" binding:"required" label:"用户地址"`
 }
 
 func (x *UpdateReq) Reset() {
