@@ -1,5 +1,5 @@
-// const API_BASE = 'http://127.0.0.1:8080';
 const API_BASE = '';
+
 document.addEventListener('DOMContentLoaded', async () => {
     if (!localStorage.getItem('authToken')) {
         window.location.href = 'index.html';
@@ -24,20 +24,48 @@ async function loadCart() {
 }
 
 function renderCart(cart) {
-    const tbody = document.getElementById('cartItems');
-    tbody.innerHTML = cart.items.map(item => `
-        <tr>
-            <td>${item.product.name}</td>
-            <td>$${item.product.price.toFixed(2)}</td>
-            <td>${item.quantity}</td>
-            <td>$${(item.product.price * item.quantity).toFixed(2)}</td>
-        </tr>
-    `).join('');
+    const container = document.getElementById('cartItems');
+    container.innerHTML = cart.items.map(item => `
+            <div class="cart-item">
+                <img src="${item.product.picture}" class="item-image" alt="${item.product.name}">
+                <div class="item-info">
+                    <div class="item-name">${item.product.name}</div>
+                    <div class="item-price">¥${item.product.price.toFixed(2)}</div>
+                    <div class="quantity-control">
+                        <button class="quantity-btn" onclick="updateQuantity(${item.product.id}, ${item.quantity - 1})">-</button>
+                        <input type="number" class="quantity-input" value="${item.quantity}" 
+                               min="1" onchange="updateQuantity(${item.product.id}, this.value)">
+                        <button class="quantity-btn" onclick="updateQuantity(${item.product.id}, ${item.quantity + 1})">+</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
 
     document.getElementById('totalPrice').textContent = cart.total_price.toFixed(2);
 }
 
-// 在 cart.js 中添加
+async function updateQuantity(productId, newQuantity) {
+    try {
+        const response = await fetch(`${API_BASE}/cart/update`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('authToken')
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: parseInt(newQuantity)
+            })
+        });
+
+        if (response.ok) {
+            await loadCart();
+        }
+    } catch (error) {
+        console.error('Error updating quantity:', error);
+    }
+}
+
 async function proceedToCheckout() {
     try {
         const response = await fetch(`${API_BASE}/cart/get_all`, {
@@ -47,7 +75,7 @@ async function proceedToCheckout() {
         });
         const cart = await response.json();
         if (cart.data.cart.items.length === 0) {
-            alert('Your cart is empty!');
+            alert('购物车为空！');
             return;
         }
         window.location.href = 'checkout.html';
