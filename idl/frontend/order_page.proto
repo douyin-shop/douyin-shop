@@ -1,15 +1,16 @@
 syntax = "proto3";
 
-package order;
+package frontend.order;
 
-option go_package = "order";
+import "api-tools.proto";
 
+option go_package = "/frontend/order";
 
 
 service OrderService {
-  rpc PlaceOrder(PlaceOrderReq) returns (PlaceOrderResp) {}
-  rpc ListOrder(ListOrderReq) returns (ListOrderResp) {}
-  rpc MarkOrderPaid(MarkOrderPaidReq) returns (MarkOrderPaidResp) {}
+  rpc ListOrder(ListOrderReq) returns (ListOrderResp) {
+    option (api.post) = "/order/list";
+  }
 }
 
 message Address {
