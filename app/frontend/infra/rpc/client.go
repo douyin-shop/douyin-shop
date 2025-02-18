@@ -9,6 +9,7 @@ import (
 	"github.com/douyin-shop/douyin-shop/app/cart/kitex_gen/cart/cartservice"
 	"github.com/douyin-shop/douyin-shop/app/checkout/kitex_gen/checkout/checkoutservice"
 	"github.com/douyin-shop/douyin-shop/app/frontend/conf"
+	"github.com/douyin-shop/douyin-shop/app/order/kitex_gen/order/orderservice"
 	"github.com/douyin-shop/douyin-shop/app/product/kitex_gen/product/productcatalogservice"
 	"github.com/douyin-shop/douyin-shop/app/user/kitex_gen/user/userservice"
 	"github.com/douyin-shop/douyin-shop/common/nacos"
@@ -21,6 +22,7 @@ var (
 	CartClient     cartservice.Client
 	ProductClient  productcatalogservice.Client
 	CheckoutClient checkoutservice.Client
+	OrderClient    orderservice.Client
 )
 
 func InitClient() {
@@ -48,6 +50,11 @@ func InitClient() {
 		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: conf.GetConf().Hertz.Service}),
 	)
 	CheckoutClient = checkoutservice.MustNewClient("checkout",
+		client.WithResolver(resolver),
+		client.WithSuite(kitextracing.NewClientSuite()),
+		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: conf.GetConf().Hertz.Service}),
+	)
+	OrderClient = orderservice.MustNewClient("order",
 		client.WithResolver(resolver),
 		client.WithSuite(kitextracing.NewClientSuite()),
 		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: conf.GetConf().Hertz.Service}),

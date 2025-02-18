@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/douyin-shop/douyin-shop/app/checkout/rpc"
+	"github.com/douyin-shop/douyin-shop/app/frontend/infra/rpc"
 	"github.com/jinzhu/copier"
 
 	"github.com/cloudwego/hertz/pkg/app"
