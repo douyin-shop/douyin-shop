@@ -13,7 +13,6 @@ func rootMw() []app.HandlerFunc {
 }
 
 func _orderMw() []app.HandlerFunc {
-	return nil
 	return []app.HandlerFunc{
 		middleware.VerifyTokenMiddleware(),
 		middleware.GetCasbinMiddleware().RequiresPermissions("/order:*"),
