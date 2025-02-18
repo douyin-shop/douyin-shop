@@ -33,7 +33,7 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		return nil, code.GetError(code.CartEmpty)
 	}
 
-	// 计算总价
+	// 获取购物车中的信息并计算总价
 	var totalProductPrice float32
 	var orderItems []*order.OrderItem
 	for _, cartItem := range cartResp.Cart.Items {
@@ -68,8 +68,8 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		totalProductPrice += cost
 		orderItems = append(orderItems, &order.OrderItem{
 			Item: &order.CartItem{
-				ProductId: 0,
-				Quantity:  0,
+				ProductId: p.Id,
+				Quantity:  quantity,
 			},
 			Cost: cost,
 		})
@@ -90,20 +90,6 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 	remotePlaceOrderReq.Address.ZipCode = int32(zipCode)
 	remotePlaceOrderReq.OrderItems = orderItems
 
-	//placeOrderResp, err := rpc.OrderClient.PlaceOrder(s.ctx, &order.PlaceOrderReq{
-	//	UserId:       req.UserId,
-	//	UserCurrency: "",
-	//	Address: &order.Address{
-	//		StreetAddress: req.Address.StreetAddress,
-	//		City:          req.Address.City,
-	//		State:         req.Address.State,
-	//		Country:       req.Address.Country,
-	//		ZipCode:       int32(zipCode),
-	//	},
-	//	Email:      req.Email,
-	//	OrderItems: orderItems,
-	//})
-
 	placeOrderResp, err := rpc.OrderClient.PlaceOrder(s.ctx, remotePlaceOrderReq)
 
 	if err != nil {
@@ -121,6 +107,7 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 
 	orderId := placeOrderResp.Order.OrderId
 
+	// 调用支付微服务，生成支付信息
 	payReq := &payment.ChargeReq{}
 
 	err = copier.Copy(payReq, req)
@@ -130,30 +117,17 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 
 	payReq.Amount = totalProductPrice
 	payReq.OrderId = orderId
-	//
-	//// 支付操作
-	//payReq := &payment.ChargeReq{
-	//	Amount: totalProductPrice,
-	//	CreditCard: &payment.CreditCardInfo{
-	//		CreditCardNumber:          req.CreditCard.CreditCardNumber,
-	//		CreditCardCvv:             req.CreditCard.CreditCardCvv,
-	//		CreditCardExpirationYear:  req.CreditCard.CreditCardExpirationYear,
-	//		CreditCardExpirationMonth: req.CreditCard.CreditCardExpirationMonth,
-	//	},
-	//	OrderId: orderId,
-	//	UserId:  req.UserId,
-	//}
+
+	paymentResp, err := rpc.PaymentClient.Charge(s.ctx, payReq)
+	if err != nil {
+		return nil, code.GetError(code.PayError)
+	}
 
 	// 清空购物车
 	_, err = rpc.CartClient.EmptyCart(s.ctx, &cart.EmptyCartReq{UserId: req.UserId})
 	if err != nil {
+		//TODO 将订单更改为已取消状态
 		return nil, code.GetError(code.EmptyCartFiled)
-	}
-
-	// 调用支付微服务，生成支付信息
-	paymentResp, err := rpc.PaymentClient.Charge(s.ctx, payReq)
-	if err != nil {
-		return nil, code.GetError(code.PayError)
 	}
 
 	klog.Debug("支付成功", paymentResp)
