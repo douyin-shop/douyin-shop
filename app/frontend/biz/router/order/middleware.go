@@ -4,6 +4,7 @@ package order
 
 import (
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/douyin-shop/douyin-shop/app/frontend/biz/middleware"
 )
 
 func rootMw() []app.HandlerFunc {
@@ -13,7 +14,10 @@ func rootMw() []app.HandlerFunc {
 
 func _orderMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{
+		middleware.VerifyTokenMiddleware(),
+		middleware.GetCasbinMiddleware().RequiresPermissions("/order:*"),
+	}
 }
 
 func _listorderMw() []app.HandlerFunc {
