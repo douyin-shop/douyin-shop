@@ -1,8 +1,16 @@
-// const API_BASE = 'http://127.0.0.1:8080';
 const API_BASE = '';
+
 function showForm(formType) {
+    const container = document.querySelector('.form-container');
     document.getElementById('loginForm').classList.toggle('hidden', formType !== 'login');
     document.getElementById('registerForm').classList.toggle('hidden', formType !== 'register');
+
+    // 更新切换动画
+    if(formType === 'register') {
+        container.querySelector('.form-toggle').classList.add('register-active');
+    } else {
+        container.querySelector('.form-toggle').classList.remove('register-active');
+    }
 }
 
 async function handleLogin(e) {
@@ -17,29 +25,16 @@ async function handleLogin(e) {
             body: JSON.stringify({ email, password })
         });
 
-
-        // 正确的返回结果
-        `{
-            "code": 0,
-            "data": {
-                "user_id": 2,
-                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzgzODg0MTMsInVzZXJfaWQiOjJ9.PoH-e_v19H3Zk1IAbHeW0V7hKDc7y5DnyCcmLFB_RdU"
-            },
-            "msg": "success"
-        }`
         const data = await response.json();
-
-        // 判断code是否为0
         if (data.code === 0) {
             localStorage.setItem('authToken', data.data.token);
-            window.location.href = 'products.html';
-        }else{
-            alert('Login failed: ' + (data.msg || 'Unknown error'));
+            window.location.href = 'product-list.html';
+        } else {
+            alert('登录失败: ' + (data.msg || '请检查输入信息'));
         }
-
     } catch (error) {
-        console.error('Login error:', error);
-        alert('Login failed. Please try again.');
+        console.error('登录错误:', error);
+        alert('登录失败，请稍后重试');
     }
 }
 
@@ -57,14 +52,14 @@ async function handleRegister(e) {
 
         const data = await response.json();
         if (data.code === 0) {
-            alert('Registration successful! Please login.');
+            alert('注册成功，请登录');
             showForm('login');
+            document.getElementById('loginEmail').value = email;
         } else {
-            alert('Registration failed: ' + (data.msg || 'Unknown error'));
+            alert('注册失败: ' + (data.msg || '该邮箱已被使用'));
         }
-
     } catch (error) {
-        console.error('Registration error:', error);
-        alert('Registration failed. Please try again.');
+        console.error('注册错误:', error);
+        alert('注册失败，请检查网络连接');
     }
 }
