@@ -1,0 +1,120 @@
+:root {
+    --primary-color: #FE2C55;
+    --secondary-color: #20D5EC;
+    --bg-color: #F5F5F5;
+}
+
+body {
+    font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+    padding: 20px;
+}
+
+.order-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.order-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    margin-bottom: 16px;
+    padding: 16px;
+    position: relative;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #EEE;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+}
+
+.order-status {
+    color: var(--primary-color);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.order-time {
+    color: #999;
+    font-size: 12px;
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+}
+
+.product-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    margin-right: 12px;
+    background: #F0F0F0; /* 图片占位背景 */
+}
+
+.product-info {
+    flex: 1;
+}
+
+.product-title {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.product-spec {
+    color: #666;
+    font-size: 12px;
+}
+
+.order-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #EEE;
+}
+
+.total-price {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-secondary {
+    background: #EEE;
+    color: #333;
+}
+
+/* 抖音风格渐变文字 */
+.gradient-text {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}

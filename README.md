@@ -18,9 +18,11 @@ cwgo client  --type RPC  --idl user.proto  --server_name user --registry NACOS  
 cwgo server  --type HTTP -I ../../idl --idl ../../idl/frontend/user_page.proto  --server_name frontend  --module github.com/douyin-shop/douyin-shop/app/frontend 
 # 生成前端购物车微服务
 cwgo server  --type HTTP -I ../../idl --idl ../../idl/frontend/cart_page.proto  --server_name frontend  --module github.com/douyin-shop/douyin-shop/app/frontend
-# 生成结算微服务
+# 生成前端结算微服务
 cwgo server  --type HTTP -I ../../idl --idl ../../idl/frontend/checkout_page.proto  --server_name frontend  --module github.com/douyin-shop/douyin-shop/app/frontend
 # 生成前端商品微服务
 cwgo server  --type HTTP -I ../../idl --idl ../../idl/frontend/product_page.proto  --server_name frontend  --module github.com/douyin-shop/douyin-shop/app/frontend
+# 生成前端订单微服务
+cwgo server  --type HTTP -I ../../idl --idl ../../idl/frontend/order_page.proto  --server_name frontend  --module github.com/douyin-shop/douyin-shop/app/frontend
 
 ```

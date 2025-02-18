@@ -2,35 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Shopping Cart</title>
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        .checkout-btn {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>我的购物车</title>
+    <link rel="stylesheet" href="css/cart.css">
+
 </head>
 <body>
-<h1>Shopping Cart</h1>
-<table class="cart-table">
-    <thead>
-    <tr>
-        <th>Product</th>
-        <th>Price</th>
-        <th>Quantity</th>
-        <th>Total</th>
-    </tr>
-    </thead>
-    <tbody id="cartItems"></tbody>
-</table>
-<p>Total Price: $<span id="totalPrice">0.00</span></p>
-<button onclick="window.location.href='checkout.html'" class="checkout-btn">Proceed to Checkout</button>
+<div class="cart-header">
+    <h1>我的购物车</h1>
+    <a href="products.html" class="nav-button">继续购物</a>
+</div>
 
+<div id="cartItems"></div>
+
+<div class="total-section">
+    <p style="text-align: right; font-size: 18px;">
+        总计：<span id="totalPrice" style="color: #ff3b6b; font-weight: bold;">0.00</span>
+    </p>
+    <button onclick="proceedToCheckout()" class="checkout-btn">去结算</button>
+</div>
 <script src="js/cart.js"></script>
 </body>
 </html>
