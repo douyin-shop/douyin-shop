@@ -2,23 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Product List</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品列表</title>
+    <link rel="stylesheet" href="css/products.css">
 </head>
 <body>
 <header>
-    <h1>Products</h1>
-    <div>
-        <input type="text" id="searchInput" placeholder="Search products...">
-        <button onclick="searchProducts()">Search</button>
-        <a href="cart.html">View Cart</a>
-        <a href="order.html">View Orders</a>
-
-    </div>
+    <input type="text" id="searchInput" placeholder="搜索商品">
+    <a href="cart.html" class="nav-button">购物车</a>
+    <a href="order.html" class="nav-button">订单</a>
 </header>
 
 <div class="product-grid" id="productList"></div>
-
 <script src="js/products.js"></script>
 </body>
 </html>

@@ -1,5 +1,6 @@
-// const API_BASE = 'http://127.0.0.1:8080';
+// 保持原有的JavaScript逻辑不变
 const API_BASE = '';
+
 document.addEventListener('DOMContentLoaded', async () => {
     if (!localStorage.getItem('authToken')) {
         window.location.href = 'index.html';
@@ -28,13 +29,17 @@ async function loadProducts() {
 function renderProducts(products) {
     const container = document.getElementById('productList');
     container.innerHTML = products.map(product => `
-        <div class="product-card">
-            <h3>${product.name}</h3>
-            <img src="${product.picture}" alt="${product.name}" style="max-width: 200px;">
-            <p>$${product.price.toFixed(2)}</p>
-            <button onclick="viewProductDetail(${product.id})">View Details</button>
-        </div>
-    `).join('');
+            <div class="product-card">
+                <img src="${product.picture}" class="product-image" alt="${product.name}">
+                <div class="product-info">
+                    <div class="product-title">${product.name}</div>
+                    <div class="product-price">¥${product.price.toFixed(2)}</div>
+                </div>
+                <a href="javascript:void(0)" onclick="viewProductDetail(${product.id})" class="view-button">
+                    查看详情
+                </a>
+            </div>
+        `).join('');
 }
 
 function viewProductDetail(productId) {
@@ -54,17 +59,19 @@ async function searchProducts() {
         });
 
         const data = await response.json();
-        if(data.code === -1){
-            alert('No results found');
-            return
+        if(data.code === -1 || data.data.results.length === 0){
+            alert('未找到相关商品');
+            return;
         }
-        if (data.data.results.length === 0) {
-            alert('No results found');
-            return
-        }
-
         renderProducts(data.data.results);
     } catch (error) {
         console.error('Search error:', error);
     }
 }
+
+// 添加搜索输入框的实时监听
+document.getElementById('searchInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        searchProducts();
+    }
+});
