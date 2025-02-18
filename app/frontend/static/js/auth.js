@@ -28,7 +28,7 @@ async function handleLogin(e) {
         const data = await response.json();
         if (data.code === 0) {
             localStorage.setItem('authToken', data.data.token);
-            window.location.href = 'product-list.html';
+            window.location.href = 'products.html';
         } else {
             alert('登录失败: ' + (data.msg || '请检查输入信息'));
         }
