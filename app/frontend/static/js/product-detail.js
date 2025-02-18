@@ -1,5 +1,5 @@
-// const API_BASE = 'http://127.0.0.1:8080';
 const API_BASE = '';
+
 document.addEventListener('DOMContentLoaded', async () => {
     const productId = new URLSearchParams(window.location.search).get('id');
     if (productId) {
@@ -29,11 +29,11 @@ function renderProduct(product) {
     document.getElementById('productName').textContent = product.name;
     document.getElementById('productImage').src = product.picture;
     document.getElementById('productDescription').textContent = product.description;
-    document.getElementById('productPrice').textContent = product.price.toFixed(2);
+    document.getElementById('productPrice').textContent = `¥${product.price.toFixed(2)}`;
 }
 
 async function addToCart() {
-    const quantity = parseInt(document.getElementById('quantity').value);
+    const quantity = parseInt(document.getElementById('quantity').value) || 1;
     try {
         const response = await fetch(`${API_BASE}/cart/add`, {
             method: 'POST',
@@ -48,12 +48,12 @@ async function addToCart() {
         });
 
         if (response.ok) {
-            alert('Product added to cart!');
+            alert('成功加入购物车 🛒');
         } else {
             const error = await response.json();
-            alert('Error: ' + error.message);
+            alert('操作失败: ' + error.message);
         }
     } catch (error) {
-        console.error('Add to cart error:', error);
+        console.error('添加购物车失败:', error);
     }
 }

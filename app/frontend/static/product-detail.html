@@ -2,18 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Product Detail</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品详情</title>
+    <link rel="stylesheet" href="css/product-detail.css">
 </head>
 <body>
-<div id="productDetail">
-    <h1 id="productName"></h1>
-    <img id="productImage" src="" alt="Product Image" style="max-width: 300px;">
-    <p id="productDescription"></p>
-    <p>Price: $<span id="productPrice"></span></p>
-    <input type="number" id="quantity" value="1" min="1">
-    <button onclick="addToCart()">Add to Cart</button>
+<a href="products.html" class="back-link">← 返回商品列表</a>
+<div class="container">
+    <img id="productImage" class="product-image" alt="商品图片">
+    <h1 class="product-title" id="productName"></h1>
+    <div class="product-price" id="productPrice"></div>
+    <p class="product-description" id="productDescription"></p>
+
+    <div class="quantity-control">
+        <input
+                type="number"
+                id="quantity"
+                class="quantity-input"
+                value="1"
+                min="1"
+                onkeydown="return event.keyCode !== 69"
+        >
+        <button onclick="addToCart()" class="add-to-cart-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+            加入购物车
+        </button>
+    </div>
 </div>
+
 
 <script src="js/product-detail.js"></script>
 </body>
