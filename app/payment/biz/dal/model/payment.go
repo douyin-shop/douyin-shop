@@ -3,8 +3,10 @@ package model
 
 import (
 	"context"
-	"github.com/douyin-shop/douyin-shop/app/payment/biz/utils/code"
+	"github.com/douyin-shop/douyin-shop/app/payment/conf"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
+	"log"
 	"time"
 )
 
@@ -24,18 +26,35 @@ func (PaymentLog) TableName() string {
 
 // CreatePaymentLog 创建支付日志
 func CreatePaymentLog(db *gorm.DB, ctx context.Context, paymentLog *PaymentLog) error {
-	return db.WithContext(ctx).Model(&PaymentLog{}).Create(paymentLog).Error
+	// 插入数据库
+	err := db.WithContext(ctx).Model(&PaymentLog{}).Create(paymentLog).Error
+	if err != nil {
+		return err
+	}
+
+	// 在函数内部初始化 Redis 客户端
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: conf.GetConf().Redis.Address,
+	})
+
+	// 调用钩子触发 Redis 操作
+	err = storePaymentInRedis(ctx, redisClient, paymentLog)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func GetOrderIDByTransaction(db *gorm.DB, ctx context.Context, transactionID string) (int, error) {
-	var paymentLog PaymentLog
-	result := db.WithContext(ctx).
-		Select("order_id").
-		Where("transaction_id = ?", transactionID).
-		First(&paymentLog)
-	err := result.Error
+func storePaymentInRedis(ctx context.Context, redisClient *redis.Client, paymentLog *PaymentLog) error {
+
+	redisKey := "payment:" + paymentLog.TransactionId
+	// 存储支付状态，初始为 "PENDING"
+	err := redisClient.Set(ctx, redisKey, "PENDING", 30*time.Minute).Err()
 	if err != nil {
-		return code.FailedPayment, err
+		log.Printf("Failed to store payment in Redis: %v", err)
+		return err
 	}
-	return code.Success, nil
+	log.Printf("Payment transaction %s stored in Redis with status PENDING", paymentLog.TransactionId)
+	return nil
 }

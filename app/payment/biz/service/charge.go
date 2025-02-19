@@ -9,20 +9,15 @@ import (
 	payment "github.com/douyin-shop/douyin-shop/app/payment/kitex_gen/payment"
 	creditcard "github.com/durango/go-credit-card"
 	"github.com/google/uuid"
-	"github.com/redis/go-redis/v9"
 	"strconv"
 	"time"
 )
 
 type ChargeService struct {
-	ctx   context.Context
-	redis *redis.Client
+	ctx context.Context
 } // NewChargeService new ChargeService
-func NewChargeService(ctx context.Context, redisClient *redis.Client) *ChargeService {
-	return &ChargeService{
-		ctx:   ctx,
-		redis: redisClient,
-	}
+func NewChargeService(ctx context.Context) *ChargeService {
+	return &ChargeService{ctx: ctx}
 }
 
 // Run create note info

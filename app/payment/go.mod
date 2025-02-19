@@ -5,13 +5,16 @@ go 1.22.9
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
+	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/cloudwego/fastpb v0.0.5
+	github.com/cloudwego/hertz v0.9.5
 	github.com/cloudwego/kitex v0.12.1
 	github.com/douyin-shop/douyin-shop/app/auth v0.0.0-20250203124345-ca77d837a1dc
 	github.com/douyin-shop/douyin-shop/app/product v0.0.0-20250203124345-ca77d837a1dc
 	github.com/douyin-shop/douyin-shop/app/user v0.0.0-20250203124345-ca77d837a1dc
 	github.com/douyin-shop/douyin-shop/common v0.0.0-20250203124345-ca77d837a1dc
 	github.com/durango/go-credit-card v0.0.0-20220404131259-a9e175ba4082
+	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kitex-contrib/config-nacos/v2 v2.0.0-20241203120505-63d6739ba3a2
 	github.com/kitex-contrib/obs-opentelemetry v0.2.9
@@ -54,14 +57,15 @@ require (
 	github.com/cloudwego/thriftgo v0.3.18 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
+	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/pprof v0.0.0-20240727154555-813a5fbdbec8 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.25.1 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/jhump/protoreflect v1.8.2 // indirect
@@ -76,6 +80,8 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/gls v0.0.0-20220109145502-612d0167dce5 // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/nyaruka/phonenumbers v1.0.55 // indirect
+	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.18.0 // indirect
@@ -119,4 +125,5 @@ require (
 	gopkg.in/ini.v1 v1.66.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
+	stathat.com/c/consistent v1.0.0 // indirect
 )

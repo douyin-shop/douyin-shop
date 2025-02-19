@@ -1,91 +1,115 @@
 package service
 
 import (
+	"context"
 	"fmt"
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/douyin-shop/douyin-shop/app/payment/biz/dal/model"
-	"github.com/douyin-shop/douyin-shop/app/payment/biz/dal/mysql"
-	"github.com/douyin-shop/douyin-shop/app/payment/biz/utils/code"
-	payment "github.com/douyin-shop/douyin-shop/app/payment/kitex_gen/payment"
-	"github.com/goccy/go-json"
-	"net/http"
+	"github.com/apache/rocketmq-client-go/v2"
+	"github.com/apache/rocketmq-client-go/v2/consumer"
+	"github.com/apache/rocketmq-client-go/v2/primitive"
+	"github.com/apache/rocketmq-client-go/v2/producer"
+	"github.com/go-redis/redis/v8"
+	"log"
 )
 
-type Pay struct {
-	Code int
-	Msg  string
+type PaymentProcessor struct {
+	redis  *redis.Client
+	rocket *rocketmq.Producer
 }
 
-func (s *ChargeService) SimulatePaymentSuccess(req *payment.ChargeReq, c *app.RequestContext, transactionID string) string {
+var (
+	RedisClient *redis.Client
+)
 
-	if err := c.BindAndValidate(&req); err != nil {
-		c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"code":    code.FailedPayment,
-			"message": code.GetMsg(code.FailedPayment),
-		})
-		return code.GetMsg(code.FailedPayment)
+// ListenForPayments 监听 Redis 频道并处理支付超时
+func (p *PaymentProcessor) ListenForPayments(ctx context.Context) {
+	// 订阅 Redis 频道
+	pubsub := p.redis.Subscribe(ctx, "paymentChannel")
+	defer pubsub.Close()
+
+	// 获取消息频道
+	ch := pubsub.Channel()
+
+	// 消费消息
+	for msg := range ch {
+		transactionId := msg.Payload
+		log.Printf("Received transaction ID: %s", transactionId)
+
+		// 设置延时消息，30分钟后超时
+		p.sendPaymentToQueue(transactionId)
+
+		// 在此处也可以将交易号记录到 Redis 等，等后续的支付回调进行处理
+	}
+}
+
+// sendPaymentToQueue 将交易号发送到 RocketMQ
+func (p *PaymentProcessor) sendPaymentToQueue(transactionId string) {
+	// 创建 RocketMQ 消息
+	msg := &primitive.Message{
+		Topic: "PaymentTimeoutTopic", // 设置主题
+		Body:  []byte(transactionId), // 消息体为交易 ID
+	}
+	q, _ := rocketmq.NewProducer(
+		producer.WithNsResolver(primitive.NewPassthroughResolver([]string{"127.0.0.1:9876"})),
+		producer.WithRetry(2),
+	) //小bug，无法使用p.rocket.SendSync
+	// 发送消息到 RocketMQ
+	res, err := q.SendSync(context.Background(), msg)
+	if err != nil {
+		log.Printf("Failed to send RocketMQ message: %v", err)
+		return
 	}
 
-	// 2. 执行支付成功处理
-	err := s.HandlePaymentSuccess(transactionID)
-	if err != code.Success {
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    code.FailedPayment,
-			"message": code.GetMsg(code.FailedPayment),
-		})
-		return code.GetMsg(code.FailedPayment)
+	log.Printf("Message sent to RocketMQ with transactionId: %s, result: %v", transactionId, res)
+}
+
+// ProcessPaymentCallback 支付回调，处理支付成功
+func (p *PaymentProcessor) ProcessPaymentCallback(transactionId string) error {
+	// 支付回调时从 Redis 删除交易号
+	err := p.redis.Del(context.Background(), transactionId)
+	if err != nil {
+		log.Printf("Failed to delete transactionId from Redis: %v", err)
+		return fmt.Errorf("failed to process payment callback")
 	}
 
-	// 3. 返回成功响应
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"code":    code.Success,
-		"message": code.GetMsg(code.Success),
-		"data": map[string]string{
-			"transaction_id": transactionID,
-			"status":         "success",
-		},
+	// 在此处可以继续处理支付成功后的业务逻辑
+	log.Printf("Payment processed successfully for transactionId: %s", transactionId)
+
+	return nil
+}
+
+func consumePaymentTimeout() {
+	// 创建 RocketMQ 消费者
+	c, err := rocketmq.NewPushConsumer(
+		consumer.WithNameServer([]string{"localhost:9876"}),
+		consumer.WithGroupName("PaymentTimeoutGroup"),
+	)
+	if err != nil {
+		log.Fatal("Failed to create consumer:", err)
+	}
+	defer c.Shutdown()
+
+	// 订阅支付超时消息主题
+	err = c.Subscribe("PaymentTimeoutTopic", consumer.MessageSelector{}, func(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
+		for _, msg := range msgs {
+			transactionId := string(msg.Body)
+			log.Printf("Payment timeout for transactionId: %s", transactionId)
+			// 删除 Redis 中的记录
+			err := RedisClient.Del(ctx, transactionId).Err()
+			if err != nil {
+				log.Printf("Failed to delete transactionId from Redis: %v", err)
+			}
+		}
+		return consumer.ConsumeSuccess, nil
 	})
-	return code.GetMsg(code.Success)
-}
-
-// 支付成功处理
-func (s *ChargeService) HandlePaymentSuccess(transactionID string) int {
-	paymentKey := fmt.Sprintf("payment:%s", transactionID)
-	if err := s.redis.Del(s.ctx, paymentKey).Err(); err != nil {
-		return code.FailedPayment
-	}
-
-	orderID, err := model.GetOrderIDByTransaction(mysql.DB, s.ctx, transactionID)
 	if err != nil {
-		return code.FailedPayment
-	}
-	if err := s.sendToPaymentQueue(orderID, transactionID); err != code.Success {
-		return code.Queueerr
+		log.Fatal("Failed to subscribe:", err)
 	}
 
-	return code.Overtime
-}
-
-// 启动Redis过期监听
-
-type PaymentMessage struct {
-	OrderID       int
-	TransactionID string
-}
-
-func (s *ChargeService) sendToPaymentQueue(orderID int, transactionID string) int {
-	msg := PaymentMessage{
-		OrderID:       orderID,
-		TransactionID: transactionID,
-	}
-
-	_, err := json.Marshal(msg)
+	// 开始消费
+	err = c.Start()
 	if err != nil {
-		return code.Queueerr
+		log.Fatal("Failed to start consumer:", err)
 	}
+	select {}
 
-	// 使用Redis Stream确保消息持久化
-	return code.Success
 }
-
-// HandlePaymentSuccess 处理支付成功
