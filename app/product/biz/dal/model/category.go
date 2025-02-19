@@ -8,8 +8,8 @@ import (
 type Category struct {
 	Id        uint64  `gorm:"column:id;primaryKey;autoIncrement" json:"id"`
 	Name      string `gorm:"column:name;not null" json:"name"`
-	ParentId  int64  `gorm:"column:parent_id;not null" json:"parent_id"`
-	Level     int64  `gorm:"column:level;not null" json:"level"`
+	ParentId  uint64  `gorm:"column:parent_id;not null" json:"parent_id"`
+	Level     uint64  `gorm:"column:level;not null" json:"level"`
 }
 
 func CheckCategoryExist(name string,tx *gorm.DB) int {

@@ -29,6 +29,13 @@ func AddProduct(product *Product,tx *gorm.DB) int{
 	if c == code.ProductExist {
 	    return c
 	}
+	//查看商品分类是否存在
+	for _,category := range product.Category {
+	    c=CheckCategoryExist(category.Name, tx)
+	    if c == code.CategoryNotExist {
+	        AddCategory(&category, tx)
+	    }
+	}
 	err:=tx.Create(product).Error
 	if err != nil {
 	    return code.Error
@@ -42,7 +49,10 @@ func DeleteProduct(id int,tx *gorm.DB) int {
 	if product.ID == 0 {
 	    return code.ProductNotExist
 	}
-	tx.Delete(product)
+	err:=tx.Delete(product).Error
+	if err != nil {
+	    return code.Error
+	}
 	return code.Success
 }
 
@@ -61,6 +71,9 @@ func GetProduct(id int,tx *gorm.DB) (*Product,int){
 	err:=tx.Where("id = ?",id).First(&product).Error
 	if err != nil {
 	    return nil,code.Error
+	}
+	if product.ID == 0 {
+	    return nil,code.ProductNotExist
 	}
 	return product,code.Success
 }
