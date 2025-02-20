@@ -2,6 +2,8 @@
 
 cd app
 
+export PATH=$PATH:$GOPATH/bin
+
 # 遍历所有服务目录
 for service in */; do
     service=${service%/}  # 移除路径末尾的斜杠

@@ -2,8 +2,8 @@ package redis
 
 import (
 	"context"
-	"github.com/redis/go-redis/v9"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/douyin-shop/douyin-shop/app/product/conf"
 )
 
