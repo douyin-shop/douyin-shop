@@ -6,6 +6,7 @@ import (
 	caerService "github.com/douyin-shop/douyin-shop/app/cart/kitex_gen/cart"
 	"github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend/product"
 	"github.com/douyin-shop/douyin-shop/app/frontend/infra/rpc"
+	"github.com/jinzhu/copier"
 	"strconv"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -33,6 +34,7 @@ func (h *GetCartService) Run(req *cart.GetCartReq) (resp *cart.GetCartResp, err 
 
 	hlog.Info("请求用户id:", userId)
 
+	// 将用户id转换为int
 	userIdInt, err := strconv.Atoi(userId.(string))
 	if err != nil {
 		return nil, err
@@ -59,14 +61,21 @@ func (h *GetCartService) Run(req *cart.GetCartReq) (resp *cart.GetCartResp, err 
 
 		p := productResp.Product
 
-		productDetail := &product.Product{
-			Id:          productId,
-			Name:        p.Name,
-			Description: p.Description,
-			Picture:     p.Picture,
-			Price:       p.Price, // TODO 其实这里价格不应该用浮点数，应该用整数，但是这里为了简化，就直接用浮点数了
-			Categories:  productResp.Product.Categories,
+		//productDetail := &product.Product{
+		//	Id:          productId,
+		//	Name:        p.Name,
+		//	Description: p.Description,
+		//	Picture:     p.Picture,
+		//	Price:       p.Price, // TODO 其实这里价格不应该用浮点数，应该用整数，但是这里为了简化，就直接用浮点数了
+		//	Categories:  productResp.Product.Categories,
+		//}
+
+		productDetail := &product.Product{}
+		err = copier.Copy(productDetail, p)
+		if err != nil {
+			return nil, err
 		}
+		productDetail.Id = productId
 
 		// 计算购物车商品总价
 		totalProductPrice += productDetail.Price * float32(quantity)

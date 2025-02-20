@@ -8,10 +8,10 @@ import (
 	checkout "github.com/douyin-shop/douyin-shop/app/checkout/kitex_gen/checkout"
 	"github.com/douyin-shop/douyin-shop/app/checkout/rpc"
 	"github.com/douyin-shop/douyin-shop/app/frontend/hertz_gen/frontend/product"
-	cart2 "github.com/douyin-shop/douyin-shop/app/order/kitex_gen/cart"
 	"github.com/douyin-shop/douyin-shop/app/order/kitex_gen/order"
 	"github.com/douyin-shop/douyin-shop/app/payment/kitex_gen/payment"
 	productService "github.com/douyin-shop/douyin-shop/app/product/kitex_gen/product"
+	"github.com/jinzhu/copier"
 	"strconv"
 )
 
@@ -33,7 +33,7 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		return nil, code.GetError(code.CartEmpty)
 	}
 
-	// 总价
+	// 获取购物车中的信息并计算总价
 	var totalProductPrice float32
 	var orderItems []*order.OrderItem
 	for _, cartItem := range cartResp.Cart.Items {
@@ -48,22 +48,28 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 
 		p := productResp.Product
 
-		productDetail := &product.Product{
-			Id:          productId,
-			Name:        p.Name,
-			Description: p.Description,
-			Picture:     p.Picture,
-			Price:       p.Price, // TODO 其实这里价格不应该用浮点数，应该用整数，但是这里为了简化，就直接用浮点数了
-			Categories:  productResp.Product.Categories,
+		//productDetail := &product.Product{
+		//	Id:          productId,
+		//	Name:        p.Name,
+		//	Description: p.Description,
+		//	Picture:     p.Picture,
+		//	Price:       p.Price, // TODO 其实这里价格不应该用浮点数，应该用整数，但是这里为了简化，就直接用浮点数了
+		//	Categories:  productResp.Product.Categories,
+		//}
+
+		productDetail := &product.Product{}
+		err = copier.Copy(productDetail, p)
+		if err != nil {
+			return nil, err
 		}
 
 		// 计算购物车商品总价
 		cost := productDetail.Price * float32(quantity)
 		totalProductPrice += cost
 		orderItems = append(orderItems, &order.OrderItem{
-			Item: &cart2.CartItem{
-				ProductId: cartItem.ProductId,
-				Quantity:  cartItem.Quantity,
+			Item: &order.CartItem{
+				ProductId: p.Id,
+				Quantity:  quantity,
 			},
 			Cost: cost,
 		})
@@ -74,48 +80,54 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 	if err != nil {
 		return nil, code.GetError(code.ZipCodeError)
 	}
-	placeOrderResp, err := rpc.OrderClient.PlaceOrder(s.ctx, &order.PlaceOrderReq{
-		UserId:       req.UserId,
-		UserCurrency: "",
-		Address: &order.Address{
-			StreetAddress: req.Address.StreetAddress,
-			City:          req.Address.City,
-			State:         req.Address.State,
-			Country:       req.Address.Country,
-			ZipCode:       int32(zipCode),
-		},
-		Email:      req.Email,
-		OrderItems: orderItems,
-	})
+
+	remotePlaceOrderReq := &order.PlaceOrderReq{}
+
+	err = copier.Copy(remotePlaceOrderReq, req)
 	if err != nil {
+		return nil, err
+	}
+	remotePlaceOrderReq.Address.ZipCode = int32(zipCode)
+	remotePlaceOrderReq.OrderItems = orderItems
+
+	placeOrderResp, err := rpc.OrderClient.PlaceOrder(s.ctx, remotePlaceOrderReq)
+
+	if err != nil {
+		return nil, code.GetError(code.PlaceOrderError)
+	}
+
+	// 订单id，可能会获取失败，需要处理
+	if placeOrderResp.Order == nil || placeOrderResp.Order.OrderId == "" {
+		return nil, code.GetError(code.PlaceOrderError)
+	}
+
+	if placeOrderResp.Order == nil || placeOrderResp.Order.OrderId == "" {
 		return nil, code.GetError(code.PlaceOrderError)
 	}
 
 	orderId := placeOrderResp.Order.OrderId
 
-	// 支付操作
-	payReq := &payment.ChargeReq{
-		Amount: totalProductPrice,
-		CreditCard: &payment.CreditCardInfo{
-			CreditCardNumber:          req.CreditCard.CreditCardNumber,
-			CreditCardCvv:             req.CreditCard.CreditCardCvv,
-			CreditCardExpirationYear:  req.CreditCard.CreditCardExpirationYear,
-			CreditCardExpirationMonth: req.CreditCard.CreditCardExpirationMonth,
-		},
-		OrderId: orderId,
-		UserId:  req.UserId,
+	// 调用支付微服务，生成支付信息
+	payReq := &payment.ChargeReq{}
+
+	err = copier.Copy(payReq, req)
+	if err != nil {
+		return nil, err
+	}
+
+	payReq.Amount = totalProductPrice
+	payReq.OrderId = orderId
+
+	paymentResp, err := rpc.PaymentClient.Charge(s.ctx, payReq)
+	if err != nil {
+		return nil, code.GetError(code.PayError)
 	}
 
 	// 清空购物车
 	_, err = rpc.CartClient.EmptyCart(s.ctx, &cart.EmptyCartReq{UserId: req.UserId})
 	if err != nil {
+		//TODO 将订单更改为已取消状态
 		return nil, code.GetError(code.EmptyCartFiled)
-	}
-
-	// 调用支付微服务，生成支付信息
-	paymentResp, err := rpc.PaymentClient.Charge(s.ctx, payReq)
-	if err != nil {
-		return nil, code.GetError(code.PayError)
 	}
 
 	klog.Debug("支付成功", paymentResp)
