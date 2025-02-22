@@ -39,3 +39,8 @@ redis:
 
 opentelemetry:
   address: "127.0.0.1:4317"
+
+rocketmq:
+  address: "127.0.0.1:9876"
+  retry_times: 3
+  group_name: "payment"
