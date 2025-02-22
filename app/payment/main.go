@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/douyin-shop/douyin-shop/app/payment/biz/dal"
 	"github.com/douyin-shop/douyin-shop/app/payment/rpc"
+	"github.com/douyin-shop/douyin-shop/common/custom_logger"
 	"github.com/douyin-shop/douyin-shop/common/nacos"
 	"github.com/joho/godotenv"
 	"github.com/kitex-contrib/obs-opentelemetry/provider"
@@ -74,6 +75,8 @@ func kitexInit() (opts []server.Option) {
 
 	// klog
 	logger := kitexlogrus.NewLogger()
+	logger.Logger().SetReportCaller(true)
+	logger.Logger().SetFormatter(&custom_logger.CustomFormatter{})
 	klog.SetLogger(logger)
 	klog.SetLevel(conf.LogLevel())
 	asyncWriter := &zapcore.BufferedWriteSyncer{
