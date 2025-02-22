@@ -25,5 +25,7 @@ cwgo server  --type HTTP -I ../../idl --idl ../../idl/frontend/checkout_page.pro
 cwgo server  --type HTTP -I ../../idl --idl ../../idl/frontend/product_page.proto  --server_name frontend  --module github.com/douyin-shop/douyin-shop/app/frontend
 # 生成前端订单微服务
 cwgo server  --type HTTP -I ../../idl --idl ../../idl/frontend/order_page.proto  --server_name frontend  --module github.com/douyin-shop/douyin-shop/app/frontend
+# 生成前端支付微服务
+cwgo server  --type HTTP -I ../../idl --idl ../../idl/frontend/payment_page.proto  --server_name frontend  --module github.com/douyin-shop/douyin-shop/app/frontend
 
 ```
