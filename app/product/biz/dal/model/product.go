@@ -24,6 +24,15 @@ func CheckProductExist(name string,tx *gorm.DB) int {
 	return code.ProductNotExist
 }
 
+func CheckImage(id uint,imageName string,tx *gorm.DB )bool{  //判断在更新商品时要不要更新图片url
+	var product *Product
+	tx.Where("id = ?",id).First(&product)
+	if product.ImageName != imageName {
+	    return true
+	}
+	return false
+}
+
 func AddProduct(product *Product,tx *gorm.DB) int{
 	c:= CheckProductExist(product.Name,tx)
 	if c == code.ProductExist {
@@ -56,13 +65,15 @@ func DeleteProduct(id int,tx *gorm.DB) int {
 	return code.Success
 }
 
-func UpdateProduct(product *Product,tx *gorm.DB) int {
+func UpdateProduct(product *Product,tx *gorm.DB)int { //考虑到图片的更新，所以需要返回flag来判断是否需要更新图片
 	var p *Product
 	tx.Where("id = ?",product.ID).First(&p)
 	if p.ID == 0 {
 	    return code.ProductNotExist
 	}
-	tx.Save(product)
+	if err := tx.Model(&p).Updates(product).Error; err != nil {
+        return code.Error
+    }
 	return code.Success
 }
 
