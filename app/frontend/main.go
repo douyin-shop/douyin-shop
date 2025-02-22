@@ -63,6 +63,8 @@ func main() {
 
 	registerMiddleware(h)
 
+	h.Static("/", "./static")
+
 	// add a ping route to test
 	h.GET("/ping", func(c context.Context, ctx *app.RequestContext) {
 		ctx.JSON(consts.StatusOK, utils.H{"ping": "pong"})
@@ -112,5 +114,14 @@ func registerMiddleware(h *server.Hertz) {
 	h.Use(recovery.Recovery())
 
 	// cores
-	h.Use(cors.Default())
+	//h.Use(cors.Default())
+
+	h.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"}, // 允许所有来源
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 }
