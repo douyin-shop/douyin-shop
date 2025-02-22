@@ -138,3 +138,62 @@ func ExactSearchProduct(client *elastic.Client, indexName string, categoryName s
 	klog.Debugf("Successfully exact searched with category: %s, minPrice: %.2f, maxPrice: %.2f, pageNum: %d, pageSize: %d", categoryName, minPrice, maxPrice, pageNum, pageSize)
 	return products, code.Success
 }
+
+func CombinedSearchProduct(client *elastic.Client, indexName string, keyword string, categoryName string, minPrice, maxPrice float64, pageNum, pageSize int) ([]model.Product, int) {
+    var products []model.Product
+
+    // 模糊搜索关键词不为空时，进行模糊搜索
+    if keyword != "" {
+        fuzzyProducts, c := FuzzySearchProduct(client, indexName, keyword, pageNum, pageSize)
+        if c ==code.Error {
+            return nil, code.Error
+        }
+        products = fuzzyProducts
+    }
+
+    // 精确匹配分类名称不为空时，进行精确搜索或对模糊搜索的结果进一步过滤
+    if categoryName != "" || minPrice > 0 || maxPrice > 0 {
+        boolQuery := elastic.NewBoolQuery()
+
+        if categoryName != "" {
+            boolQuery = boolQuery.Must(elastic.NewNestedQuery("categories", elastic.NewTermQuery("categories.name", categoryName)))
+        }
+
+        if minPrice > 0 && maxPrice > 0 {
+            boolQuery = boolQuery.Must(elastic.NewRangeQuery("product-price").Gte(minPrice).Lte(maxPrice))
+        } else if minPrice > 0 {
+            boolQuery = boolQuery.Must(elastic.NewRangeQuery("product-price").Gte(minPrice))
+        } else if maxPrice > 0 {
+            boolQuery = boolQuery.Must(elastic.NewRangeQuery("product-price").Lte(maxPrice))
+        }
+
+        searchService := client.Search().Index(indexName).Query(boolQuery)
+
+        // 如果进行了模糊搜索，这里需要使用post filter来进行过滤
+        if keyword != "" {
+            searchService = searchService.PostFilter(boolQuery)
+        }
+
+        // 如果 pageNum 和 pageSize 都不为 0，则启用分页
+        if pageNum > 0 && pageSize > 0 {
+            from := (pageNum - 1) * pageSize // 计算起始位置
+            searchService = searchService.From(from).Size(pageSize)
+        }
+
+        searchResult, err := searchService.Do(context.Background())
+        if err != nil {
+            return nil, code.Error
+        }
+
+        products = make([]model.Product, 0)
+        for _, hit := range searchResult.Hits.Hits {
+            var product model.Product
+            err := json.Unmarshal(hit.Source, &product)
+            if err != nil {
+                return nil, code.Error
+            }
+            products = append(products, product)
+        }
+    }
+    return products, code.Success
+}

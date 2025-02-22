@@ -167,6 +167,81 @@ func (x *Product) fastReadField8(buf []byte, _type int8) (offset int, err error)
 	return offset, nil
 }
 
+func (x *SearchQuery) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+	switch number {
+	case 1:
+		offset, err = x.fastReadField1(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 2:
+		offset, err = x.fastReadField2(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 3:
+		offset, err = x.fastReadField3(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 4:
+		offset, err = x.fastReadField4(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 5:
+		offset, err = x.fastReadField5(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 6:
+		offset, err = x.fastReadField6(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	default:
+		offset, err = fastpb.Skip(buf, _type, number)
+		if err != nil {
+			goto SkipFieldError
+		}
+	}
+	return offset, nil
+SkipFieldError:
+	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
+ReadFieldError:
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_SearchQuery[number], err)
+}
+
+func (x *SearchQuery) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+	x.KeyWord, offset, err = fastpb.ReadString(buf, _type)
+	return offset, err
+}
+
+func (x *SearchQuery) fastReadField2(buf []byte, _type int8) (offset int, err error) {
+	x.PageNum, offset, err = fastpb.ReadInt32(buf, _type)
+	return offset, err
+}
+
+func (x *SearchQuery) fastReadField3(buf []byte, _type int8) (offset int, err error) {
+	x.PageSize, offset, err = fastpb.ReadInt32(buf, _type)
+	return offset, err
+}
+
+func (x *SearchQuery) fastReadField4(buf []byte, _type int8) (offset int, err error) {
+	x.CategoryName, offset, err = fastpb.ReadString(buf, _type)
+	return offset, err
+}
+
+func (x *SearchQuery) fastReadField5(buf []byte, _type int8) (offset int, err error) {
+	x.MinPrice, offset, err = fastpb.ReadDouble(buf, _type)
+	return offset, err
+}
+
+func (x *SearchQuery) fastReadField6(buf []byte, _type int8) (offset int, err error) {
+	x.MaxPrice, offset, err = fastpb.ReadDouble(buf, _type)
+	return offset, err
+}
+
 func (x *AddProductReq) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
 	switch number {
 	case 1:
@@ -464,6 +539,11 @@ func (x *SearchProductsReq) FastRead(buf []byte, _type int8, number int32) (offs
 		if err != nil {
 			goto ReadFieldError
 		}
+	case 2:
+		offset, err = x.fastReadField2(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
 	default:
 		offset, err = fastpb.Skip(buf, _type, number)
 		if err != nil {
@@ -480,6 +560,16 @@ ReadFieldError:
 func (x *SearchProductsReq) fastReadField1(buf []byte, _type int8) (offset int, err error) {
 	x.Query, offset, err = fastpb.ReadString(buf, _type)
 	return offset, err
+}
+
+func (x *SearchProductsReq) fastReadField2(buf []byte, _type int8) (offset int, err error) {
+	var v SearchQuery
+	offset, err = fastpb.ReadMessage(buf, _type, &v)
+	if err != nil {
+		return offset, err
+	}
+	x.SearchQuery = &v
+	return offset, nil
 }
 
 func (x *SearchProductsResp) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
@@ -633,6 +723,67 @@ func (x *Product) fastWriteField8(buf []byte) (offset int) {
 	for i := range x.GetCategory() {
 		offset += fastpb.WriteMessage(buf[offset:], 8, x.GetCategory()[i])
 	}
+	return offset
+}
+
+func (x *SearchQuery) FastWrite(buf []byte) (offset int) {
+	if x == nil {
+		return offset
+	}
+	offset += x.fastWriteField1(buf[offset:])
+	offset += x.fastWriteField2(buf[offset:])
+	offset += x.fastWriteField3(buf[offset:])
+	offset += x.fastWriteField4(buf[offset:])
+	offset += x.fastWriteField5(buf[offset:])
+	offset += x.fastWriteField6(buf[offset:])
+	return offset
+}
+
+func (x *SearchQuery) fastWriteField1(buf []byte) (offset int) {
+	if x.KeyWord == "" {
+		return offset
+	}
+	offset += fastpb.WriteString(buf[offset:], 1, x.GetKeyWord())
+	return offset
+}
+
+func (x *SearchQuery) fastWriteField2(buf []byte) (offset int) {
+	if x.PageNum == 0 {
+		return offset
+	}
+	offset += fastpb.WriteInt32(buf[offset:], 2, x.GetPageNum())
+	return offset
+}
+
+func (x *SearchQuery) fastWriteField3(buf []byte) (offset int) {
+	if x.PageSize == 0 {
+		return offset
+	}
+	offset += fastpb.WriteInt32(buf[offset:], 3, x.GetPageSize())
+	return offset
+}
+
+func (x *SearchQuery) fastWriteField4(buf []byte) (offset int) {
+	if x.CategoryName == "" {
+		return offset
+	}
+	offset += fastpb.WriteString(buf[offset:], 4, x.GetCategoryName())
+	return offset
+}
+
+func (x *SearchQuery) fastWriteField5(buf []byte) (offset int) {
+	if x.MinPrice == 0 {
+		return offset
+	}
+	offset += fastpb.WriteDouble(buf[offset:], 5, x.GetMinPrice())
+	return offset
+}
+
+func (x *SearchQuery) fastWriteField6(buf []byte) (offset int) {
+	if x.MaxPrice == 0 {
+		return offset
+	}
+	offset += fastpb.WriteDouble(buf[offset:], 6, x.GetMaxPrice())
 	return offset
 }
 
@@ -821,6 +972,7 @@ func (x *SearchProductsReq) FastWrite(buf []byte) (offset int) {
 		return offset
 	}
 	offset += x.fastWriteField1(buf[offset:])
+	offset += x.fastWriteField2(buf[offset:])
 	return offset
 }
 
@@ -829,6 +981,14 @@ func (x *SearchProductsReq) fastWriteField1(buf []byte) (offset int) {
 		return offset
 	}
 	offset += fastpb.WriteString(buf[offset:], 1, x.GetQuery())
+	return offset
+}
+
+func (x *SearchProductsReq) fastWriteField2(buf []byte) (offset int) {
+	if x.SearchQuery == nil {
+		return offset
+	}
+	offset += fastpb.WriteMessage(buf[offset:], 2, x.GetSearchQuery())
 	return offset
 }
 
@@ -971,6 +1131,67 @@ func (x *Product) sizeField8() (n int) {
 	for i := range x.GetCategory() {
 		n += fastpb.SizeMessage(8, x.GetCategory()[i])
 	}
+	return n
+}
+
+func (x *SearchQuery) Size() (n int) {
+	if x == nil {
+		return n
+	}
+	n += x.sizeField1()
+	n += x.sizeField2()
+	n += x.sizeField3()
+	n += x.sizeField4()
+	n += x.sizeField5()
+	n += x.sizeField6()
+	return n
+}
+
+func (x *SearchQuery) sizeField1() (n int) {
+	if x.KeyWord == "" {
+		return n
+	}
+	n += fastpb.SizeString(1, x.GetKeyWord())
+	return n
+}
+
+func (x *SearchQuery) sizeField2() (n int) {
+	if x.PageNum == 0 {
+		return n
+	}
+	n += fastpb.SizeInt32(2, x.GetPageNum())
+	return n
+}
+
+func (x *SearchQuery) sizeField3() (n int) {
+	if x.PageSize == 0 {
+		return n
+	}
+	n += fastpb.SizeInt32(3, x.GetPageSize())
+	return n
+}
+
+func (x *SearchQuery) sizeField4() (n int) {
+	if x.CategoryName == "" {
+		return n
+	}
+	n += fastpb.SizeString(4, x.GetCategoryName())
+	return n
+}
+
+func (x *SearchQuery) sizeField5() (n int) {
+	if x.MinPrice == 0 {
+		return n
+	}
+	n += fastpb.SizeDouble(5, x.GetMinPrice())
+	return n
+}
+
+func (x *SearchQuery) sizeField6() (n int) {
+	if x.MaxPrice == 0 {
+		return n
+	}
+	n += fastpb.SizeDouble(6, x.GetMaxPrice())
 	return n
 }
 
@@ -1159,6 +1380,7 @@ func (x *SearchProductsReq) Size() (n int) {
 		return n
 	}
 	n += x.sizeField1()
+	n += x.sizeField2()
 	return n
 }
 
@@ -1167,6 +1389,14 @@ func (x *SearchProductsReq) sizeField1() (n int) {
 		return n
 	}
 	n += fastpb.SizeString(1, x.GetQuery())
+	return n
+}
+
+func (x *SearchProductsReq) sizeField2() (n int) {
+	if x.SearchQuery == nil {
+		return n
+	}
+	n += fastpb.SizeMessage(2, x.GetSearchQuery())
 	return n
 }
 
@@ -1204,6 +1434,15 @@ var fieldIDToName_Product = map[int32]string{
 	6: "Price",
 	7: "ImageUrl",
 	8: "Category",
+}
+
+var fieldIDToName_SearchQuery = map[int32]string{
+	1: "KeyWord",
+	2: "PageNum",
+	3: "PageSize",
+	4: "CategoryName",
+	5: "MinPrice",
+	6: "MaxPrice",
 }
 
 var fieldIDToName_AddProductReq = map[int32]string{
@@ -1250,6 +1489,7 @@ var fieldIDToName_GetProductResp = map[int32]string{
 
 var fieldIDToName_SearchProductsReq = map[int32]string{
 	1: "Query",
+	2: "SearchQuery",
 }
 
 var fieldIDToName_SearchProductsResp = map[int32]string{

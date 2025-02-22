@@ -32,6 +32,15 @@ message Product {
   repeated Category category = 8;
 }
 
+message SearchQuery{  // 搜索条件
+  string keyWord = 1;
+  int32 pageNum=2;
+  int32 pageSize=3;
+  string CategoryName=4;
+  double minPrice=5;
+  double maxPrice=6;
+}
+
 message AddProductReq {
   Product product = 1;
 }
@@ -76,7 +85,8 @@ message GetProductResp {
 }
 
 message SearchProductsReq {
-  string query = 1;
+  string query = 1; //废弃不用
+  SearchQuery searchQuery=2;
 }
 
 message SearchProductsResp {
