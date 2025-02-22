@@ -48,10 +48,8 @@ func PaymentTimeout(ctx context.Context, messages ...*primitive.MessageExt) (con
 		orderId := messageMap["order_id"]
 		transactionId := messageMap["transaction_id"]
 
-		// TODO 通知订单服务取消订单
+		// TODO 通知订单服务取消订单，取消订单的具体逻辑需要在客户端判断，因为有可能订单已经支付成功了，如果支付成功了那就不需要取消订单
 		klog.Debug("订单号: ", orderId, " 交易号: ", transactionId)
-
-		klog.Debugf("messageMap：%v", messageMap)
 
 	}
 

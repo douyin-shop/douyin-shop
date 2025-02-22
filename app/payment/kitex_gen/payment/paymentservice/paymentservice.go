@@ -22,6 +22,13 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingUnary),
 	),
+	"PaymentCallback": kitex.NewMethodInfo(
+		paymentCallbackHandler,
+		newPaymentCallbackArgs,
+		newPaymentCallbackResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingUnary),
+	),
 }
 
 var (
@@ -241,6 +248,159 @@ func (p *ChargeResult) GetResult() interface{} {
 	return p.Success
 }
 
+func paymentCallbackHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	switch s := arg.(type) {
+	case *streaming.Args:
+		st := s.Stream
+		req := new(payment.PaymentCallbackReq)
+		if err := st.RecvMsg(req); err != nil {
+			return err
+		}
+		resp, err := handler.(payment.PaymentService).PaymentCallback(ctx, req)
+		if err != nil {
+			return err
+		}
+		return st.SendMsg(resp)
+	case *PaymentCallbackArgs:
+		success, err := handler.(payment.PaymentService).PaymentCallback(ctx, s.Req)
+		if err != nil {
+			return err
+		}
+		realResult := result.(*PaymentCallbackResult)
+		realResult.Success = success
+		return nil
+	default:
+		return errInvalidMessageType
+	}
+}
+func newPaymentCallbackArgs() interface{} {
+	return &PaymentCallbackArgs{}
+}
+
+func newPaymentCallbackResult() interface{} {
+	return &PaymentCallbackResult{}
+}
+
+type PaymentCallbackArgs struct {
+	Req *payment.PaymentCallbackReq
+}
+
+func (p *PaymentCallbackArgs) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetReq() {
+		p.Req = new(payment.PaymentCallbackReq)
+	}
+	return p.Req.FastRead(buf, _type, number)
+}
+
+func (p *PaymentCallbackArgs) FastWrite(buf []byte) (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.FastWrite(buf)
+}
+
+func (p *PaymentCallbackArgs) Size() (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.Size()
+}
+
+func (p *PaymentCallbackArgs) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetReq() {
+		return out, nil
+	}
+	return proto.Marshal(p.Req)
+}
+
+func (p *PaymentCallbackArgs) Unmarshal(in []byte) error {
+	msg := new(payment.PaymentCallbackReq)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Req = msg
+	return nil
+}
+
+var PaymentCallbackArgs_Req_DEFAULT *payment.PaymentCallbackReq
+
+func (p *PaymentCallbackArgs) GetReq() *payment.PaymentCallbackReq {
+	if !p.IsSetReq() {
+		return PaymentCallbackArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+func (p *PaymentCallbackArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *PaymentCallbackArgs) GetFirstArgument() interface{} {
+	return p.Req
+}
+
+type PaymentCallbackResult struct {
+	Success *payment.PaymentCallbackResp
+}
+
+var PaymentCallbackResult_Success_DEFAULT *payment.PaymentCallbackResp
+
+func (p *PaymentCallbackResult) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetSuccess() {
+		p.Success = new(payment.PaymentCallbackResp)
+	}
+	return p.Success.FastRead(buf, _type, number)
+}
+
+func (p *PaymentCallbackResult) FastWrite(buf []byte) (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.FastWrite(buf)
+}
+
+func (p *PaymentCallbackResult) Size() (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.Size()
+}
+
+func (p *PaymentCallbackResult) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetSuccess() {
+		return out, nil
+	}
+	return proto.Marshal(p.Success)
+}
+
+func (p *PaymentCallbackResult) Unmarshal(in []byte) error {
+	msg := new(payment.PaymentCallbackResp)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Success = msg
+	return nil
+}
+
+func (p *PaymentCallbackResult) GetSuccess() *payment.PaymentCallbackResp {
+	if !p.IsSetSuccess() {
+		return PaymentCallbackResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+func (p *PaymentCallbackResult) SetSuccess(x interface{}) {
+	p.Success = x.(*payment.PaymentCallbackResp)
+}
+
+func (p *PaymentCallbackResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *PaymentCallbackResult) GetResult() interface{} {
+	return p.Success
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -256,6 +416,16 @@ func (p *kClient) Charge(ctx context.Context, Req *payment.ChargeReq) (r *paymen
 	_args.Req = Req
 	var _result ChargeResult
 	if err = p.c.Call(ctx, "Charge", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) PaymentCallback(ctx context.Context, Req *payment.PaymentCallbackReq) (r *payment.PaymentCallbackResp, err error) {
+	var _args PaymentCallbackArgs
+	_args.Req = Req
+	var _result PaymentCallbackResult
+	if err = p.c.Call(ctx, "PaymentCallback", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
