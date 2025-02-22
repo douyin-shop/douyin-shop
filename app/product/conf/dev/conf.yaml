@@ -27,6 +27,12 @@ nacos:
   not_load_cache_at_start: true
 
 mysql:
+  serverid: 1
+  address: "127.0.0.1"
+  port: 3306
+  username: "root"
+  password: "88888888"
+  dbname: "douyin-shop"
   dsn: "root:88888888@tcp(127.0.0.1:3306)/douyin-shop?charset=utf8mb4&parseTime=True&loc=Local"
 #  dsn: "root:Q1w2e3r4@tcp(rm-cn-em943mba000039.rwlb.rds.aliyuncs.com:3306)/douyin-shop?charset=utf8mb4&parseTime=True&loc=Local"
 

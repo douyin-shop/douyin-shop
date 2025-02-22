@@ -28,17 +28,17 @@ type Config struct {
 	Nacos         Nacos         `yaml:"nacos"`
 	Jwt           Jwt           `yaml:"jwt"`
 	OpenTelemetry OpenTelemetry `yaml:"opentelemetry"`
-	ElasticSearch  ElasticSearch `yaml:"elasticsearch"`
+	ElasticSearch ElasticSearch `yaml:"elasticsearch"`
 	OSS           OSS           `yaml:"oss"`
-	Pool Pool          `yaml:"goroutine-pool"`
-	Snowflake Snowflake `yaml:"snowflake"`
-	RocketMQ RocketMQ `yaml:"rocketmq"`
+	Pool          Pool          `yaml:"goroutine-pool"`
+	Snowflake     Snowflake     `yaml:"snowflake"`
+	RocketMQ      RocketMQ      `yaml:"rocketmq"`
 }
 
 type RocketMQ struct {
-	NameServer string `yaml:"name_server"`
+	NameServer  string `yaml:"name_server"`
 	CustomGroup string `yaml:"custom_group"`
-	Topic string `yaml:"topic"`
+	Topic       string `yaml:"topic"`
 }
 
 type MySQL struct {
@@ -48,10 +48,11 @@ type MySQL struct {
 	Port     int    `yaml:"port"`
 	DbName   string `yaml:"dbname"`
 	ServerId uint32 `yaml:"serverid"`
+	DSN      string `yaml:"dsn"`
 }
 
 type ElasticSearch struct {
-    Address string `yaml:"address"`
+	Address   string `yaml:"address"`
 	IndexName string `yaml:"index_name"`
 }
 
@@ -63,15 +64,15 @@ type Redis struct {
 }
 
 type OSS struct {
-    AccessKey     string `yaml:"access_key"`
-    SecretKey string `yaml:"secret_key"`
-    Domain       string `yaml:"endpoint"`
-    Bucket          string `yaml:"bucket"`
-	Zone          int `yaml:"zone"`  //类型不能直接为需要的，使用int表示，转换方式参考oss包
+	AccessKey string `yaml:"access_key"`
+	SecretKey string `yaml:"secret_key"`
+	Domain    string `yaml:"endpoint"`
+	Bucket    string `yaml:"bucket"`
+	Zone      int    `yaml:"zone"` //类型不能直接为需要的，使用int表示，转换方式参考oss包
 }
 
 type Pool struct {
-    Size int `yaml:"size"`
+	Size  int `yaml:"size"`
 	Queue int `yaml:"queue"`
 }
 
