@@ -17,8 +17,17 @@ var (
 )
 
 func Init() {
-	conf:=conf.GetConf()
-	dns := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",conf.MySQL.Username,conf.MySQL.Password,conf.MySQL.Address,conf.MySQL.Port,conf.MySQL.DbName)
+	conf := conf.GetConf()
+	dns := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+		conf.MySQL.Username,
+		conf.MySQL.Password,
+		conf.MySQL.Address,
+		conf.MySQL.Port,
+		conf.MySQL.DbName,
+	)
+
+	fmt.Println(dns)
+
 	Db, err = gorm.Open(mysql.Open(dns),
 		&gorm.Config{
 			PrepareStmt:            true,
@@ -31,7 +40,7 @@ func Init() {
 	var sqlDB *sql.DB
 	sqlDB, err = Db.DB()
 
-	_ = Db.AutoMigrate(model.Product{},model.Category{})
+	_ = Db.AutoMigrate(model.Product{}, model.Category{})
 
 	//设置连接池最大连接数量
 	sqlDB.SetMaxOpenConns(100)
