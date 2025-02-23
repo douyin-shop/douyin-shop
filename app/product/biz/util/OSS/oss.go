@@ -3,13 +3,12 @@ package oss
 import (
 	"bytes"
 	"context"
-	"github.com/douyin-shop/douyin-shop/app/product/biz/code"
 	"github.com/douyin-shop/douyin-shop/app/product/conf"
 	"github.com/qiniu/go-sdk/v7/auth/qbox"
 	"github.com/qiniu/go-sdk/v7/storage"
 )
 
-func UploadFile(fileData []byte, fileSize int64) (string, int) {
+func UploadFile(fileData []byte, fileSize int64) (string, error) {
 	server := conf.GetConf().OSS
 
 	// 将 []byte 转换为 io.Reader
@@ -33,11 +32,11 @@ func UploadFile(fileData []byte, fileSize int64) (string, int) {
 	putExtra := storage.PutExtra{}
 	err := formUploader.PutWithoutKey(context.Background(), &ret, upToken, fileReader, fileSize, &putExtra)
 	if err != nil {
-		return "", code.Error
+		return "", err
 	}
 
 	url := server.Domain + ret.Key
-	return url, code.Success
+	return url, nil
 }
 
 func setConfig(server conf.OSS) *storage.Config {
@@ -62,5 +61,3 @@ func selectZone(Zone int) *storage.Zone {
 		return &storage.ZoneHuadong
 	}
 }
-
-

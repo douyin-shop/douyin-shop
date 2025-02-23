@@ -47,7 +47,7 @@ func (h *GetCartService) Run(req *cart.GetCartReq) (resp *cart.GetCartResp, err 
 	}
 
 	var items []*cart.CartItem
-	var totalProductPrice float32 = 0
+	var totalProductPrice float64 = 0
 	for _, item := range getCartResp.Cart.Items {
 
 		productId := item.ProductId
@@ -78,7 +78,7 @@ func (h *GetCartService) Run(req *cart.GetCartReq) (resp *cart.GetCartResp, err 
 		productDetail.Id = productId
 
 		// 计算购物车商品总价
-		totalProductPrice += productDetail.Price * float32(quantity)
+		totalProductPrice += productDetail.Price * float64(quantity)
 
 		items = append(items, &cart.CartItem{
 			ProductId: productId,
@@ -91,7 +91,7 @@ func (h *GetCartService) Run(req *cart.GetCartReq) (resp *cart.GetCartResp, err 
 		Cart: &cart.Cart{
 			UserId:     uint32(userIdInt),
 			Items:      items,
-			TotalPrice: totalProductPrice,
+			TotalPrice: float32(totalProductPrice),
 		},
 	}, nil
 }
