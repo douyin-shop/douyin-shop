@@ -45,3 +45,28 @@ redis:
 
 opentelemetry:
   address: "127.0.0.1:4317"
+
+
+elasticsearch:
+  address: "http://127.0.0.1:9200"
+  index_name: "product"
+
+oss:
+  zone: 1
+  bucket: douyin-shop
+  access_key: ySX6iSWlb5mH1nDuUDo0NU0y1ICxCIWi6BXM4wKo
+  secret_key: F_CERy4ZYbau2Khva1f8xy4MG89dy0YJ7J7m5rQM
+  domain: srb589zh9.hd-bkt.clouddn.com
+
+goroutine-pool:
+  size: 100
+  queue: 10
+
+snowflake:
+  machine_id: 1
+  start_time: 2021-09-01
+
+rocketmq:
+  name_server: "127.0.0.1:9876"
+  consumer_group: "product"
+  topic: "es"
