@@ -2,25 +2,24 @@ package main
 
 import (
 	"context"
+	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/cloudwego/kitex/pkg/rpcinfo"
+	"github.com/cloudwego/kitex/server"
 	"github.com/douyin-shop/douyin-shop/app/user/biz/dal"
+	"github.com/douyin-shop/douyin-shop/app/user/conf"
+	"github.com/douyin-shop/douyin-shop/app/user/kitex_gen/user/userservice"
 	"github.com/douyin-shop/douyin-shop/common/nacos"
 	"github.com/joho/godotenv"
+	kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
 	"github.com/kitex-contrib/obs-opentelemetry/provider"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
+	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"log"
 	"net"
 	"os"
 	"time"
-
-	"github.com/cloudwego/kitex/pkg/klog"
-	"github.com/cloudwego/kitex/pkg/rpcinfo"
-	"github.com/cloudwego/kitex/server"
-	"github.com/douyin-shop/douyin-shop/app/user/conf"
-	"github.com/douyin-shop/douyin-shop/app/user/kitex_gen/user/userservice"
-	kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
-	"go.uber.org/zap/zapcore"
 )
 
 func main() {
