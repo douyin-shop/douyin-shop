@@ -34,7 +34,7 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 	}
 
 	// 获取购物车中的信息并计算总价
-	var totalProductPrice float32
+	var totalProductPrice float64
 	var orderItems []*order.OrderItem
 	for _, cartItem := range cartResp.Cart.Items {
 		productId := cartItem.ProductId
@@ -64,14 +64,14 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		}
 
 		// 计算购物车商品总价
-		cost := productDetail.Price * float32(quantity)
+		cost := productDetail.Price * float64(quantity)
 		totalProductPrice += cost
 		orderItems = append(orderItems, &order.OrderItem{
 			Item: &order.CartItem{
 				ProductId: p.Id,
 				Quantity:  quantity,
 			},
-			Cost: cost,
+			Cost: float32(cost),
 		})
 	}
 
@@ -115,7 +115,7 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		return nil, err
 	}
 
-	payReq.Amount = totalProductPrice
+	payReq.Amount = float32(totalProductPrice)
 	payReq.OrderId = orderId
 
 	paymentResp, err := rpc.PaymentClient.Charge(s.ctx, payReq)
