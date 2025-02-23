@@ -3,7 +3,9 @@ package model
 
 import (
 	"context"
+	"github.com/douyin-shop/douyin-shop/app/payment/biz/dal/redis"
 	"gorm.io/gorm"
+	"log"
 	"time"
 )
 
@@ -21,7 +23,27 @@ func (PaymentLog) TableName() string {
 	return "payment_log"
 }
 
+func (pl PaymentLog) BeforeCreate(tx *gorm.DB) (err error) {
+
+	redisKey := "payment:" + pl.TransactionId
+	// 存储支付状态，初始为 "PENDING"
+	err = redis.RedisClient.Set(context.Background(), redisKey, "PENDING", 30*time.Minute).Err()
+	if err != nil {
+		log.Printf("Failed to store payment in Redis: %v", err)
+		return err
+	}
+	log.Printf("Payment transaction %s stored in Redis with status PENDING", pl.TransactionId)
+	return nil
+
+}
+
 // CreatePaymentLog 创建支付日志
 func CreatePaymentLog(db *gorm.DB, ctx context.Context, paymentLog *PaymentLog) error {
-	return db.WithContext(ctx).Model(&PaymentLog{}).Create(paymentLog).Error
+	// 插入数据库
+	err := db.WithContext(ctx).Model(&PaymentLog{}).Create(paymentLog).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

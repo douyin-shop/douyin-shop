@@ -36,6 +36,13 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingUnary),
 	),
+	"CompensateEmptyCart": kitex.NewMethodInfo(
+		compensateEmptyCartHandler,
+		newCompensateEmptyCartArgs,
+		newCompensateEmptyCartResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingUnary),
+	),
 }
 
 var (
@@ -561,6 +568,159 @@ func (p *EmptyCartResult) GetResult() interface{} {
 	return p.Success
 }
 
+func compensateEmptyCartHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	switch s := arg.(type) {
+	case *streaming.Args:
+		st := s.Stream
+		req := new(cart.RestoreCartItemsReq)
+		if err := st.RecvMsg(req); err != nil {
+			return err
+		}
+		resp, err := handler.(cart.CartService).CompensateEmptyCart(ctx, req)
+		if err != nil {
+			return err
+		}
+		return st.SendMsg(resp)
+	case *CompensateEmptyCartArgs:
+		success, err := handler.(cart.CartService).CompensateEmptyCart(ctx, s.Req)
+		if err != nil {
+			return err
+		}
+		realResult := result.(*CompensateEmptyCartResult)
+		realResult.Success = success
+		return nil
+	default:
+		return errInvalidMessageType
+	}
+}
+func newCompensateEmptyCartArgs() interface{} {
+	return &CompensateEmptyCartArgs{}
+}
+
+func newCompensateEmptyCartResult() interface{} {
+	return &CompensateEmptyCartResult{}
+}
+
+type CompensateEmptyCartArgs struct {
+	Req *cart.RestoreCartItemsReq
+}
+
+func (p *CompensateEmptyCartArgs) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetReq() {
+		p.Req = new(cart.RestoreCartItemsReq)
+	}
+	return p.Req.FastRead(buf, _type, number)
+}
+
+func (p *CompensateEmptyCartArgs) FastWrite(buf []byte) (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.FastWrite(buf)
+}
+
+func (p *CompensateEmptyCartArgs) Size() (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.Size()
+}
+
+func (p *CompensateEmptyCartArgs) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetReq() {
+		return out, nil
+	}
+	return proto.Marshal(p.Req)
+}
+
+func (p *CompensateEmptyCartArgs) Unmarshal(in []byte) error {
+	msg := new(cart.RestoreCartItemsReq)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Req = msg
+	return nil
+}
+
+var CompensateEmptyCartArgs_Req_DEFAULT *cart.RestoreCartItemsReq
+
+func (p *CompensateEmptyCartArgs) GetReq() *cart.RestoreCartItemsReq {
+	if !p.IsSetReq() {
+		return CompensateEmptyCartArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+func (p *CompensateEmptyCartArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *CompensateEmptyCartArgs) GetFirstArgument() interface{} {
+	return p.Req
+}
+
+type CompensateEmptyCartResult struct {
+	Success *cart.RestoreCartItemsResp
+}
+
+var CompensateEmptyCartResult_Success_DEFAULT *cart.RestoreCartItemsResp
+
+func (p *CompensateEmptyCartResult) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetSuccess() {
+		p.Success = new(cart.RestoreCartItemsResp)
+	}
+	return p.Success.FastRead(buf, _type, number)
+}
+
+func (p *CompensateEmptyCartResult) FastWrite(buf []byte) (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.FastWrite(buf)
+}
+
+func (p *CompensateEmptyCartResult) Size() (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.Size()
+}
+
+func (p *CompensateEmptyCartResult) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetSuccess() {
+		return out, nil
+	}
+	return proto.Marshal(p.Success)
+}
+
+func (p *CompensateEmptyCartResult) Unmarshal(in []byte) error {
+	msg := new(cart.RestoreCartItemsResp)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Success = msg
+	return nil
+}
+
+func (p *CompensateEmptyCartResult) GetSuccess() *cart.RestoreCartItemsResp {
+	if !p.IsSetSuccess() {
+		return CompensateEmptyCartResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+func (p *CompensateEmptyCartResult) SetSuccess(x interface{}) {
+	p.Success = x.(*cart.RestoreCartItemsResp)
+}
+
+func (p *CompensateEmptyCartResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *CompensateEmptyCartResult) GetResult() interface{} {
+	return p.Success
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -596,6 +756,16 @@ func (p *kClient) EmptyCart(ctx context.Context, Req *cart.EmptyCartReq) (r *car
 	_args.Req = Req
 	var _result EmptyCartResult
 	if err = p.c.Call(ctx, "EmptyCart", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) CompensateEmptyCart(ctx context.Context, Req *cart.RestoreCartItemsReq) (r *cart.RestoreCartItemsResp, err error) {
+	var _args CompensateEmptyCartArgs
+	_args.Req = Req
+	var _result CompensateEmptyCartResult
+	if err = p.c.Call(ctx, "CompensateEmptyCart", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

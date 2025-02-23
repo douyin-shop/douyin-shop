@@ -28,6 +28,7 @@ type Config struct {
 	Nacos         Nacos         `yaml:"nacos"`
 	Jwt           Jwt           `yaml:"jwt"`
 	OpenTelemetry OpenTelemetry `yaml:"opentelemetry"`
+	RocketMQ      RocketMQ      `yaml:"rocketmq"`
 }
 
 type MySQL struct {
@@ -77,6 +78,12 @@ type Jwt struct {
 
 type OpenTelemetry struct {
 	Address string `yaml:"address"`
+}
+
+type RocketMQ struct {
+	Address    string `yaml:"address"`
+	RetryTimes int    `yaml:"retry_times"`
+	GroupName  string `yaml:"group_name"`
 }
 
 // GetConf gets configuration instance

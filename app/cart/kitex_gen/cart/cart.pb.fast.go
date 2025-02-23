@@ -47,6 +47,81 @@ func (x *CartItem) fastReadField2(buf []byte, _type int8) (offset int, err error
 	return offset, err
 }
 
+func (x *RestoreCartItemsReq) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+	switch number {
+	case 1:
+		offset, err = x.fastReadField1(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 2:
+		offset, err = x.fastReadField2(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	case 3:
+		offset, err = x.fastReadField3(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	default:
+		offset, err = fastpb.Skip(buf, _type, number)
+		if err != nil {
+			goto SkipFieldError
+		}
+	}
+	return offset, nil
+SkipFieldError:
+	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
+ReadFieldError:
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_RestoreCartItemsReq[number], err)
+}
+
+func (x *RestoreCartItemsReq) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+	x.UserId, offset, err = fastpb.ReadUint32(buf, _type)
+	return offset, err
+}
+
+func (x *RestoreCartItemsReq) fastReadField2(buf []byte, _type int8) (offset int, err error) {
+	var v CartItem
+	offset, err = fastpb.ReadMessage(buf, _type, &v)
+	if err != nil {
+		return offset, err
+	}
+	x.Items = append(x.Items, &v)
+	return offset, nil
+}
+
+func (x *RestoreCartItemsReq) fastReadField3(buf []byte, _type int8) (offset int, err error) {
+	x.CompensationId, offset, err = fastpb.ReadString(buf, _type)
+	return offset, err
+}
+
+func (x *RestoreCartItemsResp) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
+	switch number {
+	case 1:
+		offset, err = x.fastReadField1(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
+	default:
+		offset, err = fastpb.Skip(buf, _type, number)
+		if err != nil {
+			goto SkipFieldError
+		}
+	}
+	return offset, nil
+SkipFieldError:
+	return offset, fmt.Errorf("%T cannot parse invalid wire-format data, error: %s", x, err)
+ReadFieldError:
+	return offset, fmt.Errorf("%T read field %d '%s' error: %s", x, number, fieldIDToName_RestoreCartItemsResp[number], err)
+}
+
+func (x *RestoreCartItemsResp) fastReadField1(buf []byte, _type int8) (offset int, err error) {
+	x.RestoredCount, offset, err = fastpb.ReadUint32(buf, _type)
+	return offset, err
+}
+
 func (x *AddItemReq) FastRead(buf []byte, _type int8, number int32) (offset int, err error) {
 	switch number {
 	case 1:
@@ -258,6 +333,58 @@ func (x *CartItem) fastWriteField2(buf []byte) (offset int) {
 	return offset
 }
 
+func (x *RestoreCartItemsReq) FastWrite(buf []byte) (offset int) {
+	if x == nil {
+		return offset
+	}
+	offset += x.fastWriteField1(buf[offset:])
+	offset += x.fastWriteField2(buf[offset:])
+	offset += x.fastWriteField3(buf[offset:])
+	return offset
+}
+
+func (x *RestoreCartItemsReq) fastWriteField1(buf []byte) (offset int) {
+	if x.UserId == 0 {
+		return offset
+	}
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetUserId())
+	return offset
+}
+
+func (x *RestoreCartItemsReq) fastWriteField2(buf []byte) (offset int) {
+	if x.Items == nil {
+		return offset
+	}
+	for i := range x.GetItems() {
+		offset += fastpb.WriteMessage(buf[offset:], 2, x.GetItems()[i])
+	}
+	return offset
+}
+
+func (x *RestoreCartItemsReq) fastWriteField3(buf []byte) (offset int) {
+	if x.CompensationId == "" {
+		return offset
+	}
+	offset += fastpb.WriteString(buf[offset:], 3, x.GetCompensationId())
+	return offset
+}
+
+func (x *RestoreCartItemsResp) FastWrite(buf []byte) (offset int) {
+	if x == nil {
+		return offset
+	}
+	offset += x.fastWriteField1(buf[offset:])
+	return offset
+}
+
+func (x *RestoreCartItemsResp) fastWriteField1(buf []byte) (offset int) {
+	if x.RestoredCount == 0 {
+		return offset
+	}
+	offset += fastpb.WriteUint32(buf[offset:], 1, x.GetRestoredCount())
+	return offset
+}
+
 func (x *AddItemReq) FastWrite(buf []byte) (offset int) {
 	if x == nil {
 		return offset
@@ -397,6 +524,58 @@ func (x *CartItem) sizeField2() (n int) {
 	return n
 }
 
+func (x *RestoreCartItemsReq) Size() (n int) {
+	if x == nil {
+		return n
+	}
+	n += x.sizeField1()
+	n += x.sizeField2()
+	n += x.sizeField3()
+	return n
+}
+
+func (x *RestoreCartItemsReq) sizeField1() (n int) {
+	if x.UserId == 0 {
+		return n
+	}
+	n += fastpb.SizeUint32(1, x.GetUserId())
+	return n
+}
+
+func (x *RestoreCartItemsReq) sizeField2() (n int) {
+	if x.Items == nil {
+		return n
+	}
+	for i := range x.GetItems() {
+		n += fastpb.SizeMessage(2, x.GetItems()[i])
+	}
+	return n
+}
+
+func (x *RestoreCartItemsReq) sizeField3() (n int) {
+	if x.CompensationId == "" {
+		return n
+	}
+	n += fastpb.SizeString(3, x.GetCompensationId())
+	return n
+}
+
+func (x *RestoreCartItemsResp) Size() (n int) {
+	if x == nil {
+		return n
+	}
+	n += x.sizeField1()
+	return n
+}
+
+func (x *RestoreCartItemsResp) sizeField1() (n int) {
+	if x.RestoredCount == 0 {
+		return n
+	}
+	n += fastpb.SizeUint32(1, x.GetRestoredCount())
+	return n
+}
+
 func (x *AddItemReq) Size() (n int) {
 	if x == nil {
 		return n
@@ -514,6 +693,16 @@ func (x *EmptyCartResp) Size() (n int) {
 var fieldIDToName_CartItem = map[int32]string{
 	1: "ProductId",
 	2: "Quantity",
+}
+
+var fieldIDToName_RestoreCartItemsReq = map[int32]string{
+	1: "UserId",
+	2: "Items",
+	3: "CompensationId",
+}
+
+var fieldIDToName_RestoreCartItemsResp = map[int32]string{
+	1: "RestoredCount",
 }
 
 var fieldIDToName_AddItemReq = map[int32]string{

@@ -12,6 +12,7 @@ import (
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.
 type Client interface {
 	Charge(ctx context.Context, Req *payment.ChargeReq, callOptions ...callopt.Option) (r *payment.ChargeResp, err error)
+	PaymentCallback(ctx context.Context, Req *payment.PaymentCallbackReq, callOptions ...callopt.Option) (r *payment.PaymentCallbackResp, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -46,4 +47,9 @@ type kPaymentServiceClient struct {
 func (p *kPaymentServiceClient) Charge(ctx context.Context, Req *payment.ChargeReq, callOptions ...callopt.Option) (r *payment.ChargeResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.Charge(ctx, Req)
+}
+
+func (p *kPaymentServiceClient) PaymentCallback(ctx context.Context, Req *payment.PaymentCallbackReq, callOptions ...callopt.Option) (r *payment.PaymentCallbackResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.PaymentCallback(ctx, Req)
 }

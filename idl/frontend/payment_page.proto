@@ -1,13 +1,16 @@
 syntax = "proto3";
 
-package payment;
+package frontend.payment;
 
-option go_package = "payment";
+option go_package = "/frontend/payment";
+
+import "api-tools.proto";
 
 
 service PaymentService {
-  rpc Charge(ChargeReq) returns (ChargeResp) {}
-  rpc PaymentCallback(PaymentCallbackReq) returns (PaymentCallbackResp) {}
+  rpc PaymentCallback(PaymentCallbackReq) returns (PaymentCallbackResp) {
+    option (api.get) = "/payment/callback";
+  }
 }
 
 message CreditCardInfo {
@@ -15,17 +18,6 @@ message CreditCardInfo {
   int32 credit_card_cvv = 2;
   int32 credit_card_expiration_year = 3;
   int32 credit_card_expiration_month = 4;
-}
-
-message ChargeReq {
-  float amount = 1;
-  CreditCardInfo credit_card = 2;
-  string order_id = 3;
-  uint32 user_id = 4;
-}
-
-message ChargeResp {
-  string transaction_id = 1;
 }
 
 
