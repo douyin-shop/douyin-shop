@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/douyin-shop/douyin-shop/app/product/biz/dal/redis"
 	"time"
 
@@ -27,6 +28,7 @@ func (s *GetProductService) Run(req *product.GetProductReq) (resp *product.GetPr
 	if data, err := redis.RedisClient.Get(s.ctx, productKey).Bytes(); err == nil {
 		var p product.Product
 		if err := json.Unmarshal(data, &p); err == nil {
+			klog.Debug("缓存命中！！！加载缓存中的数据：", productKey)
 			return &product.GetProductResp{Product: &p}, nil
 		}
 	}
