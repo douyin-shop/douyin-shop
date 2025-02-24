@@ -74,5 +74,5 @@ snowflake:
 
 rocketmq:
   name_server: "127.0.0.1:9876"
-  consumer_group: "product"
+  custom_group: "product"
   topic: "es"
