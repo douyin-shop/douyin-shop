@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/douyin-shop/douyin-shop/app/product/biz/code"
 	"gorm.io/gorm"
 )
@@ -89,11 +90,17 @@ func GetProduct(id int, tx *gorm.DB) (*Product, int) {
 	return product, code.Success
 }
 
-func ListProduct(tx *gorm.DB, PageSize, PageNum int) ([]Product, int) {
+func ListProduct(tx *gorm.DB, PageNum, PageSize int) ([]Product, int) {
 	var products []Product
-	err := tx.Preload("Category").Offset((PageNum - 1) * PageSize).Limit(PageSize).Find(&products).Error
+	err := tx.Debug().Preload("Category").
+		Offset((PageNum - 1) * PageSize).
+		Limit(PageSize).
+		Find(&products).Error
 	if err != nil {
 		return nil, code.Error
 	}
+
+	klog.Debug("products", products)
+
 	return products, code.Success
 }
