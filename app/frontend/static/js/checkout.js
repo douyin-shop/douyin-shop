@@ -118,6 +118,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(formData)
             });
 
+            // 如果状态码是401，说明用户未登录，跳转到登录页面
+            if (response.status === 401) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+
             const data = await response.json();
 
             if (data.code===0) {

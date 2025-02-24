@@ -23,7 +23,15 @@ function simulatePaymentSuccess() {
             'Authorization': `${localStorage.getItem('authToken')}`
         }
     })
-        .then(response => response.json())
+        .then(response => {
+            // 如果状态码是401，说明用户未登录，跳转到登录页面
+            if (response.status === 401) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            return response.json()
+        })
         .then(result => {
             document.getElementById('paymentMessage').style.display = 'block';
             if (result.code === 0 && result.data.success) {

@@ -18,6 +18,12 @@ async function loadProduct(id) {
             body: JSON.stringify({ id: parseInt(id) })
         });
 
+        // 如果状态码是401，说明用户未登录，跳转到登录页面
+        if (response.status === 401) {
+            window.location.href = 'index.html';
+            return;
+        }
+
         const data = await response.json();
         renderProduct(data.data.product);
     } catch (error) {
@@ -46,6 +52,13 @@ async function addToCart() {
                 product_num: quantity
             })
         });
+
+        // 如果状态码是401，说明用户未登录，跳转到登录页面
+        if (response.status === 401) {
+            window.location.href = 'index.html';
+            return;
+        }
+
 
         if (response.ok) {
             alert('成功加入购物车 🛒');
