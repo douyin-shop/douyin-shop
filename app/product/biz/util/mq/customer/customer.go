@@ -74,7 +74,47 @@ func handleEventMessage(msg mysql.EventMessage) {
 		handleProductEvent(msg)
 	case "categories":
 		handleCategoryEvent(msg)
+
+	case "product_categories":
+		handleProductCategoryEvent(msg)
 	}
+}
+
+// Deprecated
+func handleProductCategoryEvent(msg mysql.EventMessage) {
+	// 处理 product 表的事件
+	newData, _ := parseRowData(msg.Table, msg.NewData)
+	oldData, _ := parseRowData(msg.Table, msg.OldData)
+
+	klog.Debug("=====================================")
+	klog.Debug("Elastic Search 进行产品相关事件的更新操作")
+	klog.Debug("操作类型：", msg.EventType)
+	klog.Debug("表名：", msg.Table.Name)
+	klog.Debug("新数据：", pretty.Sprintf("%# v", newData))
+	klog.Debug("旧数据：", pretty.Sprintf("%# v", oldData))
+	klog.Debug("-------------------------------------")
+
+	// json转化成map
+	var newDataJson map[string]interface{}
+	var oldDataJson map[string]interface{}
+	json.Unmarshal(newData, &newDataJson)
+	json.Unmarshal(oldData, &oldDataJson)
+
+	switch msg.EventType {
+	case "insert":
+		// 创建产品
+		document.CreateProductCategories(es.Client, conf.GetConf().ElasticSearch.IndexName, newDataJson)
+	case "update":
+		// 更新产品
+
+	case "delete":
+		// 删除产品
+
+	default:
+		// 未知事件类型
+		klog.Error("unknown event type")
+	}
+
 }
 
 func handleProductEvent(msg mysql.EventMessage) {
@@ -88,7 +128,7 @@ func handleProductEvent(msg mysql.EventMessage) {
 	json.Unmarshal(newData, &p1)
 	json.Unmarshal(oldData, &p2)
 	klog.Debug("=====================================")
-	klog.Debug("Consumer 进行产品相关事件的更新操作")
+	klog.Debug("Elastic Search 进行产品相关事件的更新操作")
 	klog.Debug("操作类型：", msg.EventType)
 	klog.Debug("表名：", msg.Table.Name)
 	klog.Debug("新数据：", pretty.Sprintf("%# v", msg.NewData))
@@ -116,6 +156,13 @@ func handleCategoryEvent(msg mysql.EventMessage) {
 	oldData, _ := parseRowData(msg.Table, msg.OldData)
 	var c1 model.Category
 	var c2 model.Category
+	klog.Debug("=====================================")
+	klog.Debug("Elastic Search 进行分类相关事件的更新操作")
+	klog.Debug("操作类型：", msg.EventType)
+	klog.Debug("表名：", msg.Table.Name)
+	klog.Debug("新数据：", pretty.Sprintf("%# v", msg.NewData))
+	klog.Debug("旧数据：", pretty.Sprintf("%# v", msg.OldData))
+	klog.Debug("-------------------------------------")
 	json.Unmarshal(newData, &c1)
 	json.Unmarshal(oldData, &c2)
 	switch msg.EventType {

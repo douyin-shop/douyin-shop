@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/douyin-shop/douyin-shop/app/product/biz/dal/redis"
 	"strconv"
 
 	"github.com/cloudwego/kitex/pkg/klog"
@@ -46,7 +47,10 @@ func UpdateProduct(client *elastic.Client, indexName string, OldProduct, NewProd
 
 	klog.Debugf("Successfully updated document with ID %d", OldProduct.ID)
 
+	productKey := fmt.Sprintf("product:%d", OldProduct.ID)
+
 	// 从缓存中删除旧商品
+	redis.RedisClient.Del(context.Background(), productKey)
 
 	return nil
 }
@@ -65,6 +69,10 @@ func DeleteProduct(client *elastic.Client, indexName string, docID uint) error {
 	}
 
 	klog.Debugf("Successfully deleted document with ID %d", docID)
+
+	productKey := fmt.Sprintf("product:%d", docID)
+	// 从缓存中删除旧商品
+	redis.RedisClient.Del(context.Background(), productKey)
 	return nil
 }
 
@@ -102,7 +110,7 @@ func FuzzySearchProduct(client *elastic.Client, indexName string, keyword string
 	return products, nil
 }
 
-// 分类精确匹配(支持分类和价格区间)
+// ExactSearchProduct 分类精确匹配(支持分类和价格区间)
 func ExactSearchProduct(client *elastic.Client, indexName string, categoryName string, minPrice, maxPrice float64, pageNum, pageSize int) ([]model.Product, int) {
 	boolQuery := elastic.NewBoolQuery()
 
