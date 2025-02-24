@@ -35,7 +35,7 @@ func UploadFile(fileData []byte, fileSize int64) (string, error) {
 		return "", err
 	}
 
-	url := server.Domain + ret.Key
+	url := "http://" + server.Domain + "/" + ret.Key
 	return url, nil
 }
 
