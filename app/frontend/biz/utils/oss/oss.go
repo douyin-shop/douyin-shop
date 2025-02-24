@@ -1,9 +1,11 @@
+// Package oss @Author Adrian.Wang 2025/2/23 13:27:00
 package oss
 
 import (
 	"bytes"
 	"context"
-	"github.com/douyin-shop/douyin-shop/app/product/conf"
+	"github.com/douyin-shop/douyin-shop/app/frontend/biz/utils/code"
+	"github.com/douyin-shop/douyin-shop/app/frontend/conf"
 	"github.com/qiniu/go-sdk/v7/auth/qbox"
 	"github.com/qiniu/go-sdk/v7/storage"
 )
@@ -32,10 +34,10 @@ func UploadFile(fileData []byte, fileSize int64) (string, error) {
 	putExtra := storage.PutExtra{}
 	err := formUploader.PutWithoutKey(context.Background(), &ret, upToken, fileReader, fileSize, &putExtra)
 	if err != nil {
-		return "", err
+		return "", code.GetErr(code.ImageUploadFail)
 	}
 
-	url := "http://" + server.Domain + "/" + ret.Key
+	url := server.Domain + ret.Key
 	return url, nil
 }
 

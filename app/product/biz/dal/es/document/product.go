@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/douyin-shop/douyin-shop/app/product/biz/dal/redis"
 	"strconv"
 
 	"github.com/cloudwego/kitex/pkg/klog"
@@ -15,28 +16,28 @@ import (
 func CreateProduct(client *elastic.Client, indexName string, product model.Product) error {
 	_, err := client.Index().
 		Index(indexName).
-		Id(strconv.FormatUint(uint64(product.ID),10)). // 使用产品名称作为 ID，可以根据需要调整
+		Id(strconv.FormatUint(uint64(product.ID), 10)). // 使用产品名称作为 ID，可以根据需要调整
 		BodyJson(product).
 		Do(context.Background())
 
 	if err != nil {
 		return fmt.Errorf("error creating document: %v", err)
 	}
-	klog.Debugf("Successfully created document with ID %s", product.Name)
+	klog.Debugf("Successfully created document with ID %d", product.ID)
 	return nil
 }
 
-func UpdateProduct(client *elastic.Client, indexName string, OldProduct,NewProduct model.Product) error {
+func UpdateProduct(client *elastic.Client, indexName string, OldProduct, NewProduct model.Product) error {
 	updateService := client.Update().
 		Index(indexName).
-		Id(strconv.FormatUint(uint64(OldProduct.ID),10)).
+		Id(strconv.FormatUint(uint64(OldProduct.ID), 10)).
 		Doc(map[string]interface{}{
-			"product-name":     NewProduct.Name,
-			"product-description": NewProduct.Description,
-			"product-price":     NewProduct.Price,
-			"image-name":        NewProduct.ImageName,
-			"image-url":         NewProduct.ImageURL,
-			"categories":        NewProduct.Category,
+			"name":        NewProduct.Name,
+			"description": NewProduct.Description,
+			"price":       NewProduct.Price,
+			"image_name":  NewProduct.ImageName,
+			"image_url":   NewProduct.ImageURL,
+			"Category":    NewProduct.Category,
 		})
 
 	_, err := updateService.Do(context.Background())
@@ -44,30 +45,43 @@ func UpdateProduct(client *elastic.Client, indexName string, OldProduct,NewProdu
 		return fmt.Errorf("error updating document: %v", err)
 	}
 
-	klog.Debugf("Successfully updated document with ID %s", OldProduct.Name)
+	klog.Debugf("Successfully updated document with ID %d", OldProduct.ID)
+
+	productKey := fmt.Sprintf("product:%d", OldProduct.ID)
+
+	// 从缓存中删除旧商品
+	redis.RedisClient.Del(context.Background(), productKey)
+
 	return nil
 }
 
 func DeleteProduct(client *elastic.Client, indexName string, docID uint) error {
+	klog.Debug("从ES中删除商品")
+
 	deleteService := client.Delete().
 		Index(indexName).
-		Id(strconv.FormatUint(uint64(docID),10))
+		Id(strconv.FormatUint(uint64(docID), 10))
 
 	_, err := deleteService.Do(context.Background())
 	if err != nil {
-		return fmt.Errorf("error deleting document: %v", err)
+		klog.Error("error deleting document: %v", err)
+		return err
 	}
 
-	klog.Debugf("Successfully deleted document with ID %s", docID)
+	klog.Debugf("Successfully deleted document with ID %d", docID)
+
+	productKey := fmt.Sprintf("product:%d", docID)
+	// 从缓存中删除旧商品
+	redis.RedisClient.Del(context.Background(), productKey)
 	return nil
 }
 
 //搜索商品(关键词模糊匹配与分类精确匹配)
 
-//关键词模糊匹配
-func FuzzySearchProduct(client *elastic.Client, indexName string, keyword string, pageNum, pageSize int) ([]model.Product, int) {
+// FuzzySearchProduct 关键词模糊匹配
+func FuzzySearchProduct(client *elastic.Client, indexName string, keyword string, pageNum, pageSize int) ([]model.Product, error) {
 	searchService := client.Search().Index(indexName).
-		Query(elastic.NewMultiMatchQuery(keyword, "product-name", "product-description").
+		Query(elastic.NewMultiMatchQuery(keyword, "name", "description").
 			Type("best_fields").
 			Analyzer("ik_max_word"))
 
@@ -79,7 +93,7 @@ func FuzzySearchProduct(client *elastic.Client, indexName string, keyword string
 
 	searchResult, err := searchService.Do(context.Background())
 	if err != nil {
-		return nil, code.Error
+		return nil, err
 	}
 
 	var products []model.Product
@@ -87,16 +101,16 @@ func FuzzySearchProduct(client *elastic.Client, indexName string, keyword string
 		var product model.Product
 		err := json.Unmarshal(hit.Source, &product)
 		if err != nil {
-			return nil, code.Error
+			return nil, err
 		}
 		products = append(products, product)
 	}
 
 	klog.Debugf("Successfully fuzzy searched for keyword: %s with pageNum: %d and pageSize: %d", keyword, pageNum, pageSize)
-	return products, code.Success
+	return products, nil
 }
 
-//分类精确匹配(支持分类和价格区间)
+// ExactSearchProduct 分类精确匹配(支持分类和价格区间)
 func ExactSearchProduct(client *elastic.Client, indexName string, categoryName string, minPrice, maxPrice float64, pageNum, pageSize int) ([]model.Product, int) {
 	boolQuery := elastic.NewBoolQuery()
 
@@ -105,11 +119,11 @@ func ExactSearchProduct(client *elastic.Client, indexName string, categoryName s
 	}
 
 	if minPrice > 0 && maxPrice > 0 {
-		boolQuery = boolQuery.Must(elastic.NewRangeQuery("product-price").Gte(minPrice).Lte(maxPrice))
+		boolQuery = boolQuery.Must(elastic.NewRangeQuery("price").Gte(minPrice).Lte(maxPrice))
 	} else if minPrice > 0 {
-		boolQuery = boolQuery.Must(elastic.NewRangeQuery("product-price").Gte(minPrice))
+		boolQuery = boolQuery.Must(elastic.NewRangeQuery("price").Gte(minPrice))
 	} else if maxPrice > 0 {
-		boolQuery = boolQuery.Must(elastic.NewRangeQuery("product-price").Lte(maxPrice))
+		boolQuery = boolQuery.Must(elastic.NewRangeQuery("price").Lte(maxPrice))
 	}
 
 	searchService := client.Search().Index(indexName).Query(boolQuery)
@@ -139,61 +153,61 @@ func ExactSearchProduct(client *elastic.Client, indexName string, categoryName s
 	return products, code.Success
 }
 
-func CombinedSearchProduct(client *elastic.Client, indexName string, keyword string, categoryName string, minPrice, maxPrice float64, pageNum, pageSize int) ([]model.Product, int) {
-    var products []model.Product
+func CombinedSearchProduct(client *elastic.Client, indexName string, keyword string, categoryName string, minPrice, maxPrice float64, pageNum, pageSize int) ([]model.Product, error) {
+	var products []model.Product
 
-    // 模糊搜索关键词不为空时，进行模糊搜索
-    if keyword != "" {
-        fuzzyProducts, c := FuzzySearchProduct(client, indexName, keyword, pageNum, pageSize)
-        if c ==code.Error {
-            return nil, code.Error
-        }
-        products = fuzzyProducts
-    }
+	// 模糊搜索关键词不为空时，进行模糊搜索
+	if keyword != "" {
+		fuzzyProducts, err := FuzzySearchProduct(client, indexName, keyword, pageNum, pageSize)
+		if err != nil {
+			return nil, err
+		}
+		products = fuzzyProducts
+	}
 
-    // 精确匹配分类名称不为空时，进行精确搜索或对模糊搜索的结果进一步过滤
-    if categoryName != "" || minPrice > 0 || maxPrice > 0 {
-        boolQuery := elastic.NewBoolQuery()
+	// 精确匹配分类名称不为空时，进行精确搜索或对模糊搜索的结果进一步过滤
+	if categoryName != "" || minPrice > 0 || maxPrice > 0 {
+		boolQuery := elastic.NewBoolQuery()
 
-        if categoryName != "" {
-            boolQuery = boolQuery.Must(elastic.NewNestedQuery("categories", elastic.NewTermQuery("categories.name", categoryName)))
-        }
+		if categoryName != "" {
+			boolQuery = boolQuery.Must(elastic.NewNestedQuery("categories", elastic.NewTermQuery("categories.name", categoryName)))
+		}
 
-        if minPrice > 0 && maxPrice > 0 {
-            boolQuery = boolQuery.Must(elastic.NewRangeQuery("product-price").Gte(minPrice).Lte(maxPrice))
-        } else if minPrice > 0 {
-            boolQuery = boolQuery.Must(elastic.NewRangeQuery("product-price").Gte(minPrice))
-        } else if maxPrice > 0 {
-            boolQuery = boolQuery.Must(elastic.NewRangeQuery("product-price").Lte(maxPrice))
-        }
+		if minPrice > 0 && maxPrice > 0 {
+			boolQuery = boolQuery.Must(elastic.NewRangeQuery("price").Gte(minPrice).Lte(maxPrice))
+		} else if minPrice > 0 {
+			boolQuery = boolQuery.Must(elastic.NewRangeQuery("price").Gte(minPrice))
+		} else if maxPrice > 0 {
+			boolQuery = boolQuery.Must(elastic.NewRangeQuery("price").Lte(maxPrice))
+		}
 
-        searchService := client.Search().Index(indexName).Query(boolQuery)
+		searchService := client.Search().Index(indexName).Query(boolQuery)
 
-        // 如果进行了模糊搜索，这里需要使用post filter来进行过滤
-        if keyword != "" {
-            searchService = searchService.PostFilter(boolQuery)
-        }
+		// 如果进行了模糊搜索，这里需要使用post filter来进行过滤
+		if keyword != "" {
+			searchService = searchService.PostFilter(boolQuery)
+		}
 
-        // 如果 pageNum 和 pageSize 都不为 0，则启用分页
-        if pageNum > 0 && pageSize > 0 {
-            from := (pageNum - 1) * pageSize // 计算起始位置
-            searchService = searchService.From(from).Size(pageSize)
-        }
+		// 如果 pageNum 和 pageSize 都不为 0，则启用分页
+		if pageNum > 0 && pageSize > 0 {
+			from := (pageNum - 1) * pageSize // 计算起始位置
+			searchService = searchService.From(from).Size(pageSize)
+		}
 
-        searchResult, err := searchService.Do(context.Background())
-        if err != nil {
-            return nil, code.Error
-        }
+		searchResult, err := searchService.Do(context.Background())
+		if err != nil {
+			return nil, err
+		}
 
-        products = make([]model.Product, 0)
-        for _, hit := range searchResult.Hits.Hits {
-            var product model.Product
-            err := json.Unmarshal(hit.Source, &product)
-            if err != nil {
-                return nil, code.Error
-            }
-            products = append(products, product)
-        }
-    }
-    return products, code.Success
+		products = make([]model.Product, 0)
+		for _, hit := range searchResult.Hits.Hits {
+			var product model.Product
+			err := json.Unmarshal(hit.Source, &product)
+			if err != nil {
+				return nil, err
+			}
+			products = append(products, product)
+		}
+	}
+	return products, nil
 }

@@ -14,10 +14,10 @@ import (
 // EventMessage 结构体定义
 type EventMessage struct {
 	Table     *schema.Table
-	EventType string          `json:"event_type"`
-	ID        uint64         `json:"id"`
-	OldData []interface{} `json:"old_data"`
-	NewData []interface{} `json:"new_data"`
+	EventType string        `json:"event_type"`
+	ID        uint64        `json:"id"`
+	OldData   []interface{} `json:"old_data"`
+	NewData   []interface{} `json:"new_data"`
 }
 
 // MyEventHandler 结构体定义
@@ -60,20 +60,24 @@ func (m *MyEventHandler) OnRow(event *canal.RowsEvent) error {
 }
 
 // handleInsert 处理插入事件
-func (m *MyEventHandler)handleInsert(e *canal.RowsEvent) {
+func (m *MyEventHandler) handleInsert(e *canal.RowsEvent) {
 	for _, row := range e.Rows {
 		msg := EventMessage{
 			Table:     e.Table,
 			ID:        GetId(), //生成唯一ID
 			EventType: "insert",
-			NewData:      row,
+			NewData:   row,
 		}
-		m.mqProducer.PutMessage(conf.GetConf().RocketMQ.Topic, serializeEventMessage(msg))
+		klog.Debug("监听到插入事件", msg)
+		err := m.mqProducer.PutMessage(conf.GetConf().RocketMQ.Topic, serializeEventMessage(msg))
+		if err != nil {
+			klog.Error("put message error,err:", err)
+		}
 	}
 }
 
 // handleUpdate 处理更新事件
-func (m *MyEventHandler)handleUpdate(e *canal.RowsEvent) {
+func (m *MyEventHandler) handleUpdate(e *canal.RowsEvent) {
 	if len(e.Rows) < 2 {
 		return
 	}
@@ -88,20 +92,28 @@ func (m *MyEventHandler)handleUpdate(e *canal.RowsEvent) {
 			OldData:   oldRow,
 			NewData:   newRow,
 		}
-		m.mqProducer.PutMessage(conf.GetConf().RocketMQ.Topic, serializeEventMessage(msg))
+		klog.Debug("监听到更新事件", msg)
+		err := m.mqProducer.PutMessage(conf.GetConf().RocketMQ.Topic, serializeEventMessage(msg))
+		if err != nil {
+			klog.Error("put message error,err:", err)
+		}
 	}
 }
 
 // handleDelete 处理删除事件
-func (m *MyEventHandler)handleDelete(e *canal.RowsEvent) {
+func (m *MyEventHandler) handleDelete(e *canal.RowsEvent) {
 	for _, row := range e.Rows {
 		msg := EventMessage{
 			Table:     e.Table,
 			ID:        GetId(),
 			EventType: "delete",
-			OldData:      row,
+			OldData:   row,
 		}
-		m.mqProducer.PutMessage(conf.GetConf().RocketMQ.Topic, serializeEventMessage(msg))
+		klog.Debug("监听到删除事件", msg)
+		err := m.mqProducer.PutMessage(conf.GetConf().RocketMQ.Topic, serializeEventMessage(msg))
+		if err != nil {
+			klog.Error("put message error,err:", err)
+		}
 	}
 }
 
@@ -118,8 +130,10 @@ func RunListen(producer *producer.MQProducer) {
 	// 注册回调函数
 	c.SetEventHandler(&MyEventHandler{mqProducer: producer})
 
-	// 开始监听
-	c.Run()
+	if err = c.Run(); err != nil {
+		klog.Error("Canal 运行失败", err)
+	}
+
 }
 
 // 初始化配置函数

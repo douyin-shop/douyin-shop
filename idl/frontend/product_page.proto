@@ -29,15 +29,33 @@ service ProductCatalogService {
   }
 }
 
+message Category{
+  uint64 id=1;
+  string name=2;
+  uint64 parentId=3;
+  uint64 level=4;
+}
+
 message Product {
   uint32 id = 1;
   string name = 2;
   string description = 3;
   string imageName=4;
   bytes image=5;
-  float price = 6;
+  double price = 6;
+  string imageUrl = 7;
 
-  repeated string categories = 7;
+  repeated Category category = 8;
+}
+
+
+message SearchQuery{  // 搜索条件
+  string keyWord = 1;
+  int32 pageNum=2;
+  int32 pageSize=3;
+  string CategoryName=4;
+  double minPrice=5;
+  double maxPrice=6;
 }
 
 message AddProductReq {
@@ -71,6 +89,7 @@ message ListProductsReq{
   string categoryName = 3;
 }
 
+
 message ListProductsResp {
   repeated Product products = 1;
 }
@@ -84,7 +103,8 @@ message GetProductResp {
 }
 
 message SearchProductsReq {
-  string query = 1;
+  string query = 1; //废弃不用
+  SearchQuery searchQuery=2;
 }
 
 message SearchProductsResp {

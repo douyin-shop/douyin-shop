@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加新商品</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <link rel="stylesheet" href="css/add_product.css">
+</head>
+<body>
+<div class="container">
+    <h1><i class="fas fa-plus-circle"></i> 添加新商品</h1>
+    <form id="productForm">
+        <div class="form-group">
+            <label for="name">商品名称</label>
+            <input id="name" name="name" type="text" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">商品描述</label>
+            <textarea id="description" name="description" rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="price">价格</label>
+            <input id="price" name="price" type="number" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+            <label>商品分类</label>
+            <div class="categories-group">
+                <div class="category-item">
+                    <input type="checkbox" name="categories[]" value="electronics" id="cat1">
+                    <label for="cat1">📱 数码电子</label>
+                </div>
+                <div class="category-item">
+                    <input type="checkbox" name="categories[]" value="fashion" id="cat2">
+                    <label for="cat2">👗 时尚服饰</label>
+                </div>
+                <div class="category-item">
+                    <input type="checkbox" name="categories[]" value="home" id="cat3">
+                    <label for="cat3">🏠 家居生活</label>
+                </div>
+                <div class="category-item">
+                    <input type="checkbox" name="categories[]" value="beauty" id="cat4">
+                    <label for="cat4">💄 美妆个护</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="file-upload">
+                <label for="image_file">
+                    <i class="fas fa-upload"></i> 上传商品图片
+                    <input id="image_file" name="image_file" type="file" accept="image/*" required>
+                </label>
+                <div class="file-name" id="file-name"></div>
+            </div>
+        </div>
+
+        <button type="submit">立即上架</button>
+        <div id="response"></div>
+    </form>
+</div>
+<script src="js/add_product.js"></script>
+</body>
+</html>

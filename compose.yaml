@@ -105,7 +105,7 @@ services:
         container_name: rocketmq-namesrv
         restart: always
         ports:
-            - 9876:9876
+            - "9876:9876"
 #        volumes:
 #            - ./rocketmq/namesrv/logs:/home/rocketmq/logs
 #            - ./rocketmq/namesrv/store:/home/rocketmq/store
@@ -121,9 +121,9 @@ services:
         container_name: rocketmq-broker
         restart: always
         ports:
-            - 10909:10909
-            - 10911:10911
-            - 10912:10912
+            - "10909:10909"
+            - "10911:10911"
+            - "10912:10912"
         volumes:
 #            - ./rocketmq/broker/logs:/home/rocketmq/logs
 #            - ./rocketmq/broker/store:/home/rocketmq/store
@@ -143,7 +143,7 @@ services:
         container_name: rocketmq-dashboard
         restart: always
         ports:
-            - 808:8080
+            - "808:8080"
         environment:
             - JAVA_OPTS=-Drocketmq.namesrv.addr=rocketmq-namesrv:9876
         depends_on:
