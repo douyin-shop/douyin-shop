@@ -37,12 +37,12 @@ func main() {
 	//init snowflake
 	snoyflake.Init(conf.GetConf().Snowflake.StartTime, conf.GetConf().Snowflake.MachineId)
 
+	// init model
+	dal.Init()
+
 	// init mq
 	mq.InitMq()
 	defer mq.ShutdownMq()
-
-	// init model
-	dal.Init()
 
 	svr := productcatalogservice.NewServer(new(ProductCatalogServiceImpl), opts...)
 

@@ -8,11 +8,11 @@ import (
 
 type Product struct {
 	gorm.Model
-	Name        string     `gorm:"type:varchar(80);not null" json:"product-name" binding:"required,len=9" label:"商品名称"`
-	Description string     `gorm:"type:text;not null" json:"product-description" binding:"required,len=9" label:"商品描述"`
-	Price       float64    `gorm:"type:decimal(10,2);not null" json:"product-price" binding:"required,len=9" label:"商品价格"`
-	ImageName   string     `gorm:"type:varchar(255)" json:"image-name" binding:"omitempty" label:"商品图片名称"`
-	ImageURL    string     `gorm:"type:varchar(255)" json:"image-url" binding:"omitempty,url" label:"商品图片URL"`
+	Name        string     `gorm:"type:varchar(80);not null" json:"name" binding:"required,len=9" label:"商品名称"`
+	Description string     `gorm:"type:text;not null" json:"description" binding:"required,len=9" label:"商品描述"`
+	Price       float64    `gorm:"type:decimal(10,2);not null" json:"price" binding:"required,len=9" label:"商品价格"`
+	ImageName   string     `gorm:"type:varchar(255)" json:"image_name" binding:"omitempty" label:"商品图片名称"`
+	ImageURL    string     `gorm:"type:varchar(255)" json:"image_url" binding:"omitempty,url" label:"商品图片URL"`
 	Category    []Category `gorm:"many2many:product_categories;"`
 }
 

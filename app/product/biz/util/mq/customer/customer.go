@@ -78,21 +78,21 @@ func handleEventMessage(msg mysql.EventMessage) {
 
 func handleProductEvent(msg mysql.EventMessage) {
 
-	klog.Debug("=====================================")
-	klog.Debug("Consumer 进行产品相关事件的更新操作")
-	klog.Debug("操作类型：", msg.EventType)
-	klog.Debug("表名：", msg.Table.Name)
-	klog.Debug("新数据：", pretty.Sprintf("%# v", msg.NewData))
-	klog.Debug("旧数据：", pretty.Sprintf("%# v", msg.OldData))
-	klog.Debug("-------------------------------------")
-
 	// 处理 product 表的事件
 	newData, _ := parseRowData(msg.Table, msg.NewData)
 	oldData, _ := parseRowData(msg.Table, msg.OldData)
+
 	var p1 model.Product
 	var p2 model.Product
 	json.Unmarshal(newData, &p1)
 	json.Unmarshal(oldData, &p2)
+	klog.Debug("=====================================")
+	klog.Debug("Consumer 进行产品相关事件的更新操作")
+	klog.Debug("操作类型：", msg.EventType)
+	klog.Debug("表名：", msg.Table.Name)
+	klog.Debug("新数据：", pretty.Sprintf("%# v", p1))
+	klog.Debug("旧数据：", pretty.Sprintf("%# v", p2))
+	klog.Debug("-------------------------------------")
 	switch msg.EventType {
 	case "insert":
 		// 创建产品
