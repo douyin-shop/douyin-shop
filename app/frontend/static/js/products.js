@@ -30,7 +30,7 @@ function renderProducts(products) {
     const container = document.getElementById('productList');
     container.innerHTML = products.map(product => `
             <div class="product-card">
-                <img src="${product.picture}" class="product-image" alt="${product.name}">
+                <img src="${product.imageUrl}" class="product-image" alt="${product.name}">
                 <div class="product-info">
                     <div class="product-title">${product.name}</div>
                     <div class="product-price">¥${product.price.toFixed(2)}</div>
@@ -70,8 +70,11 @@ async function searchProducts() {
 }
 
 // 添加搜索输入框的实时监听
-document.getElementById('searchInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
+// 添加搜索输入框的防抖监听
+let searchTimeout;
+document.getElementById('searchInput').addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
         searchProducts();
-    }
+    }, 2000);
 });

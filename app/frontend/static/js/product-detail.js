@@ -27,7 +27,7 @@ async function loadProduct(id) {
 
 function renderProduct(product) {
     document.getElementById('productName').textContent = product.name;
-    document.getElementById('productImage').src = product.picture;
+    document.getElementById('productImage').src = product.imageUrl;
     document.getElementById('productDescription').textContent = product.description;
     document.getElementById('productPrice').textContent = `¥${product.price.toFixed(2)}`;
 }
