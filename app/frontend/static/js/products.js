@@ -45,9 +45,8 @@ function renderProducts(products) {
 function viewProductDetail(productId) {
     window.location.href = `product-detail.html?id=${productId}`;
 }
-
 async function searchProducts() {
-    const query = document.getElementById('searchInput').value;
+    const searchInput = document.getElementById('searchInput').value;
     try {
         const response = await fetch(`${API_BASE}/product/search`, {
             method: 'POST',
@@ -55,7 +54,16 @@ async function searchProducts() {
                 'Content-Type': 'application/json',
                 'Authorization': `${localStorage.getItem('authToken')}`
             },
-            body: JSON.stringify({ query })
+            body: JSON.stringify({
+                searchQuery: {  // 符合Protobuf结构
+                    keyWord: searchInput,    // 关键词
+                    pageNum: 1,             // 当前页码（可按需动态获取）
+                    pageSize: 10,           // 每页数量（可按需动态获取）
+                    CategoryName: "",       // 分类（可按需添加选择器获取）
+                    minPrice: 0,            // 最低价（可按需添加输入框获取）
+                    maxPrice: 0             // 最高价（可按需添加输入框获取）
+                }
+            })
         });
 
         const data = await response.json();
