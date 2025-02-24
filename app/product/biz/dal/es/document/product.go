@@ -22,7 +22,7 @@ func CreateProduct(client *elastic.Client, indexName string, product model.Produ
 	if err != nil {
 		return fmt.Errorf("error creating document: %v", err)
 	}
-	klog.Debugf("Successfully created document with ID %s", product.Name)
+	klog.Debugf("Successfully created document with ID %d", product.ID)
 	return nil
 }
 
@@ -44,21 +44,24 @@ func UpdateProduct(client *elastic.Client, indexName string, OldProduct, NewProd
 		return fmt.Errorf("error updating document: %v", err)
 	}
 
-	klog.Debugf("Successfully updated document with ID %s", OldProduct.Name)
+	klog.Debugf("Successfully updated document with ID %d", OldProduct.ID)
 	return nil
 }
 
 func DeleteProduct(client *elastic.Client, indexName string, docID uint) error {
+	klog.Debug("从ES中删除商品")
+
 	deleteService := client.Delete().
 		Index(indexName).
 		Id(strconv.FormatUint(uint64(docID), 10))
 
 	_, err := deleteService.Do(context.Background())
 	if err != nil {
-		return fmt.Errorf("error deleting document: %v", err)
+		klog.Error("error deleting document: %v", err)
+		return err
 	}
 
-	klog.Debugf("Successfully deleted document with ID %s", docID)
+	klog.Debugf("Successfully deleted document with ID %d", docID)
 	return nil
 }
 

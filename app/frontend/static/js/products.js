@@ -28,18 +28,24 @@ async function loadProducts() {
 
 function renderProducts(products) {
     const container = document.getElementById('productList');
-    container.innerHTML = products.map(product => `
+    container.innerHTML = products.map(product => {
+        var price = product.price;
+        if(price == null){
+            price = 0;
+        }
+        return `
             <div class="product-card">
                 <img src="${product.imageUrl}" class="product-image" alt="${product.name}">
                 <div class="product-info">
                     <div class="product-title">${product.name}</div>
-                    <div class="product-price">¥${product.price.toFixed(2)}</div>
+                    <div class="product-price">¥${price.toFixed(2)}</div>
                 </div>
                 <a href="javascript:void(0)" onclick="viewProductDetail(${product.id})" class="view-button">
                     查看详情
                 </a>
             </div>
-        `).join('');
+        `
+    }).join('');
 }
 
 function viewProductDetail(productId) {
@@ -67,7 +73,7 @@ async function searchProducts() {
         });
 
         const data = await response.json();
-        if(data.code === -1 || data.data.results.length === 0){
+        if(data.code === -1 || data.data.results === undefined || data.data.results.length === 0){
             alert('未找到相关商品');
             return;
         }
