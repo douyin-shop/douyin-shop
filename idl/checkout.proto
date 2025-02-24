@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package  checkout;
 
-import "payment.proto";
-
 option go_package = "/checkout";
 
 service CheckoutService {
@@ -18,13 +16,21 @@ message Address {
   string zip_code = 5;
 }
 
+message CreditCardInfo {
+  string credit_card_number = 1;
+  int32 credit_card_cvv = 2;
+  int32 credit_card_expiration_year = 3;
+  int32 credit_card_expiration_month = 4;
+}
+
+
 message CheckoutReq {
   uint32 user_id = 1;
   string firstname = 2;
   string lastname = 3;
   string email = 4;
   Address address = 5;
-  payment.CreditCardInfo credit_card = 6;
+  CreditCardInfo credit_card = 6;
 }
 
 message CheckoutResp {

@@ -7,6 +7,7 @@ import (
 	"github.com/kitex-contrib/obs-opentelemetry/provider"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"io"
+	"log"
 	"net"
 	"os"
 	"time"
@@ -18,6 +19,7 @@ import (
 	"github.com/cloudwego/kitex/server"
 	"github.com/douyin-shop/douyin-shop/app/auth/conf"
 	"github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth/authservice"
+	"github.com/joho/godotenv"
 
 	kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
 	"go.uber.org/zap/zapcore"
@@ -25,11 +27,18 @@ import (
 )
 
 func main() {
+
+	// 读取环境变量
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("环境变量文件加载失败", err)
+	}
+
 	opts := kitexInit()
 
 	svr := authservice.NewServer(new(AuthServiceImpl), opts...)
 
-	err := svr.Run()
+	err = svr.Run()
 	if err != nil {
 		klog.Error(err.Error())
 	}

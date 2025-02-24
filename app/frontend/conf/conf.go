@@ -31,6 +31,7 @@ type Config struct {
 	Nacos         Nacos         `yaml:"nacos"`
 	Jwt           Jwt           `yaml:"jwt"`
 	OpenTelemetry OpenTelemetry `yaml:"opentelemetry"`
+	OSS           OSS           `yaml:"oss"`
 	Casbin        Casbin        `yaml:"casbin"`
 }
 
@@ -78,6 +79,14 @@ type Jwt struct {
 
 type OpenTelemetry struct {
 	Address string `yaml:"address"`
+}
+
+type OSS struct {
+	AccessKey string `yaml:"access_key"`
+	SecretKey string `yaml:"secret_key"`
+	Domain    string `yaml:"endpoint"`
+	Bucket    string `yaml:"bucket"`
+	Zone      int    `yaml:"zone"` //类型不能直接为需要的，使用int表示，转换方式参考oss包
 }
 
 type Rule struct {

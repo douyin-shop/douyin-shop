@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	product "github.com/douyin-shop/douyin-shop/app/product/kitex_gen/product"
 	"github.com/douyin-shop/douyin-shop/app/product/biz/service"
 )
 
@@ -26,6 +25,27 @@ func (s *ProductCatalogServiceImpl) GetProduct(ctx context.Context, req *product
 // SearchProducts implements the ProductCatalogServiceImpl interface.
 func (s *ProductCatalogServiceImpl) SearchProducts(ctx context.Context, req *product.SearchProductsReq) (resp *product.SearchProductsResp, err error) {
 	resp, err = service.NewSearchProductsService(ctx).Run(req)
+
+	return resp, err
+}
+
+// AddProduct implements the ProductCatalogServiceImpl interface.
+func (s *ProductCatalogServiceImpl) AddProduct(ctx context.Context, req *product.AddProductReq) (resp *product.AddProductResp, err error) {
+	resp, err = service.NewAddProductService(ctx).Run(req)
+
+	return resp, err
+}
+
+// UpdateProduct implements the ProductCatalogServiceImpl interface.
+func (s *ProductCatalogServiceImpl) UpdateProduct(ctx context.Context, req *product.UpdateProductReq) (resp *product.UpdateProductResp, err error) {
+	resp, err = service.NewUpdateProductService(ctx).Run(req)
+
+	return resp, err
+}
+
+// DeleteProduct implements the ProductCatalogServiceImpl interface.
+func (s *ProductCatalogServiceImpl) DeleteProduct(ctx context.Context, req *product.DeleteProductReq) (resp *product.DeleteProductResp, err error) {
+	resp, err = service.NewDeleteProductService(ctx).Run(req)
 
 	return resp, err
 }

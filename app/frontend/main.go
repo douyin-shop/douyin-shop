@@ -8,7 +8,9 @@ import (
 	"github.com/douyin-shop/douyin-shop/app/frontend/biz/dal"
 	"github.com/douyin-shop/douyin-shop/app/frontend/infra/rpc"
 	"github.com/hertz-contrib/obs-opentelemetry/provider"
+	"github.com/joho/godotenv"
 	"io"
+	"log"
 	"os"
 	"time"
 
@@ -32,6 +34,12 @@ import (
 )
 
 func main() {
+	// 读取环境变量
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("环境变量文件加载失败", err)
+	}
+
 	// init dal
 	dal.Init()
 	// 初始化 rpc 客户端
@@ -54,6 +62,8 @@ func main() {
 	h.Use(hertztracing.ServerMiddleware(cfg))
 
 	registerMiddleware(h)
+
+	h.Static("/", "./static")
 
 	// add a ping route to test
 	h.GET("/ping", func(c context.Context, ctx *app.RequestContext) {
@@ -104,5 +114,14 @@ func registerMiddleware(h *server.Hertz) {
 	h.Use(recovery.Recovery())
 
 	// cores
-	h.Use(cors.Default())
+	//h.Use(cors.Default())
+
+	h.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"}, // 允许所有来源
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 }

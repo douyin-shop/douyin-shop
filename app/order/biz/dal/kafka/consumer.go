@@ -3,36 +3,33 @@ package kafka
 import (
 	"encoding/json"
 	"github.com/IBM/sarama"
-	"log"
+	"github.com/cloudwego/kitex/tool/internal_pkg/log"
+	"github.com/douyin-shop/douyin-shop/app/product/biz/dal/model"
+	"github.com/douyin-shop/douyin-shop/app/product/biz/dal/mysql"
 )
 
 // 消费者处理消息的函数
 func (h *consumerGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
-	var messages []InventoryMessage
+	// 消费消息
 	for message := range claim.Messages() {
+		// 处理消息
 		var msg InventoryMessage
 		err := json.Unmarshal(message.Value, &msg)
 		if err != nil {
-			log.Printf("解析消息失败: %v", err)
+			// 消费失败，记录日志
+			log.Info("kafka consumer unmarshal message failed, err: %v", err)
 			continue
 		}
-		messages = append(messages, msg)
-		// 当收到一定数量（这里假设为5条）的消息后进行处理
-		if len(messages) >= 5 {
-			processMessages(messages)
-			// 标记已处理的消息
-			for _, m := range messages {
-				session.MarkMessage(message, "")
-			}
-			messages = messages[:0]
-		}
+		processMessages(msg)
+		// 消费成功，提交消息
+		session.MarkMessage(message, "")
 	}
 	return nil
 }
 
 type consumerGroupHandler struct{}
 
-func processMessages(messages []InventoryMessage) {
+func processMessages(messages InventoryMessage) {
 	// 这里实现具体的库存扣减逻辑
-	// 开启事务
+	model.UpdateProductStock(mysql.Db, messages.ProductId, messages.Quantity)
 }

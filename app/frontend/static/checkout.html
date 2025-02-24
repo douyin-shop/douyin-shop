@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单结算</title>
+    <link rel="stylesheet" href="css/checkout.css">
+</head>
+<body>
+<div class="checkout-form">
+    <h2>订单结算</h2>
+    <form id="checkoutForm">
+        <!-- 测试数据自动填充 -->
+        <div class="flex-group">
+            <div class="form-group" style="flex:1">
+                <label>名字</label>
+                <input type="text" id="firstname" value="测试" required>
+            </div>
+            <div class="form-group" style="flex:1">
+                <label>姓氏</label>
+                <input type="text" id="lastname" value="用户" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>电子邮箱</label>
+            <input type="email" id="email" value="test@example.com" required>
+        </div>
+
+        <div class="form-section">
+            <h3>配送地址</h3>
+            <div class="form-group">
+                <label>详细地址</label>
+                <input type="text" id="street_address" value="测试街道 123号" required>
+            </div>
+            <div class="flex-group">
+                <div class="form-group" style="flex:1">
+                    <label>城市</label>
+                    <input type="text" id="city" value="上海" required>
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label>省份</label>
+                    <input type="text" id="state" value="上海" required>
+                </div>
+            </div>
+            <div class="flex-group">
+                <div class="form-group" style="flex:1">
+                    <label>国家</label>
+                    <input type="text" id="country" value="中国" required>
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label>邮编</label>
+                    <input type="text" id="zip_code" value="200000" required pattern="\d+">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>支付信息</h3>
+            <div class="form-group">
+                <label>信用卡号</label>
+                <input type="text" id="credit_card_number"
+                       value="4242424242424242"
+                       pattern="\d{13,19}"
+                       required>
+            </div>
+            <div class="flex-group">
+                <div class="form-group" style="flex:1">
+                    <label>有效期</label>
+                    <div class="flex-group">
+                        <select id="credit_card_expiration_month" required>
+                            <!-- JS动态填充 -->
+                        </select>
+                        <select id="credit_card_expiration_year" required>
+                            <!-- JS动态填充 -->
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label>安全码 (CVV)</label>
+                    <input type="text" id="credit_card_cvv" value="123" required pattern="\d{3,4}">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit">提交订单</button>
+    </form>
+</div>
+<script src="js/checkout.js"></script>
+</body>
+</html>

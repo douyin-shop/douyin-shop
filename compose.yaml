@@ -16,10 +16,12 @@ services:
             - "55679" # zpages extension
         depends_on:
             - jaeger-all-in-one
+        restart: always
 
     # Jaeger
     jaeger-all-in-one:
         image: jaegertracing/all-in-one:latest
+        restart: always
         environment:
             - COLLECTOR_OTLP_ENABLED=true
         ports:
@@ -51,6 +53,7 @@ services:
     # Grafana
     grafana:
         image: grafana/grafana:latest
+        restart: always
         environment:
             - GF_AUTH_ANONYMOUS_ENABLED=true
             - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
@@ -75,7 +78,7 @@ services:
     nacos:
         image: nacos/nacos-server:v2.4.0
         container_name: nacos
-
+        restart: always
         ports:
             - "8848:8848"
             - "9848:9848"
@@ -100,8 +103,9 @@ services:
     rocketmq-namesrv:
         image: apache/rocketmq:5.3.1
         container_name: rocketmq-namesrv
+        restart: always
         ports:
-            - 9876:9876
+            - "9876:9876"
 #        volumes:
 #            - ./rocketmq/namesrv/logs:/home/rocketmq/logs
 #            - ./rocketmq/namesrv/store:/home/rocketmq/store
@@ -115,10 +119,11 @@ services:
     rocketmq-broker:
         image: apache/rocketmq:5.3.1
         container_name: rocketmq-broker
+        restart: always
         ports:
-            - 10909:10909
-            - 10911:10911
-            - 10912:10912
+            - "10909:10909"
+            - "10911:10911"
+            - "10912:10912"
         volumes:
 #            - ./rocketmq/broker/logs:/home/rocketmq/logs
 #            - ./rocketmq/broker/store:/home/rocketmq/store
@@ -136,8 +141,9 @@ services:
     rocketmq-dashboard:
         image: apacherocketmq/rocketmq-dashboard:latest
         container_name: rocketmq-dashboard
+        restart: always
         ports:
-            - 808:8080
+            - "808:8080"
         environment:
             - JAVA_OPTS=-Drocketmq.namesrv.addr=rocketmq-namesrv:9876
         depends_on:
@@ -146,6 +152,7 @@ services:
             - micro-service-net
     redis:
         image: redis:6.2.6
+        restart: always
         container_name: redis
         ports:
             - "6379:6379"
@@ -153,6 +160,7 @@ services:
             - micro-service-net
     mysql:
         image: mysql:8.0 # 使用MySQL官方镜像，版本8
+
         restart: always # 容器退出后总是重启
         environment:
             MYSQL_ROOT_PASSWORD: 88888888 # 设置root用户的密码，生产环境中请使用更复杂的密码
@@ -166,17 +174,21 @@ services:
     elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:8.17.1
         container_name: elasticsearch
+        restart: always
         environment:
             - discovery.type=single-node
             - ES_JAVA_OPTS=-Xms512m -Xmx512m
             - xpack.security.enabled=false
+        volumes:
+            - ./tools/elasticsearch-analysis-ik-8.17.1/:/usr/share/elasticsearch/plugins/analysis-ik
         ports:
             - "9200:9200"
             - "9300:9300"
         networks:
             - micro-service-net
+        
 networks:
     micro-service-net:
         driver: bridge
 volumes:
-    db_data:
+  db_data:

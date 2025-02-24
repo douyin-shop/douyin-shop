@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package frontend.product;
+
+
+import "api-tools.proto";
+import "frontend/common.proto";
+
+option go_package = "/frontend/product";
+
+service ProductCatalogService {
+  rpc AddProduct(AddProductReq) returns (AddProductResp) {
+    option (api.post) = "/product/add";
+  }
+  rpc UpdateProduct(UpdateProductReq) returns (UpdateProductResp) {
+    option (api.post) = "/product/update";
+  }
+  rpc DeleteProduct(DeleteProductReq) returns (DeleteProductResp) {
+    option (api.post) = "/product/delete";
+  }
+  rpc ListProducts(ListProductsReq) returns (ListProductsResp) {
+    option (api.post) = "/product/list";
+  }
+  rpc GetProduct(GetProductReq) returns (GetProductResp) {
+    option (api.post) = "/product/get";
+  }
+  rpc SearchProducts(SearchProductsReq) returns (SearchProductsResp) {
+    option (api.post) = "/product/search";
+  }
+}
+
+message Category{
+  uint64 id=1;
+  string name=2;
+  uint64 parentId=3;
+  uint64 level=4;
+}
+
+message Product {
+  uint32 id = 1;
+  string name = 2;
+  string description = 3;
+  string imageName=4;
+  bytes image=5;
+  double price = 6;
+  string imageUrl = 7;
+
+  repeated Category category = 8;
+}
+
+
+message SearchQuery{  // 搜索条件
+  string keyWord = 1;
+  int32 pageNum=2;
+  int32 pageSize=3;
+  string CategoryName=4;
+  double minPrice=5;
+  double maxPrice=6;
+}
+
+message AddProductReq {
+  Product product = 1;
+}
+
+message AddProductResp {
+  uint32 id = 1;
+}
+
+message UpdateProductReq {
+  Product updatedProduct = 1;
+}
+
+message UpdateProductResp {
+  bool success = 1;
+}
+
+message DeleteProductReq {
+  uint32 id = 1;
+}
+
+message DeleteProductResp {
+  bool success = 1;
+}
+
+message ListProductsReq{
+  int32 page = 1;
+  int64 pageSize = 2;
+
+  string categoryName = 3;
+}
+
+
+message ListProductsResp {
+  repeated Product products = 1;
+}
+
+message GetProductReq {
+  uint32 id = 1;
+}
+
+message GetProductResp {
+  Product product = 1;
+}
+
+message SearchProductsReq {
+  string query = 1; //废弃不用
+  SearchQuery searchQuery=2;
+}
+
+message SearchProductsResp {
+  repeated Product results = 1;
+}

@@ -1,6 +1,8 @@
 package model
 
 import (
+	"github.com/douyin-shop/douyin-shop/app/order/biz/dal/constant"
+	"github.com/douyin-shop/douyin-shop/app/order/biz/dal/mysql"
 	"gorm.io/gorm"
 	"time"
 )
@@ -13,6 +15,7 @@ type Order struct {
 	TotalAmount     float32   `gorm:"not null" json:"total_amount" binding:"required" label:"订单总金额"`
 	OrderStatus     int       `gorm:"tinyint;not null;" json:"order_status" binding:"required" label:"订单状态"`
 	UserId          uint32    `gorm:"int;not null;" json:"user_id" binding:"required" label:"用户id"`
+	UserCurrency    string    `gorm:"type:varchar(20);not null" json:"user_currency" binding:"required" label:"用户货币"`
 	Phone           string    `gorm:"varchar(20);not null;" json:"phone" binding:"required" label:"收货电话"`
 	Email           string    `gorm:"varchar(30);not null;" json:"email" binding:"required,email" label:"用户邮箱"`
 	Address         Address   `gorm:"type:varchar(100);not null" json:"address" binding:"required" label:"收货地址"`
@@ -30,4 +33,22 @@ type Address struct {
 	State         string `protobuf:"bytes,3,opt,name=state,proto3" json:"state,omitempty"`
 	Country       string `protobuf:"bytes,4,opt,name=country,proto3" json:"country,omitempty"`
 	ZipCode       int32  `protobuf:"varint,5,opt,name=zip_code,json=zipCode,proto3" json:"zip_code,omitempty"`
+}
+
+func GetOrdersByUserId(db *gorm.DB, userId uint32) ([]Order, error) {
+	var orders []Order
+	err := db.Where("user_id = ?", userId).Find(&orders).Error
+	if err != nil {
+		return nil, err
+	}
+	return orders, nil
+}
+
+func MarkOrderPaid(userId uint32, orderId string) error {
+	db := mysql.DB
+	err := db.Model(&Order{}).Where("userId = ? and orderId = ?", userId, orderId).Update("orderStatus", constant.Order_Paid).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

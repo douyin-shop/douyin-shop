@@ -1,7 +1,7 @@
 kitex:
   service: "product"
   address: ":8006"
-  log_level: info
+  log_level: debug
   log_file_name: "log/kitex.log"
   log_max_size: 10
   log_max_age: 3
@@ -27,6 +27,12 @@ nacos:
   not_load_cache_at_start: true
 
 mysql:
+  serverid: 1
+  address: "127.0.0.1"
+  port: 3306
+  username: "root"
+  password: "88888888"
+  dbname: "douyin-shop"
   dsn: "root:88888888@tcp(127.0.0.1:3306)/douyin-shop?charset=utf8mb4&parseTime=True&loc=Local"
 #  dsn: "root:Q1w2e3r4@tcp(rm-cn-em943mba000039.rwlb.rds.aliyuncs.com:3306)/douyin-shop?charset=utf8mb4&parseTime=True&loc=Local"
 
@@ -38,3 +44,35 @@ redis:
 
 opentelemetry:
   address: "127.0.0.1:4317"
+
+
+elasticsearch:
+  address: "http://127.0.0.1:9200"
+  index_name: "product"
+
+#oss:
+#  zone: 1
+#  bucket: douyin-shop
+#  access_key: ySX6iSWlb5mH1nDuUDo0NU0y1ICxCIWi6BXM4wKo
+#  secret_key: F_CERy4ZYbau2Khva1f8xy4MG89dy0YJ7J7m5rQM
+#  domain: srb589zh9.hd-bkt.clouddn.com
+
+oss:
+  zone: 1
+  bucket: adrian-douyin-shop
+  access_key: ZB3v6lUPfo9HCHjbrmrX3LrtGz8_hOV58Zan6oov
+  secret_key: Tbj7bzE6_7HJ_0_A3YmzGhhX7NI8n1vdnAwNjUBF
+  domain: ss53quubh.hd-bkt.clouddn.com
+
+goroutine-pool:
+  size: 100
+  queue: 10
+
+snowflake:
+  machine_id: 1
+  start_time: 2021-09-01
+
+rocketmq:
+  name_server: "127.0.0.1:9876"
+  custom_group: "product"
+  topic: "es"

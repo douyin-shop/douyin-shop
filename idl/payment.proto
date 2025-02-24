@@ -7,6 +7,7 @@ option go_package = "payment";
 
 service PaymentService {
   rpc Charge(ChargeReq) returns (ChargeResp) {}
+  rpc PaymentCallback(PaymentCallbackReq) returns (PaymentCallbackResp) {}
 }
 
 message CreditCardInfo {
@@ -25,4 +26,21 @@ message ChargeReq {
 
 message ChargeResp {
   string transaction_id = 1;
+}
+
+
+// 支付回调请求
+message PaymentCallbackReq {
+  string order_id = 1; // 订单 ID
+  string transaction_id = 2; // 微信支付交易 ID
+  string payment_time = 3; // 支付时间
+  string sign = 4; // 微信支付回调签名
+  string sign_type = 5; // 签名类型，如 MD5、HMAC-SHA256 等
+  // 可以根据微信支付回调实际返回的参数添加更多字段
+}
+
+// 微信支付回调响应
+message PaymentCallbackResp {
+  bool success = 1; // 表示回调处理是否成功
+  string message = 2; // 回调处理结果消息
 }

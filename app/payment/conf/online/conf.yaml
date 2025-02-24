@@ -14,7 +14,8 @@ registry:
   password: ''
 
 nacos:
-  address: 'mse-160d8470-p.nacos-ans.mse.aliyuncs.com'
+  #  address: 'mse-160d8470-p.nacos-ans.mse.aliyuncs.com'
+  address: '127.0.0.1'
   port: 8848
   namespace: ''
   group: 'DEFAULT_GROUP'
@@ -38,3 +39,8 @@ redis:
 
 opentelemetry:
   address: "127.0.0.1:4317"
+
+rocketmq:
+  address: "127.0.0.1:9876"
+  retry_times: 3
+  group_name: "payment"

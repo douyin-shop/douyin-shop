@@ -2,10 +2,15 @@ package main
 
 import (
 	"context"
+	"github.com/douyin-shop/douyin-shop/app/checkout/biz/dal"
+	"github.com/douyin-shop/douyin-shop/app/checkout/rpc"
+	"github.com/douyin-shop/douyin-shop/common/custom_logger"
 	"github.com/douyin-shop/douyin-shop/common/nacos"
+	"github.com/joho/godotenv"
 	"github.com/kitex-contrib/obs-opentelemetry/provider"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"io"
+	"log"
 	"net"
 	"os"
 	"time"
@@ -21,17 +26,27 @@ import (
 )
 
 func main() {
+
+	// 读取环境变量
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("环境变量文件加载失败", err)
+	}
+
 	opts := kitexInit()
 
 	svr := checkoutservice.NewServer(new(CheckoutServiceImpl), opts...)
 
-	err := svr.Run()
+	err = svr.Run()
 	if err != nil {
 		klog.Error(err.Error())
 	}
 }
 
 func kitexInit() (opts []server.Option) {
+
+	dal.Init()
+	rpc.InitClient()
 
 	// OpenTelemetry
 	p := provider.NewOpenTelemetryProvider(
@@ -61,6 +76,8 @@ func kitexInit() (opts []server.Option) {
 
 	// klog
 	logger := kitexlogrus.NewLogger()
+	logger.Logger().SetReportCaller(true)
+	logger.Logger().SetFormatter(&custom_logger.CustomFormatter{})
 	klog.SetLogger(logger)
 	klog.SetLevel(conf.LogLevel())
 	asyncWriter := &zapcore.BufferedWriteSyncer{
