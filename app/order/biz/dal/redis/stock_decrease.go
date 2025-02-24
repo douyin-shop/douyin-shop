@@ -20,7 +20,7 @@ type StockDecrease struct {
 	ctx        context.Context
 	cancelFunc context.CancelFunc
 	key        string
-	stock      uint32
+	stock      int32
 	status     bool
 }
 
@@ -43,7 +43,7 @@ func (s *StockDecrease) TryDecrease() (bool, error) {
 	return true, nil
 }
 
-func NewStockDecrease(key string, stock uint32) *StockDecrease {
+func NewStockDecrease(key string, stock int32) *StockDecrease {
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	return &StockDecrease{
 		redis:      DB(),
