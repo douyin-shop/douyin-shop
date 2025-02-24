@@ -18,7 +18,7 @@ func InitMq() {
 
 	InitProducer()
 	InitConsumer()
-	mysql.RunListen(p)
+	go mysql.RunListen(p)
 }
 
 // InitProducer 初始化生产者并启动监听
