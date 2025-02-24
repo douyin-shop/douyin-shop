@@ -14,6 +14,7 @@ require (
 	github.com/kr/pretty v0.3.1
 	github.com/nacos-group/nacos-sdk-go/v2 v2.2.7
 	github.com/redis/go-redis/v9 v9.7.0
+	github.com/IBM/sarama v1.45.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.32.0
 	google.golang.org/protobuf v1.36.3
