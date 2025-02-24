@@ -14,6 +14,7 @@ import (
 	"github.com/douyin-shop/douyin-shop/app/product/conf"
 	"github.com/go-mysql-org/go-mysql/schema"
 	"github.com/kr/pretty"
+	"strconv"
 )
 
 type MQConsumer struct {
@@ -90,8 +91,8 @@ func handleProductEvent(msg mysql.EventMessage) {
 	klog.Debug("Consumer 进行产品相关事件的更新操作")
 	klog.Debug("操作类型：", msg.EventType)
 	klog.Debug("表名：", msg.Table.Name)
-	klog.Debug("新数据：", pretty.Sprintf("%# v", p1))
-	klog.Debug("旧数据：", pretty.Sprintf("%# v", p2))
+	klog.Debug("新数据：", pretty.Sprintf("%# v", msg.NewData))
+	klog.Debug("旧数据：", pretty.Sprintf("%# v", msg.OldData))
 	klog.Debug("-------------------------------------")
 	switch msg.EventType {
 	case "insert":
@@ -131,8 +132,20 @@ func parseRowData(table *schema.Table, row []interface{}) (json.RawMessage, erro
 	for i, value := range row {
 		column := table.Columns[i]
 		switch v := value.(type) {
-		case []byte:
-			encodedRow[column.Name] = string(v)
+		case string:
+			if column.Type == schema.TYPE_DECIMAL {
+				v_str := string(v)
+				// 将string转化为浮点数，使用64位精度
+				if f, err := strconv.ParseFloat(v_str, 64); err == nil {
+					encodedRow[column.Name] = f
+				} else {
+					// 如果转换失败，保留原始字符串
+					encodedRow[column.Name] = float64(0)
+				}
+			} else {
+				encodedRow[column.Name] = string(v)
+			}
+
 		default:
 			encodedRow[column.Name] = v
 		}

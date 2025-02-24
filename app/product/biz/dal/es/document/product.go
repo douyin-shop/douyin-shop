@@ -45,6 +45,9 @@ func UpdateProduct(client *elastic.Client, indexName string, OldProduct, NewProd
 	}
 
 	klog.Debugf("Successfully updated document with ID %d", OldProduct.ID)
+
+	// 从缓存中删除旧商品
+
 	return nil
 }
 
