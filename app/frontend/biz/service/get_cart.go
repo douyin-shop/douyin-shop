@@ -37,12 +37,14 @@ func (h *GetCartService) Run(req *cart.GetCartReq) (resp *cart.GetCartResp, err 
 	// 将用户id转换为int
 	userIdInt, err := strconv.Atoi(userId.(string))
 	if err != nil {
+		hlog.Error("strconv.Atoi failed", err)
 		return nil, err
 	}
 
 	// 调用购物车微服务获取购物车信息
 	getCartResp, err := rpc.CartClient.GetCart(h.Context, &caerService.GetCartReq{UserId: uint32(userIdInt)})
 	if err != nil {
+		hlog.Error("调用购物车微服务获取购物车信息失败", err)
 		return nil, err
 	}
 
@@ -56,7 +58,8 @@ func (h *GetCartService) Run(req *cart.GetCartReq) (resp *cart.GetCartResp, err 
 		// 调用商品微服务获取商品信息
 		productResp, err := rpc.ProductClient.GetProduct(h.Context, &productService.GetProductReq{Id: productId})
 		if err != nil {
-			return nil, err
+			hlog.Errorf("调用商品微服务获取商品(%d)信息失败%s", productId, err)
+			continue
 		}
 
 		p := productResp.Product
@@ -73,7 +76,9 @@ func (h *GetCartService) Run(req *cart.GetCartReq) (resp *cart.GetCartResp, err 
 		productDetail := &product.Product{}
 		err = copier.Copy(productDetail, p)
 		if err != nil {
-			return nil, err
+			hlog.Errorf("copier.Copy failed(%d):%s", productId, err)
+
+			continue
 		}
 		productDetail.Id = productId
 
