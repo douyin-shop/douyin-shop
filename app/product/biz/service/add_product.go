@@ -30,7 +30,7 @@ func (s *AddProductService) Run(req *product.AddProductReq) (resp *product.AddPr
 		}
 		categories = append(categories, category)
 	}
-	pro := &model.Product{
+	productDetail := &model.Product{
 		Name:        req.Product.Name,
 		Price:       req.Product.Price,
 		Description: req.Product.Description,
@@ -42,13 +42,14 @@ func (s *AddProductService) Run(req *product.AddProductReq) (resp *product.AddPr
 		klog.Error("upload file error", err)
 		return nil, code.GetErr(code.UploadFileError)
 	}
-	pro.ImageURL = url
-	err = model.AddProduct(pro, mysql.Db)
+
+	productDetail.ImageURL = url
+	err = model.AddProduct(productDetail, mysql.Db)
 	if err != nil {
 		klog.Error("add product error", err)
-		return nil, code.GetErr(code.AddProductError)
+		return nil, err
 	}
 	return &product.AddProductResp{
-		Id: uint32(pro.ID),
+		Id: uint32(productDetail.ID),
 	}, nil
 }
