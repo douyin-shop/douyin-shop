@@ -5,10 +5,11 @@ import (
 )
 
 var (
-	KafkaBrokerList = []string{"localhost:9092"} // 替换为实际的Kafka broker地址
-	InventoryTopic  = "inventory"                // 扣减库存消息主题
-	producer        sarama.SyncProducer
-	err             error
+	KafkaBrokerList      = []string{"localhost:9092"} // 替换为实际的Kafka broker地址
+	InventoryTopic       = "inventory"                // 扣减库存消息主题
+	InventoryFailedTopic = "inventory_failed"         // 扣减库存失败消息主题
+	producer             sarama.SyncProducer
+	err                  error
 )
 
 // 库存扣减消息结构体

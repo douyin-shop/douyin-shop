@@ -12,6 +12,7 @@ import (
 	"github.com/douyin-shop/douyin-shop/app/order/kitex_gen/order"
 	"github.com/douyin-shop/douyin-shop/app/payment/biz/dal/mysql"
 	userModel "github.com/douyin-shop/douyin-shop/app/user/biz/dal/model"
+	"google.golang.org/appengine/log"
 	"gorm.io/gorm"
 	"math/rand"
 	"strconv"
@@ -59,24 +60,88 @@ func (s *PlaceOrderService) Run(req *order.PlaceOrderReq) (resp *order.PlaceOrde
 		}
 		//2、异步扣减数据库中的库存数据
 		//将扣减库存的请求发送到消息队列中
-		kafka.SendInventoryMessage(kafka.GetProducer(), item.Item.ProductId, item.Item.Quantity)
+		err := kafka.SendInventoryMessage(kafka.GetProducer(), item.Item.ProductId, item.Item.Quantity)
+		if err != nil {
+			//将扣减库存失败的请求重新发送到消息队列中
+			kafka.SendInventoryFailedMessage(kafka.GetProducer(), item.Item.ProductId, item.Item.Quantity)
+			return nil, kerrors.NewBizStatusError(code.InternalError, code.GetMsg(code.InternalError))
+		}
 	}
 
 	//todo 异步扣减用户余额 异步扣减用户积分 异步扣减用户优惠券 异步扣减用户积分 异步扣减用户积分
 
+	//获取订单商品信息
+	orderItems := getOrderItems(req, orderId)
 	//生成订单信息
-	order := createOrder(req, orderId)
-	db := mysql.DB
+	orderInfo := createOrder(req, orderItems, orderId)
 	//持久化订单信息到数据库
-	if err := db.Create(&order).Error; err != nil {
-		return nil, kerrors.NewBizStatusError(code.CreateOrderError, code.GetMsg(code.CreateOrderError))
+	err = WriteOrderInfo(orderInfo, orderItems)
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(code.InternalError, code.GetMsg(code.InternalError))
 	}
 	//释放锁
-	lock.Unlock()
+	unlock, err := lock.Unlock()
+	if err != nil || unlock == false {
+		return nil, kerrors.NewBizStatusError(code.UnLockError, code.GetMsg(code.UnLockError))
+	}
 	return
 }
 
-func createOrder(req *order.PlaceOrderReq, orderId string) model.Order {
+func WriteOrderInfo(order model.Order, orderItems []model.OrderItem) error {
+	// 开启事务
+	tx := mysql.DB.Begin()
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	// 保存订单信息
+	if err := tx.Create(&order).Error; err != nil {
+		tx.Rollback() // 回滚事务
+		return err
+	}
+
+	// 设置订单项的订单 ID 并保存订单商品信息
+	for i := range orderItems {
+		if err := tx.Create(&orderItems[i]).Error; err != nil {
+			tx.Rollback() // 回滚事务
+			return err
+		}
+	}
+
+	// 提交事务
+	if err := tx.Commit().Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func getOrderItems(req *order.PlaceOrderReq, orderId string) []model.OrderItem {
+	var orderItems []model.OrderItem
+	items := req.GetOrderItems()
+	for _, item := range items {
+		productId := item.Item.ProductId
+		quantity := item.Item.Quantity
+		//获取商品单价、商品名称
+		productInfo, err := model.GetProductInfo(productId, quantity)
+		if err != nil {
+			log.Debugf(context.Background(), "获取商品信息失败", err)
+			continue
+		}
+		orderItem := model.OrderItem{
+			OrderId:     orderId,
+			ProductId:   item.Item.ProductId,
+			Quantity:    item.Item.Quantity,
+			Price:       productInfo.Price,
+			ProductName: productInfo.ProductName,
+			TotalAmount: productInfo.TotalAmount,
+		}
+		orderItems = append(orderItems, orderItem)
+	}
+	return orderItems
+}
+
+func createOrder(req *order.PlaceOrderReq, orderItems []model.OrderItem, orderId string) model.Order {
 	items := req.GetOrderItems()
 	OrderItemIds := []uint32{}
 	for _, item := range items {
@@ -93,19 +158,24 @@ func createOrder(req *order.PlaceOrderReq, orderId string) model.Order {
 		Country:       reqAddress.Country,
 		ZipCode:       reqAddress.ZipCode,
 	}
-	order := model.Order{
+	totalAmount := float32(0)
+	for _, item := range orderItems {
+		totalAmount += item.TotalAmount
+	}
+	orderInfo := model.Order{
 		Model:           gorm.Model{},
 		OrderId:         orderId,
 		OrderItemIdList: OrderItemIds,
-		TotalAmount:     0,
+		TotalAmount:     totalAmount,
 		OrderStatus:     constant.Order_Created,
 		UserId:          req.UserId,
+		UserCurrency:    req.UserCurrency,
 		Phone:           user.Phone,
 		Email:           req.Email,
 		Address:         address,
 		PlaceOrderTime:  time.Now(),
 	}
-	return order
+	return orderInfo
 }
 
 func IsPlaceOrderReqValid(req *order.PlaceOrderReq) bool {

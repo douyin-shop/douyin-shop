@@ -8,6 +8,7 @@ const (
 	StockDecreaseFailed = 1003
 	CreateOrderError    = 1004
 	DecreaseStockError  = 1005
+	UnLockError         = 1006
 	InternalError       = 4003
 )
 
@@ -19,6 +20,7 @@ var CodeMessage = map[int]string{
 	StockDecreaseFailed: "stock decrease error",
 	CreateOrderError:    "create order error",
 	DecreaseStockError:  "decrease stock error",
+	UnLockError:         "code error",
 	InternalError:       "internal error",
 }
 
