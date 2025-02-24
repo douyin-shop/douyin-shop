@@ -31,12 +31,12 @@ func UpdateProduct(client *elastic.Client, indexName string, OldProduct, NewProd
 		Index(indexName).
 		Id(strconv.FormatUint(uint64(OldProduct.ID), 10)).
 		Doc(map[string]interface{}{
-			"product-name":        NewProduct.Name,
-			"product-description": NewProduct.Description,
-			"product-price":       NewProduct.Price,
-			"image-name":          NewProduct.ImageName,
-			"image-url":           NewProduct.ImageURL,
-			"categories":          NewProduct.Category,
+			"name":        NewProduct.Name,
+			"description": NewProduct.Description,
+			"price":       NewProduct.Price,
+			"image_name":  NewProduct.ImageName,
+			"image_url":   NewProduct.ImageURL,
+			"Category":    NewProduct.Category,
 		})
 
 	_, err := updateService.Do(context.Background())
@@ -67,7 +67,7 @@ func DeleteProduct(client *elastic.Client, indexName string, docID uint) error {
 // FuzzySearchProduct 关键词模糊匹配
 func FuzzySearchProduct(client *elastic.Client, indexName string, keyword string, pageNum, pageSize int) ([]model.Product, error) {
 	searchService := client.Search().Index(indexName).
-		Query(elastic.NewMultiMatchQuery(keyword, "product-name", "product-description").
+		Query(elastic.NewMultiMatchQuery(keyword, "name", "description").
 			Type("best_fields").
 			Analyzer("ik_max_word"))
 
@@ -105,11 +105,11 @@ func ExactSearchProduct(client *elastic.Client, indexName string, categoryName s
 	}
 
 	if minPrice > 0 && maxPrice > 0 {
-		boolQuery = boolQuery.Must(elastic.NewRangeQuery("product-price").Gte(minPrice).Lte(maxPrice))
+		boolQuery = boolQuery.Must(elastic.NewRangeQuery("price").Gte(minPrice).Lte(maxPrice))
 	} else if minPrice > 0 {
-		boolQuery = boolQuery.Must(elastic.NewRangeQuery("product-price").Gte(minPrice))
+		boolQuery = boolQuery.Must(elastic.NewRangeQuery("price").Gte(minPrice))
 	} else if maxPrice > 0 {
-		boolQuery = boolQuery.Must(elastic.NewRangeQuery("product-price").Lte(maxPrice))
+		boolQuery = boolQuery.Must(elastic.NewRangeQuery("price").Lte(maxPrice))
 	}
 
 	searchService := client.Search().Index(indexName).Query(boolQuery)
@@ -160,11 +160,11 @@ func CombinedSearchProduct(client *elastic.Client, indexName string, keyword str
 		}
 
 		if minPrice > 0 && maxPrice > 0 {
-			boolQuery = boolQuery.Must(elastic.NewRangeQuery("product-price").Gte(minPrice).Lte(maxPrice))
+			boolQuery = boolQuery.Must(elastic.NewRangeQuery("price").Gte(minPrice).Lte(maxPrice))
 		} else if minPrice > 0 {
-			boolQuery = boolQuery.Must(elastic.NewRangeQuery("product-price").Gte(minPrice))
+			boolQuery = boolQuery.Must(elastic.NewRangeQuery("price").Gte(minPrice))
 		} else if maxPrice > 0 {
-			boolQuery = boolQuery.Must(elastic.NewRangeQuery("product-price").Lte(maxPrice))
+			boolQuery = boolQuery.Must(elastic.NewRangeQuery("price").Lte(maxPrice))
 		}
 
 		searchService := client.Search().Index(indexName).Query(boolQuery)

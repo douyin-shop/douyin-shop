@@ -43,7 +43,8 @@ func (s *SearchProductsService) Run(req *product.SearchProductsReq) (resp *produ
 		req.SearchQuery = &product.SearchQuery{}
 	}
 
-	esProducts, err := document.CombinedSearchProduct(es.Client,
+	esProducts, err := document.CombinedSearchProduct(
+		es.Client,
 		conf.GetConf().ElasticSearch.IndexName,
 		req.SearchQuery.KeyWord,
 		req.SearchQuery.CategoryName,
