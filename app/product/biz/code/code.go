@@ -11,6 +11,7 @@ const (
 	CategoryExist    = 2001
 	CategoryNotExist = 2002
 	UploadFileError  = 3001
+	ESSearchError    = 4001
 )
 
 var CodeMsg = map[int]string{
@@ -22,6 +23,7 @@ var CodeMsg = map[int]string{
 	CategoryExist:    "category exist",
 	CategoryNotExist: "category not exist",
 	UploadFileError:  "upload file error",
+	ESSearchError:    "es search error",
 }
 
 // CodeMsgMap 获取CodeMsg
