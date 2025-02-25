@@ -97,3 +97,21 @@ func GetOrderByID(db *gorm.DB, orderID string) (*Order, error) {
 		First(&order).Error
 	return &order, err
 }
+
+// ListOrders 根据用户ID查询订单列表（包含预加载关联商品项）
+func ListOrders(db *gorm.DB, userID uint32) ([]*Order, error) {
+	var orders []*Order
+
+	// 执行查询（自动包含软删除过滤）
+	err := db.Preload("OrderItems"). // 预加载关联商品项
+						Where("user_id = ?", userID). // 用户ID过滤
+						Order("created_at DESC").     // 按创建时间倒序排列
+						Find(&orders).Error           // 查询结果注入切片
+
+	if err != nil {
+		klog.Errorf("ListOrders failed for user %d: %v", userID, err)
+		return nil, err
+	}
+
+	return orders, nil
+}
