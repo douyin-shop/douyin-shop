@@ -2,6 +2,7 @@ package mq
 
 import (
 	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/douyin-shop/douyin-shop/app/product/biz/util/mq/admin"
 	"github.com/douyin-shop/douyin-shop/app/product/biz/util/mq/customer"
 	"github.com/douyin-shop/douyin-shop/app/product/biz/util/mq/producer"
 	"github.com/douyin-shop/douyin-shop/app/product/biz/util/mysql"
@@ -15,10 +16,14 @@ var (
 
 // InitMq 初始化 MQ 生产者和消费者，并在后台运行它们
 func InitMq() {
-
+	InitAdmin()
 	InitProducer()
 	InitConsumer()
 	go mysql.RunListen(p)
+}
+
+func InitAdmin() {
+	admin.CreateTopic(conf.GetConf().RocketMQ.Topic)
 }
 
 // InitProducer 初始化生产者并启动监听

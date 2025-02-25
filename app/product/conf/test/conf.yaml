@@ -66,5 +66,6 @@ snowflake:
 
 rocketmq:
   name_server: "127.0.0.1:9876"
+  broker_server: "127.0.0.1:10911"
   custom_group: "product"
   topic: "es"

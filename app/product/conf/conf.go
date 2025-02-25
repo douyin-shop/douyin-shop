@@ -36,9 +36,10 @@ type Config struct {
 }
 
 type RocketMQ struct {
-	NameServer  string `yaml:"name_server"`
-	CustomGroup string `yaml:"custom_group"`
-	Topic       string `yaml:"topic"`
+	NameServer   string `yaml:"name_server"`
+	BrokerServer string `yaml:"broker_server"`
+	CustomGroup  string `yaml:"custom_group"`
+	Topic        string `yaml:"topic"`
 }
 
 type MySQL struct {
