@@ -6,9 +6,7 @@ import (
 	"context"
 	client "github.com/cloudwego/kitex/client"
 	callopt "github.com/cloudwego/kitex/client/callopt"
-	klog "github.com/cloudwego/kitex/pkg/klog"
 	order "github.com/douyin-shop/douyin-shop/app/order/kitex_gen/order"
-	resolver "github.com/kitex-contrib/registry-nacos/resolver"
 )
 
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.

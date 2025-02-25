@@ -2,6 +2,7 @@
 package model
 
 import (
+	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"time"
@@ -74,19 +75,8 @@ func CreateOrderWithItems(db *gorm.DB, order *Order) (string, error) {
 	err := db.Transaction(func(tx *gorm.DB) error {
 		// 1. 创建主订单记录（BeforeCreate钩子会自动生成OrderID）
 		if err := tx.Create(order).Error; err != nil {
+			klog.Error("CreateOrderWithItems failed", err)
 			return err
-		}
-
-		// 2. 关联所有订单项到当前订单
-		for i := range order.OrderItems {
-			order.OrderItems[i].OrderID = order.OrderID
-		}
-
-		// 3. 批量插入订单项（每批100条）
-		if len(order.OrderItems) > 0 {
-			if err := tx.CreateInBatches(order.OrderItems, 100).Error; err != nil {
-				return err
-			}
 		}
 
 		return nil
