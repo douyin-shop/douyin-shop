@@ -11,26 +11,31 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('transactionId').textContent = transactionId;
     document.getElementById('orderId').textContent = orderId;
 });
-
 function simulatePaymentSuccess() {
     const transactionId = document.getElementById('transactionId').textContent;
     const orderId = document.getElementById('orderId').textContent;
 
-    fetch('/payment/callback', {
-        method: 'GET',  // Changed to GET based on the router configuration
+    // 构造查询参数（根据实际需要补充签名相关参数）
+    const queryParams = new URLSearchParams({
+        order_id: orderId,                // 订单ID
+        transaction_id: transactionId,    // 交易ID
+        payment_time: new Date().toISOString(), // 自动生成支付时间
+        sign: 'mock_signature_placeholder',     // 签名占位符（需根据实际签名逻辑生成）
+        sign_type: 'HMAC-SHA256'          // 签名类型
+    });
+
+    fetch(`/payment/callback?${queryParams}`, {
+        method: 'GET',
         headers: {
-            'Content-Type': 'application/json',
             'Authorization': `${localStorage.getItem('authToken')}`
         }
     })
         .then(response => {
-            // 如果状态码是401，说明用户未登录，跳转到登录页面
             if (response.status === 401) {
                 window.location.href = 'index.html';
                 return;
             }
-
-            return response.json()
+            return response.json();
         })
         .then(result => {
             document.getElementById('paymentMessage').style.display = 'block';

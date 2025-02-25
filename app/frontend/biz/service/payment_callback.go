@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/douyin-shop/douyin-shop/app/checkout/rpc"
+	"github.com/douyin-shop/douyin-shop/app/frontend/infra/rpc"
 	remote_payment "github.com/douyin-shop/douyin-shop/app/payment/kitex_gen/payment"
 	"github.com/jinzhu/copier"
 

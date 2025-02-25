@@ -7,7 +7,11 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/cloudwego/hertz/pkg/common/json"
+	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/douyin-shop/douyin-shop/app/order/kitex_gen/order"
+	"github.com/douyin-shop/douyin-shop/app/order/utils/code"
+	"github.com/douyin-shop/douyin-shop/app/payment/rpc"
 )
 
 func Subscribe(topic string, callback func(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error)) error {
@@ -48,8 +52,26 @@ func PaymentTimeout(ctx context.Context, messages ...*primitive.MessageExt) (con
 		orderId := messageMap["order_id"]
 		transactionId := messageMap["transaction_id"]
 
-		// TODO 通知订单服务取消订单，取消订单的具体逻辑需要在客户端判断，因为有可能订单已经支付成功了，如果支付成功了那就不需要取消订单
+		// 通知订单服务取消订单，取消订单的具体逻辑需要在客户端判断，因为有可能订单已经支付成功了，如果支付成功了那就不需要取消订单
 		klog.Debug("订单号: ", orderId, " 交易号: ", transactionId)
+
+		_, err = rpc.OrderClient.MarkOrderCanceled(ctx, &order.MarkOrderCanceledReq{OrderId: orderId})
+		if err != nil {
+			// 解析错误，如果是因为订单已经支付成功，那么就不需要取消订单
+			if bizErr, ok := kerrors.FromBizStatusError(err); ok {
+				errCode := bizErr.BizStatusCode()
+
+				if errCode == code.PaymentSuccess {
+					return consumer.ConsumeSuccess, nil
+				} else {
+					klog.Error("订单服务调用失败: ", err)
+					return consumer.ConsumeRetryLater, err
+				}
+
+			}
+
+			return 0, err
+		}
 
 	}
 
