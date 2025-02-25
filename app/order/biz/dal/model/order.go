@@ -115,3 +115,26 @@ func ListOrders(db *gorm.DB, userID uint32) ([]*Order, error) {
 
 	return orders, nil
 }
+
+// MarkOrderPaid 修改订单状态为已支付
+func MarkOrderPaid(db *gorm.DB, orderID string) error {
+	// 判断订单状态是否为待支付
+	order := Order{}
+	err := db.Where("order_id = ? AND status = ?", orderID, OrderStatusPending).
+		First(&order).Error
+	if err != nil {
+		klog.Error("MarkOrderPaid failed", err)
+		return err
+	}
+
+	// 更新订单状态为已支付
+	err = db.Model(&order).
+		Updates(map[string]interface{}{"status": OrderStatusPaid}).Error
+	if err != nil {
+		klog.Error("MarkOrderPaid failed", err)
+		return err
+	}
+
+	return nil
+
+}

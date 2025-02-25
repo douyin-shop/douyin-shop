@@ -33,6 +33,21 @@ async function loadOrders() {
 
 // 修改后的渲染函数
 function renderOrders(orders) {
+
+    //enum OrderStatus {
+    //   ORDER_STATUS_UNSPECIFIED = 0;
+    //   ORDER_STATUS_PENDING = 1;
+    //   ORDER_STATUS_PAID = 2;
+    //   ORDER_STATUS_CANCELED = 3;
+    // }
+    var status = [
+        "异常",
+        "待支付",
+        "已支付",
+        "已取消"
+    ]
+
+
     const container = document.getElementById('orderGrid');
     container.innerHTML = orders.map(order => {
         const totalCost = order.order_items.reduce((sum, item) => sum + item.cost, 0);
@@ -40,7 +55,7 @@ function renderOrders(orders) {
                 <div class="order-card">
                     <div class="order-header">
                         <div>
-                            <span class="order-status">待发货</span>
+                            <span class="order-status">${status[order.status]}</span>
                             <span class="order-time">${new Date(order.created_at * 1000).toLocaleString()}</span>
                         </div>
                         <span class="order-id">订单号：${order.order_id}</span>
@@ -66,8 +81,8 @@ function renderOrders(orders) {
                     <div class="order-footer">
                         <div class="total-price">实付：¥${totalCost.toFixed(2)}</div>
                         <div class="action-buttons">
-                            <button class="btn btn-secondary">查看物流</button>
-                            <button class="btn btn-primary" onclick="viewOrderDetail('${order.order_id}')">订单详情</button>
+<!--                            <button class="btn btn-secondary">查看物流</button>-->
+<!--                            <button class="btn btn-primary">订单详情</button>-->
                         </div>
                     </div>
                 </div>

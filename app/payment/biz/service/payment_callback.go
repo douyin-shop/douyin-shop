@@ -3,7 +3,9 @@ package service
 import (
 	"context"
 	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/douyin-shop/douyin-shop/app/order/kitex_gen/order"
 	payment "github.com/douyin-shop/douyin-shop/app/payment/kitex_gen/payment"
+	"github.com/douyin-shop/douyin-shop/app/payment/rpc"
 )
 
 type PaymentCallbackService struct {
@@ -34,8 +36,18 @@ func (s *PaymentCallbackService) Run(req *payment.PaymentCallbackReq) (resp *pay
 
 	klog.Debug("订单号: ", orderId, " 交易号: ", transactionId)
 
-	// TODO 通知订单服务支付成功，修改订单状态，订单微服务如果发现订单已经被取消，那么就不需要修改订单状态，并返回错误
-	// TODO 这样第三方就会进行退款操作
+	//  通知订单服务支付成功，修改订单状态，订单微服务如果发现订单已经被取消，那么就不需要修改订单状态，并返回错误
+	//  这样第三方就会进行退款操作
+	_, err = rpc.OrderClient.MarkOrderPaid(s.ctx, &order.MarkOrderPaidReq{OrderId: orderId})
+	if err != nil {
+		klog.Error("订单服务调用失败: ", err)
+		return nil, err
+	}
+
+	resp = &payment.PaymentCallbackResp{
+		Success: true,
+		Message: "支付成功",
+	}
 
 	return
 }
