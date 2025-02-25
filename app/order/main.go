@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/douyin-shop/douyin-shop/app/order/biz/dal"
+	"github.com/douyin-shop/douyin-shop/app/order/rpc"
 	"github.com/douyin-shop/douyin-shop/common/custom_logger"
 	"github.com/douyin-shop/douyin-shop/common/nacos"
 	"github.com/joho/godotenv"
@@ -43,6 +44,7 @@ func main() {
 
 func kitexInit() (opts []server.Option) {
 
+	rpc.InitClient()
 	dal.Init()
 
 	// OpenTelemetry

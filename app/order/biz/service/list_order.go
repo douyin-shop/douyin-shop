@@ -63,6 +63,7 @@ func (s *ListOrderService) Run(req *order.ListOrderReq) (resp *order.ListOrderRe
 			} else {
 				orderName = getProductResp.Product.Name
 			}
+
 			orderItem := &order.OrderItem{
 				Item: &order.CartItem{
 					ProductId: orderModelItem.ProductID,
