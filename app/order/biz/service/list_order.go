@@ -55,13 +55,15 @@ func (s *ListOrderService) Run(req *order.ListOrderReq) (resp *order.ListOrderRe
 		for _, orderModelItem := range orderModel.OrderItems {
 
 			var orderName string
-
+			var orderUrl string
 			getProductResp, err := rpc.ProductClient.GetProduct(s.ctx, &product.GetProductReq{Id: orderModelItem.ProductID})
 			if err != nil {
 				klog.Error("rpc.ProductClient.GetProduct failed", err)
 				orderName = "unknown"
+				orderUrl = "unknown"
 			} else {
 				orderName = getProductResp.Product.Name
+				orderUrl = getProductResp.Product.ImageUrl
 			}
 
 			orderItem := &order.OrderItem{
@@ -69,8 +71,9 @@ func (s *ListOrderService) Run(req *order.ListOrderReq) (resp *order.ListOrderRe
 					ProductId: orderModelItem.ProductID,
 					Quantity:  orderModelItem.Quantity,
 				},
-				Name: orderName,
-				Cost: float32(orderModelItem.Cost),
+				Name:     orderName,
+				ImageUrl: orderUrl,
+				Cost:     float32(orderModelItem.Cost),
 			}
 
 			orderItems = append(orderItems, orderItem)

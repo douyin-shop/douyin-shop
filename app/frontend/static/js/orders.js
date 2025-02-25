@@ -48,9 +48,11 @@ function renderOrders(orders) {
 
                     ${order.order_items.map(item => `
                         <div class="product-item">
-                            <div class="product-image"></div>
+                            <div class="product-image">
+                                <img src="${item.image_url}" alt="${item.name}">
+                            </div>
                             <div class="product-info">
-                                <div class="product-title">商品名称（需要接口补充）</div>
+                                <div class="product-title">${item.name}</div>
                                 <div class="product-spec">
                                     <span>规格：默认</span>
                                     <span style="margin: 0 8px">|</span>
