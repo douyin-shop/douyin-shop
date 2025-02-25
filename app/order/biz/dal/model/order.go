@@ -3,6 +3,7 @@ package model
 
 import (
 	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/douyin-shop/douyin-shop/app/order/utils/code"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"time"
@@ -137,4 +138,26 @@ func MarkOrderPaid(db *gorm.DB, orderID string) error {
 
 	return nil
 
+}
+
+// MarkOrderCanceled 修改订单状态为已取消
+func MarkOrderCanceled(db *gorm.DB, orderID string) error {
+	// 判断订单状态是否为待支付
+	order := Order{}
+	err := db.Where("order_id = ? AND status = ?", orderID, OrderStatusPending).
+		First(&order).Error
+	if err != nil {
+		klog.Error("MarkOrderCanceled failed", err)
+		return code.GetError(code.PaymentSuccess)
+	}
+
+	// 更新订单状态为已取消
+	err = db.Model(&order).
+		Updates(map[string]interface{}{"status": OrderStatusCanceled, "canceled_at": time.Now()}).Error
+	if err != nil {
+		klog.Error("MarkOrderCanceled failed", err)
+		return err
+	}
+
+	return nil
 }
