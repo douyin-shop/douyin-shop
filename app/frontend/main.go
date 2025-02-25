@@ -63,6 +63,11 @@ func main() {
 
 	registerMiddleware(h)
 
+	// 访问根路径就重定向到index.html
+	h.GET("/", func(c context.Context, ctx *app.RequestContext) {
+		ctx.Redirect(302, []byte("/index.html"))
+	})
+
 	h.Static("/", "./static")
 
 	// add a ping route to test
