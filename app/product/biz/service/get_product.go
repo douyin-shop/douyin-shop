@@ -8,8 +8,6 @@ import (
 	"github.com/douyin-shop/douyin-shop/app/product/biz/dal/redis"
 	"time"
 
-	"github.com/cloudwego/kitex/pkg/kerrors"
-	"github.com/douyin-shop/douyin-shop/app/product/biz/code"
 	"github.com/douyin-shop/douyin-shop/app/product/biz/dal/model"
 	"github.com/douyin-shop/douyin-shop/app/product/biz/dal/mysql"
 	product "github.com/douyin-shop/douyin-shop/app/product/kitex_gen/product"
@@ -22,6 +20,9 @@ func NewGetProductService(ctx context.Context) *GetProductService {
 	return &GetProductService{ctx: ctx}
 }
 func (s *GetProductService) Run(req *product.GetProductReq) (resp *product.GetProductResp, err error) {
+
+	klog.Debug("GetProductService Run", req)
+
 	productKey := fmt.Sprintf("product:%d", req.Id)
 
 	// 尝试从缓存获取
@@ -34,12 +35,10 @@ func (s *GetProductService) Run(req *product.GetProductReq) (resp *product.GetPr
 	}
 
 	// 缓存未命中，从数据库获取
-	pro, c := model.GetProduct(int(req.Id), mysql.Db)
-	if c == code.ProductNotExist {
-		return nil, kerrors.NewGRPCBizStatusError(int32(c), code.GetMessage(c))
-	}
-	if c == code.Error {
-		return nil, kerrors.NewGRPCBizStatusError(int32(c), code.GetMessage(c))
+	pro, err := model.GetProduct(int(req.Id), mysql.Db)
+	if err != nil {
+		klog.Error("GetProduct failed", err)
+		return nil, err
 	}
 
 	var categories []*product.Category

@@ -36,6 +36,13 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingUnary),
 	),
+	"MarkOrderCanceled": kitex.NewMethodInfo(
+		markOrderCanceledHandler,
+		newMarkOrderCanceledArgs,
+		newMarkOrderCanceledResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingUnary),
+	),
 }
 
 var (
@@ -561,6 +568,159 @@ func (p *MarkOrderPaidResult) GetResult() interface{} {
 	return p.Success
 }
 
+func markOrderCanceledHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	switch s := arg.(type) {
+	case *streaming.Args:
+		st := s.Stream
+		req := new(order.MarkOrderCanceledReq)
+		if err := st.RecvMsg(req); err != nil {
+			return err
+		}
+		resp, err := handler.(order.OrderService).MarkOrderCanceled(ctx, req)
+		if err != nil {
+			return err
+		}
+		return st.SendMsg(resp)
+	case *MarkOrderCanceledArgs:
+		success, err := handler.(order.OrderService).MarkOrderCanceled(ctx, s.Req)
+		if err != nil {
+			return err
+		}
+		realResult := result.(*MarkOrderCanceledResult)
+		realResult.Success = success
+		return nil
+	default:
+		return errInvalidMessageType
+	}
+}
+func newMarkOrderCanceledArgs() interface{} {
+	return &MarkOrderCanceledArgs{}
+}
+
+func newMarkOrderCanceledResult() interface{} {
+	return &MarkOrderCanceledResult{}
+}
+
+type MarkOrderCanceledArgs struct {
+	Req *order.MarkOrderCanceledReq
+}
+
+func (p *MarkOrderCanceledArgs) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetReq() {
+		p.Req = new(order.MarkOrderCanceledReq)
+	}
+	return p.Req.FastRead(buf, _type, number)
+}
+
+func (p *MarkOrderCanceledArgs) FastWrite(buf []byte) (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.FastWrite(buf)
+}
+
+func (p *MarkOrderCanceledArgs) Size() (n int) {
+	if !p.IsSetReq() {
+		return 0
+	}
+	return p.Req.Size()
+}
+
+func (p *MarkOrderCanceledArgs) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetReq() {
+		return out, nil
+	}
+	return proto.Marshal(p.Req)
+}
+
+func (p *MarkOrderCanceledArgs) Unmarshal(in []byte) error {
+	msg := new(order.MarkOrderCanceledReq)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Req = msg
+	return nil
+}
+
+var MarkOrderCanceledArgs_Req_DEFAULT *order.MarkOrderCanceledReq
+
+func (p *MarkOrderCanceledArgs) GetReq() *order.MarkOrderCanceledReq {
+	if !p.IsSetReq() {
+		return MarkOrderCanceledArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+func (p *MarkOrderCanceledArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *MarkOrderCanceledArgs) GetFirstArgument() interface{} {
+	return p.Req
+}
+
+type MarkOrderCanceledResult struct {
+	Success *order.MarkOrderCanceledResp
+}
+
+var MarkOrderCanceledResult_Success_DEFAULT *order.MarkOrderCanceledResp
+
+func (p *MarkOrderCanceledResult) FastRead(buf []byte, _type int8, number int32) (n int, err error) {
+	if !p.IsSetSuccess() {
+		p.Success = new(order.MarkOrderCanceledResp)
+	}
+	return p.Success.FastRead(buf, _type, number)
+}
+
+func (p *MarkOrderCanceledResult) FastWrite(buf []byte) (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.FastWrite(buf)
+}
+
+func (p *MarkOrderCanceledResult) Size() (n int) {
+	if !p.IsSetSuccess() {
+		return 0
+	}
+	return p.Success.Size()
+}
+
+func (p *MarkOrderCanceledResult) Marshal(out []byte) ([]byte, error) {
+	if !p.IsSetSuccess() {
+		return out, nil
+	}
+	return proto.Marshal(p.Success)
+}
+
+func (p *MarkOrderCanceledResult) Unmarshal(in []byte) error {
+	msg := new(order.MarkOrderCanceledResp)
+	if err := proto.Unmarshal(in, msg); err != nil {
+		return err
+	}
+	p.Success = msg
+	return nil
+}
+
+func (p *MarkOrderCanceledResult) GetSuccess() *order.MarkOrderCanceledResp {
+	if !p.IsSetSuccess() {
+		return MarkOrderCanceledResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+func (p *MarkOrderCanceledResult) SetSuccess(x interface{}) {
+	p.Success = x.(*order.MarkOrderCanceledResp)
+}
+
+func (p *MarkOrderCanceledResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *MarkOrderCanceledResult) GetResult() interface{} {
+	return p.Success
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -596,6 +756,16 @@ func (p *kClient) MarkOrderPaid(ctx context.Context, Req *order.MarkOrderPaidReq
 	_args.Req = Req
 	var _result MarkOrderPaidResult
 	if err = p.c.Call(ctx, "MarkOrderPaid", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) MarkOrderCanceled(ctx context.Context, Req *order.MarkOrderCanceledReq) (r *order.MarkOrderCanceledResp, err error) {
+	var _args MarkOrderCanceledArgs
+	_args.Req = Req
+	var _result MarkOrderCanceledResult
+	if err = p.c.Call(ctx, "MarkOrderCanceled", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

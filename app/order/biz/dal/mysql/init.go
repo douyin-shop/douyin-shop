@@ -1,6 +1,8 @@
 package mysql
 
 import (
+	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/douyin-shop/douyin-shop/app/order/biz/dal/model"
 	"github.com/douyin-shop/douyin-shop/app/order/conf"
 
 	"gorm.io/driver/mysql"
@@ -22,4 +24,10 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
+
+	if err = DB.AutoMigrate(&model.Order{}, &model.OrderItem{}); err != nil {
+		klog.Error("auto migrate failed", err)
+		panic(err)
+	}
+
 }

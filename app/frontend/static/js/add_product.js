@@ -38,7 +38,14 @@ document.getElementById('productForm').addEventListener('submit', function(event
             'Authorization': `${localStorage.getItem('authToken')}`
         }
     })
-        .then(response => response.json())
+        .then(response => {
+            // 如果状态码是401，说明没有权限
+            if (response.status === 401) {
+                alert('没有权限！！！');
+            }
+
+            return response.json()
+        })
         .then(data => {
             document.getElementById('response').innerHTML = `
                 <div style="color: #00ff88; padding: 10px;">

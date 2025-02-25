@@ -39,6 +39,8 @@ message PlaceOrderReq {
 message OrderItem {
   CartItem item = 1;
   float cost = 2;
+  string name = 3;
+  string image_url = 4;
 }
 
 message OrderResult {

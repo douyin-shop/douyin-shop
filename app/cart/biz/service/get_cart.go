@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"github.com/cloudwego/kitex/pkg/kerrors"
+	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/douyin-shop/douyin-shop/app/cart/biz/dal/model"
 	"github.com/douyin-shop/douyin-shop/app/cart/biz/dal/mysql"
 	cart "github.com/douyin-shop/douyin-shop/app/cart/kitex_gen/cart"
@@ -20,6 +21,7 @@ func (s *GetCartService) Run(req *cart.GetCartReq) (resp *cart.GetCartResp, err 
 
 	list, err := model.GetCartByUserId(s.ctx, mysql.DB, int32(req.UserId))
 	if err != nil {
+		klog.Debug("GetCartByUserId failed", err)
 		return nil, kerrors.NewBizStatusError(500, err.Error())
 	}
 	var items []*cart.CartItem

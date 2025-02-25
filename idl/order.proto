@@ -10,6 +10,8 @@ service OrderService {
   rpc PlaceOrder(PlaceOrderReq) returns (PlaceOrderResp) {}
   rpc ListOrder(ListOrderReq) returns (ListOrderResp) {}
   rpc MarkOrderPaid(MarkOrderPaidReq) returns (MarkOrderPaidResp) {}
+  // 新增取消订单方法
+  rpc MarkOrderCanceled(MarkOrderCanceledReq) returns (MarkOrderCanceledResp) {}
 }
 
 message Address {
@@ -38,6 +40,8 @@ message PlaceOrderReq {
 message OrderItem {
   CartItem item = 1;
   float cost = 2;
+  string name = 3;
+  string image_url = 4;
 }
 
 message OrderResult {
@@ -60,6 +64,15 @@ message Order {
   Address address = 5;
   string email = 6;
   int32 created_at = 7;
+  OrderStatus status = 8;
+  int32 canceled_at = 9;
+}
+
+enum OrderStatus {
+  ORDER_STATUS_UNSPECIFIED = 0;
+  ORDER_STATUS_PENDING = 1;
+  ORDER_STATUS_PAID = 2;
+  ORDER_STATUS_CANCELED = 3;
 }
 
 message ListOrderResp {
@@ -72,3 +85,12 @@ message MarkOrderPaidReq {
 }
 
 message MarkOrderPaidResp {}
+
+// 新增取消订单请求
+message MarkOrderCanceledReq {
+  uint32 user_id = 1;
+  string order_id = 2;
+}
+
+// 新增取消订单响应
+message MarkOrderCanceledResp {}

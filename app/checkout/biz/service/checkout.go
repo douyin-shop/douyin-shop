@@ -27,9 +27,11 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 
 	cartResp, err := rpc.CartClient.GetCart(s.ctx, &cart.GetCartReq{UserId: req.UserId})
 	if err != nil {
+		klog.Error("获取购物车失败", err)
 		return nil, code.GetError(code.CartGetFiled)
 	}
 	if cartResp.Cart == nil || len(cartResp.Cart.Items) == 0 {
+		klog.Error("购物车为空")
 		return nil, code.GetError(code.CartEmpty)
 	}
 
@@ -43,7 +45,8 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		// 调用商品微服务获取商品信息
 		productResp, err := rpc.ProductClient.GetProduct(s.ctx, &productService.GetProductReq{Id: productId})
 		if err != nil {
-			return nil, err
+			klog.Errorf("获取商品信息失败(%d):%s", productId, err)
+			continue
 		}
 
 		p := productResp.Product
@@ -60,7 +63,8 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		productDetail := &product.Product{}
 		err = copier.Copy(productDetail, p)
 		if err != nil {
-			return nil, err
+			klog.Error("拷贝商品信息失败", err)
+			continue
 		}
 
 		// 计算购物车商品总价
@@ -78,6 +82,7 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 	// 创建订单
 	zipCode, err := strconv.Atoi(req.Address.ZipCode)
 	if err != nil {
+		klog.Error("邮编转换失败", err)
 		return nil, code.GetError(code.ZipCodeError)
 	}
 
@@ -85,6 +90,7 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 
 	err = copier.Copy(remotePlaceOrderReq, req)
 	if err != nil {
+		klog.Error("拷贝订单信息失败", err)
 		return nil, err
 	}
 	remotePlaceOrderReq.Address.ZipCode = int32(zipCode)
@@ -93,15 +99,13 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 	placeOrderResp, err := rpc.OrderClient.PlaceOrder(s.ctx, remotePlaceOrderReq)
 
 	if err != nil {
+		klog.Error("下单失败", err)
 		return nil, code.GetError(code.PlaceOrderError)
 	}
 
 	// 订单id，可能会获取失败，需要处理
 	if placeOrderResp.Order == nil || placeOrderResp.Order.OrderId == "" {
-		return nil, code.GetError(code.PlaceOrderError)
-	}
-
-	if placeOrderResp.Order == nil || placeOrderResp.Order.OrderId == "" {
+		klog.Error("下单失败,订单信息获取失败")
 		return nil, code.GetError(code.PlaceOrderError)
 	}
 
@@ -112,7 +116,8 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 
 	err = copier.Copy(payReq, req)
 	if err != nil {
-		return nil, err
+		klog.Error("拷贝支付信息失败", err)
+		return nil, code.GetError(code.PlaceOrderError)
 	}
 
 	payReq.Amount = float32(totalProductPrice)
@@ -120,13 +125,17 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 
 	paymentResp, err := rpc.PaymentClient.Charge(s.ctx, payReq)
 	if err != nil {
+		// 将订单更改为已取消状态
+		rpc.OrderClient.MarkOrderCanceled(s.ctx, &order.MarkOrderCanceledReq{OrderId: orderId})
+		klog.Error("支付失败", err)
 		return nil, code.GetError(code.PayError)
 	}
 
 	// 清空购物车
 	_, err = rpc.CartClient.EmptyCart(s.ctx, &cart.EmptyCartReq{UserId: req.UserId})
 	if err != nil {
-		//TODO 将订单更改为已取消状态
+		// 将订单更改为已取消状态
+		rpc.OrderClient.MarkOrderCanceled(s.ctx, &order.MarkOrderCanceledReq{OrderId: orderId})
 		return nil, code.GetError(code.EmptyCartFiled)
 	}
 

@@ -78,16 +78,16 @@ func UpdateProduct(product *Product, tx *gorm.DB) int { //考虑到图片的更�
 	return code.Success
 }
 
-func GetProduct(id int, tx *gorm.DB) (*Product, int) {
+func GetProduct(id int, tx *gorm.DB) (*Product, error) {
 	var product *Product
 	err := tx.Where("id = ?", id).First(&product).Error
 	if err != nil {
-		return nil, code.Error
+		return nil, err
 	}
 	if product.ID == 0 {
-		return nil, code.ProductNotExist
+		return nil, code.GetErr(code.ProductNotExist)
 	}
-	return product, code.Success
+	return product, nil
 }
 
 func ListProduct(tx *gorm.DB, PageNum, PageSize int) ([]Product, int) {

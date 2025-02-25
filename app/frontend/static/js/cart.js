@@ -16,6 +16,14 @@ async function loadCart() {
             }
         });
 
+
+        // 如果状态码是401，说明用户未登录，跳转到登录页面
+        if (response.status === 401) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+
         const data = await response.json();
         renderCart(data.data.cart);
     } catch (error) {
@@ -27,7 +35,7 @@ function renderCart(cart) {
     const container = document.getElementById('cartItems');
     container.innerHTML = cart.items.map(item => `
             <div class="cart-item">
-                <img src="${item.product.picture}" class="item-image" alt="${item.product.name}">
+                <img src="${item.product.imageUrl}" class="item-image" alt="${item.product.name}">
                 <div class="item-info">
                     <div class="item-name">${item.product.name}</div>
                     <div class="item-price">¥${item.product.price.toFixed(2)}</div>
@@ -58,6 +66,13 @@ async function updateQuantity(productId, newQuantity) {
             })
         });
 
+        // 如果状态码是401，说明用户未登录，跳转到登录页面
+        if (response.status === 401) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+
         if (response.ok) {
             await loadCart();
         }
@@ -73,6 +88,14 @@ async function proceedToCheckout() {
                 'Authorization': localStorage.getItem('authToken')
             }
         });
+
+        // 如果状态码是401，说明用户未登录，跳转到登录页面
+        if (response.status === 401) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+
         const cart = await response.json();
         if (cart.data.cart.items.length === 0) {
             alert('购物车为空！');

@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	order "github.com/douyin-shop/douyin-shop/app/order/kitex_gen/order"
 	"github.com/douyin-shop/douyin-shop/app/order/biz/service"
+	order "github.com/douyin-shop/douyin-shop/app/order/kitex_gen/order"
 )
 
 // OrderServiceImpl implements the last service interface defined in the IDL.
@@ -26,6 +26,13 @@ func (s *OrderServiceImpl) ListOrder(ctx context.Context, req *order.ListOrderRe
 // MarkOrderPaid implements the OrderServiceImpl interface.
 func (s *OrderServiceImpl) MarkOrderPaid(ctx context.Context, req *order.MarkOrderPaidReq) (resp *order.MarkOrderPaidResp, err error) {
 	resp, err = service.NewMarkOrderPaidService(ctx).Run(req)
+
+	return resp, err
+}
+
+// MarkOrderCanceled implements the OrderServiceImpl interface.
+func (s *OrderServiceImpl) MarkOrderCanceled(ctx context.Context, req *order.MarkOrderCanceledReq) (resp *order.MarkOrderCanceledResp, err error) {
+	resp, err = service.NewMarkOrderCanceledService(ctx).Run(req)
 
 	return resp, err
 }
