@@ -6,6 +6,7 @@ import (
 	"github.com/apache/rocketmq-client-go/v2"
 	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/producer"
+	"github.com/apache/rocketmq-client-go/v2/rlog"
 	"github.com/douyin-shop/douyin-shop/app/payment/conf"
 	"github.com/douyin-shop/douyin-shop/common/topic"
 )
@@ -44,4 +45,5 @@ func Init() {
 		return
 	}
 
+	rlog.SetLogLevel(conf.GetConf().Kitex.LogLevel)
 }
