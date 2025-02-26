@@ -35,7 +35,11 @@ func PaymentTimeout(ctx context.Context, messages ...*primitive.MessageExt) (con
 
 	klog.Debug("接收到PaymentTimeout消息")
 	for _, msg := range messages {
-		fmt.Println(string(msg.Body))
+
+		if string(msg.Body) == "test" {
+			continue
+		}
+
 		// 解析msg为结构体map[string]string
 		messageJson := string(msg.Body)
 
