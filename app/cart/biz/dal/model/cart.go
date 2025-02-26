@@ -37,10 +37,14 @@ func AddItem(ctx context.Context, db *gorm.DB, item *Cart) error {
 
 	// 2. 如果存在则更新数量
 	if row.ID > 0 {
+		newQuantity := row.Quantity + item.Quantity
+		if newQuantity <= 0 {
+			return errors.New("更新后的数量不能小于或等于0")
+		}
 		return db.WithContext(ctx).
 			Model(&Cart{}).
 			Where(&Cart{UserId: item.UserId, ProductId: item.ProductId}).
-			UpdateColumn("quantity", gorm.Expr("quantity+?", item.Quantity)).Error
+			UpdateColumn("quantity", newQuantity).Error
 	}
 
 	// 3. 如果不存在则新增

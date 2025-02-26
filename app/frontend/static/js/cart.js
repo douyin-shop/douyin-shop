@@ -40,10 +40,10 @@ function renderCart(cart) {
                     <div class="item-name">${item.product.name}</div>
                     <div class="item-price">¥${item.product.price.toFixed(2)}</div>
                     <div class="quantity-control">
-                        <button class="quantity-btn" onclick="updateQuantity(${item.product.id}, ${item.quantity - 1})">-</button>
+                        <button class="quantity-btn" onclick="updateQuantity(${item.product.id},-1)">-</button>
                         <input type="number" class="quantity-input" value="${item.quantity}" 
-                               min="1" onchange="updateQuantity(${item.product.id}, this.value)">
-                        <button class="quantity-btn" onclick="updateQuantity(${item.product.id}, ${item.quantity + 1})">+</button>
+                               min="1" onchange="updateQuantity(${item.product.id}, this.value - item.quantity)">
+                        <button class="quantity-btn" onclick="updateQuantity(${item.product.id}, 1)">+</button>
                     </div>
                 </div>
             </div>
@@ -52,9 +52,9 @@ function renderCart(cart) {
     document.getElementById('totalPrice').textContent = cart.total_price.toFixed(2);
 }
 
-async function updateQuantity(productId, newQuantity) {
+async function updateQuantity(productId, editNumber) {
     try {
-        const response = await fetch(`${API_BASE}/cart/update`, {
+        const response = await fetch(`${API_BASE}/cart/add`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ async function updateQuantity(productId, newQuantity) {
             },
             body: JSON.stringify({
                 product_id: productId,
-                quantity: parseInt(newQuantity)
+                product_num: parseInt(editNumber)
             })
         });
 
@@ -72,6 +72,12 @@ async function updateQuantity(productId, newQuantity) {
             return;
         }
 
+        // 如果返回结果中的code为-1，说明商品数量不足
+        const result = await response.json();
+        if (result.code === -1) {
+            alert(result.msg);
+            return;
+        }
 
         if (response.ok) {
             await loadCart();
