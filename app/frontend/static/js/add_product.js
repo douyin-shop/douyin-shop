@@ -53,6 +53,8 @@ document.getElementById('productForm').addEventListener('submit', function(event
 
                     ${JSON.stringify(data, null, 2)}
                 </div>`;
+            // 清空表单
+            form.reset();
         })
         .catch(error => {
             document.getElementById('response').innerHTML = `
