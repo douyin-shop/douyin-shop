@@ -17,6 +17,133 @@
        +-- [链路追踪]
 ```
 
+```mermaid
+graph TD
+    subgraph ClientLayer[客户端层]
+        A[移动APP] 
+        B[Web前端]
+    end
+
+    subgraph APIGateway[API网关]
+        G[[Gin网关]]
+        G --> GA[JWT认证]
+        G --> GB[Casbin鉴权]
+        G --> GC[链路追踪]
+        G --> GD[路由分发]
+    end
+
+    subgraph Microservices[微服务集群]
+        subgraph AuthService[认证服务]
+            A1[AuthService]
+            A1 -->|JWT管理| Redis
+            A1 -->|黑名单| MySQL
+        end
+
+        subgraph UserService[用户服务]
+            U1[UserService]
+            U1 -->|用户数据| MySQL
+        end
+
+        subgraph CartService[购物车服务]
+            C1[CartService]
+            C1 -->|购物车数据| Redis
+        end
+
+        subgraph ProductService[商品服务]
+            P1[ProductService]
+            P1 -->|商品数据| MySQL
+            P1 -->|搜索| ES
+        end
+
+        subgraph OrderService[订单服务]
+            O1[OrderService]
+            O1 -->|订单数据| MySQL
+            O1 -->|库存锁定| Redis
+        end
+
+        subgraph CheckoutService[交易服务]
+            CH1[CheckoutService]
+        end
+    end
+
+    subgraph Middleware[中间件]
+        N[Nacos]
+        RMQ[[RocketMQ]]
+        ES[Elasticsearch]
+        OSS[[对象存储]]
+    end
+
+    subgraph DataLayer[数据层]
+        MySQL[(MySQL)]
+        Redis[(Redis)]
+        ES[(Elasticsearch)]
+    end
+
+    subgraph Monitor[监控体系]
+        OT[OpenTelemetry]
+        VM[VictoriaMetrics]
+        GF[Grafana]
+    end
+
+    ClientLayer -->|HTTPS| APIGateway
+    APIGateway -->|gRPC| Microservices
+    
+    Microservices --> Middleware
+    Microservices --> DataLayer
+    
+    APIGateway -.->|配置中心| N
+    Microservices -.->|服务注册| N
+    
+    O1 -->|延迟消息| RMQ
+    RMQ -->|超时回调| O1
+    
+    P1 -->|文件存储| OSS
+    
+    OT -->|链路数据| VM
+    VM -->|指标展示| GF
+    G -->|埋点| OT
+    Microservices -->|埋点| OT
+```
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant CH as CheckoutService
+    participant CART as CartService
+    participant O as OrderService
+    participant P as PaymentService
+    participant MQ as MessageQueue
+    participant TPP as ThirdPartyPayment
+
+    U->>CH: 1) 请求Checkout
+    CH->>CART: 2) 获取购物车信息
+    CART->>CH: 3) 返回购物车
+    CH->>O: 4) 创建订单（立即生成订单号）
+    O->>O: 5) 生成订单号
+    O->>P: 6) 请求支付（包含订单号）
+    P->>TPP: 7) 请求第三方支付平台
+    TPP->>P: 8) 返回交易号
+    P->>MQ: 9) 将订单ID+交易号存入消息队列（启动定时器）
+    P->>O: 10) 返回交易号
+    O->>CH: 11) 确认订单创建
+    CH->>CART: 12) 清空购物车（移到流程最后）
+    CH->>U: 13) 返回交易号和订单号，引导支付
+    U->>TPP: 14) 使用交易号完成支付
+
+    alt 支付成功
+        TPP->>P: 15) 支付成功回调
+        P->>MQ: 16) 删除定时器
+        P->>O: 17) 通知支付成功
+        O->>O: 18) 标记订单已支付
+    else 支付超时
+        MQ->>P: 19) 通知支付超时
+        P->>MQ: 20) 删除定时器
+        P->>O: 21) 通知订单超时
+        O->>O: 22) 标记订单超时
+        O->>CART: 23) 恢复商品到购物车
+    end
+```
+
 ### 2. 服务划分
 | 服务名称            | 协议   | 核心功能           |
 |-----------------|------|----------------|
