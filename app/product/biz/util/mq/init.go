@@ -1,6 +1,7 @@
 package mq
 
 import (
+	"github.com/apache/rocketmq-client-go/v2/rlog"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/douyin-shop/douyin-shop/app/product/biz/util/mq/admin"
 	"github.com/douyin-shop/douyin-shop/app/product/biz/util/mq/customer"
@@ -19,6 +20,7 @@ func InitMq() {
 	InitAdmin()
 	InitProducer()
 	InitConsumer()
+	rlog.SetLogLevel(conf.GetConf().Kitex.LogLevel)
 	go mysql.RunListen(p)
 }
 

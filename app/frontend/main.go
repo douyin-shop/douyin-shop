@@ -63,8 +63,16 @@ func main() {
 
 	registerMiddleware(h)
 
-	h.Static("/", "./static")
+	// 访问根路径就重定向到index.html
+	h.GET("/", func(c context.Context, ctx *app.RequestContext) {
+		ctx.Redirect(302, []byte("/index.html"))
+	})
 
+	// 访问/admin路径就重定向到add_product.html
+	h.GET("/admin", func(c context.Context, ctx *app.RequestContext) {
+		ctx.Redirect(302, []byte("/add_product.html"))
+	})
+	h.Static("/", "./static")
 	// add a ping route to test
 	h.GET("/ping", func(c context.Context, ctx *app.RequestContext) {
 		ctx.JSON(consts.StatusOK, utils.H{"ping": "pong"})
