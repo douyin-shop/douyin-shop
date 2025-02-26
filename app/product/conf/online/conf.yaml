@@ -52,11 +52,11 @@ elasticsearch:
   index_name: "product"
 
 oss:
-  zone: 1
-  bucket: douyin-shop
-  access_key: ySX6iSWlb5mH1nDuUDo0NU0y1ICxCIWi6BXM4wKo
-  secret_key: F_CERy4ZYbau2Khva1f8xy4MG89dy0YJ7J7m5rQM
-  domain: srb589zh9.hd-bkt.clouddn.com
+    zone: 1
+    bucket: adrian-douyin-shop
+    access_key: ZB3v6lUPfo9HCHjbrmrX3LrtGz8_hOV58Zan6oov
+    secret_key: Tbj7bzE6_7HJ_0_A3YmzGhhX7NI8n1vdnAwNjUBF
+    domain: ss53quubh.hd-bkt.clouddn.com
 
 goroutine-pool:
   size: 100
