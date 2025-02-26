@@ -28,6 +28,12 @@ func Init() {
 		return
 	}
 
+	_, err = SendMessage(topic.GetMsg(topic.Payment), "test")
+	if err != nil {
+		fmt.Printf("Send message error: %s\n", err)
+		return
+	}
+
 	RocketPushConsumer, _ = rocketmq.NewPushConsumer(
 		consumer.WithNameServer([]string{conf.GetConf().RocketMQ.Address}), // 接入点地址
 		consumer.WithGroupName(conf.GetConf().RocketMQ.GroupName),          // 分组名称

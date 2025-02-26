@@ -80,7 +80,7 @@ func (s *ChargeService) Run(req *payment.ChargeReq) (resp *payment.ChargeResp, e
 		return nil, err
 	}
 
-	klog.Debug("Message sent to RocketMQ with transactionId: %s, result: %v", transactionId, message)
+	klog.Debugf("Message sent to RocketMQ with transactionId: %s, result: %v", transactionId, message)
 
 	return &payment.ChargeResp{TransactionId: transactionId.String()}, nil
 }

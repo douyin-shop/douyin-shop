@@ -44,8 +44,8 @@ func main() {
 
 func kitexInit() (opts []server.Option) {
 
-	dal.Init()
 	rpc.InitClient()
+	dal.Init()
 
 	// OpenTelemetry
 	p := provider.NewOpenTelemetryProvider(

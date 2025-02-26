@@ -6,6 +6,7 @@ import (
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth/authservice"
+	"github.com/douyin-shop/douyin-shop/app/cart/kitex_gen/cart/cartservice"
 	"github.com/douyin-shop/douyin-shop/app/order/kitex_gen/order/orderservice"
 	"github.com/douyin-shop/douyin-shop/app/payment/conf"
 	"github.com/douyin-shop/douyin-shop/app/product/kitex_gen/product/productcatalogservice"
@@ -19,6 +20,7 @@ var (
 	AuthClient    authservice.Client
 	ProductClient productcatalogservice.Client
 	OrderClient   orderservice.Client
+	CartClient    cartservice.Client
 )
 
 func InitClient() {
@@ -41,6 +43,11 @@ func InitClient() {
 		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: conf.GetConf().Kitex.Service}),
 	)
 	OrderClient = orderservice.MustNewClient("order",
+		client.WithResolver(resolver),
+		client.WithSuite(kitextracing.NewClientSuite()),
+		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: conf.GetConf().Kitex.Service}),
+	)
+	CartClient = cartservice.MustNewClient("cart",
 		client.WithResolver(resolver),
 		client.WithSuite(kitextracing.NewClientSuite()),
 		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: conf.GetConf().Kitex.Service}),
