@@ -8,6 +8,8 @@ const (
 	StructConvertError = 40005
 	ListOrderError     = 40006
 	PaymentSuccess     = 40007
+	GetOrderError      = 40008
+	RecoversError      = 40009
 )
 
 var Message = map[int]string{
@@ -16,6 +18,8 @@ var Message = map[int]string{
 	StructConvertError: "结构体转换错误",
 	ListOrderError:     "获取订单列表失败",
 	PaymentSuccess:     "订单已经支付成功，无法取消",
+	GetOrderError:      "获取订单失败",
+	RecoversError:      "回收商品失败",
 }
 
 func GetMsg(code int) string {
