@@ -79,10 +79,10 @@ func (s *ListOrderService) Run(req *order.ListOrderReq) (resp *order.ListOrderRe
 			orderItems = append(orderItems, orderItem)
 		}
 
-		createdTime := int32(orderModel.CreatedAt.Second())
+		createdTime := int32(orderModel.CreatedAt.Unix())
 		var canceledTime int32
 		if orderModel.CanceledAt != nil {
-			canceledTime = int32(orderModel.CanceledAt.Second())
+			canceledTime = int32(orderModel.CanceledAt.Unix())
 		}
 
 		singleOrderResult := &order.Order{
