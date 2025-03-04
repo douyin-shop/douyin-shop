@@ -31,6 +31,7 @@ func Subscribe(topic string, callback func(ctx context.Context, msgs ...*primiti
 	return nil
 }
 
+// PaymentTimeout 支付超时消息
 func PaymentTimeout(ctx context.Context, messages ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
 
 	klog.Debug("接收到PaymentTimeout消息")

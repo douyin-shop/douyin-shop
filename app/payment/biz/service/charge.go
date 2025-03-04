@@ -75,7 +75,7 @@ func (s *ChargeService) Run(req *payment.ChargeReq) (resp *payment.ChargeResp, e
 		return nil, kerrors.NewBizStatusError(code.FailedPayment, err.Error())
 	}
 
-	message, err := rocketmq.SendDelayMessage(topic.GetMsg(topic.Payment), string(messageJson), 16)
+	message, err := rocketmq.SendDelayMessage(topic.GetMsg(topic.Payment), string(messageJson), 3)
 	if err != nil {
 		return nil, err
 	}

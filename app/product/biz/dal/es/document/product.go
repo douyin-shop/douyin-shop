@@ -80,10 +80,37 @@ func DeleteProduct(client *elastic.Client, indexName string, docID uint) error {
 
 // FuzzySearchProduct 关键词模糊匹配
 func FuzzySearchProduct(client *elastic.Client, indexName string, keyword string, pageNum, pageSize int) ([]model.Product, error) {
-	searchService := client.Search().Index(indexName).
-		Query(elastic.NewMultiMatchQuery(keyword, "name", "description").
-			Type("best_fields").
-			Analyzer("ik_max_word"))
+	//searchService := client.Search().Index(indexName).
+	//	Query(elastic.NewMultiMatchQuery(keyword, "name", "description").
+	//		//Type("best_fields").
+	//		Type("most_fields"). // 或尝试 cross_fields
+	//		Analyzer("ik_max_word").
+	//		//Analyzer("ik_analyzer").
+	//		Fuzziness("AUTO"),
+	//	)
+
+	query := elastic.NewBoolQuery().
+		Should(
+			elastic.NewMultiMatchQuery(keyword, "name", "description").
+				Type("most_fields").
+				Analyzer("ik_max_word").
+				Fuzziness("AUTO"),
+			elastic.NewWildcardQuery("name", "*"+keyword+"*"),
+			elastic.NewWildcardQuery("description", "*"+keyword+"*"),
+			elastic.NewPrefixQuery("name", keyword),
+			elastic.NewPrefixQuery("description", keyword),
+		).
+		MinimumShouldMatch("0") // 至少匹配一个条件
+
+	// 添加高亮显示
+	searchService := client.Search().
+		Index(indexName).
+		Query(query).
+		Highlight(elastic.NewHighlight().
+			Field("name").
+			Field("description").
+			PreTags("<em>").
+			PostTags("</em>"))
 
 	// 如果 pageNum 和 pageSize 都不为 0，则启用分页
 	if pageNum > 0 && pageSize > 0 {

@@ -59,7 +59,15 @@ function viewProductDetail(productId) {
     window.location.href = `product-detail.html?id=${productId}`;
 }
 async function searchProducts() {
+
     const searchInput = document.getElementById('searchInput').value;
+
+    if(searchInput.trim() === ''){
+        await loadProducts();
+        return
+    }
+
+
     try {
         const response = await fetch(`${API_BASE}/product/search`, {
             method: 'POST',

@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/douyin-shop/douyin-shop/app/auth/biz/dal/redis"
@@ -12,7 +11,6 @@ import (
 	"github.com/douyin-shop/douyin-shop/app/auth/conf"
 	auth "github.com/douyin-shop/douyin-shop/app/auth/kitex_gen/auth"
 	"github.com/golang-jwt/jwt"
-	redis_core "github.com/redis/go-redis/v9"
 )
 
 type DeliverTokenByRPCService struct {
@@ -27,20 +25,21 @@ func (s *DeliverTokenByRPCService) Run(req *auth.DeliverTokenReq) (resp *auth.De
 
 	userId := req.UserId
 
-	result, err := redis.RedisClient.Get(context.Background(), utils.GenerateTokenKey(userId)).Result()
+	//TODO 测试阶段不开启，不方便测试
+	//result, err := redis.RedisClient.Get(context.Background(), utils.GenerateTokenKey(userId)).Result()
 
-	// 如果redis中有token，说明用户已经登录过，直接返回
-	if err == nil && result != "" {
-		err = kerrors.NewBizStatusError(400, "用户已登陆")
-		return nil, err
-	}
+	//// 如果redis中有token，说明用户已经登录过，直接返回
+	//if err == nil && result != "" {
+	//	err = kerrors.NewBizStatusError(400, "用户已登陆")
+	//	return nil, err
+	//}
 
-	// 如果redis中有错误，直接返回
-	if err != nil && !errors.Is(err, redis_core.Nil) {
-		klog.Error("redis get error: ", err)
-		err = kerrors.NewBizStatusError(502, err.Error())
-		return nil, err
-	}
+	//// 如果redis中有错误，直接返回
+	//if err != nil && !errors.Is(err, redis_core.Nil) {
+	//	klog.Error("redis get error: ", err)
+	//	err = kerrors.NewBizStatusError(502, err.Error())
+	//	return nil, err
+	//}
 
 	// 创建 token
 	token := jwt.New(jwt.SigningMethodHS256)

@@ -6,8 +6,7 @@ import (
 	"github.com/olivere/elastic/v7"
 )
 
-
-func CreateIndex(client *elastic.Client)(err error){
+func CreateIndex(client *elastic.Client) (err error) {
 	mapping := `
 	{
 		"settings": {
@@ -22,7 +21,15 @@ func CreateIndex(client *elastic.Client)(err error){
 		},
 		"mappings": {
 		  "properties": {
+			"name": {
+			  "type": "text",
+			  "analyzer": "ik_analyzer"
+			},
 			"product-name": {
+			  "type": "text",
+			  "analyzer": "ik_analyzer"
+			},
+			"description": {
 			  "type": "text",
 			  "analyzer": "ik_analyzer"
 			},
@@ -61,6 +68,6 @@ func CreateIndex(client *elastic.Client)(err error){
 		}
 	  }
 	`
-	_,err=client.CreateIndex("product").BodyString(mapping).Do(context.Background())
+	_, err = client.CreateIndex("product").BodyString(mapping).Do(context.Background())
 	return err
 }
